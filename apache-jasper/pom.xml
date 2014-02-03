@@ -69,6 +69,11 @@
         <artifactId>javax.el-api</artifactId>
         <version>3.0.0</version>
       </dependency>
+      <dependency>
+      	<groupId>org.eclipse.jetty</groupId>
+      	<artifactId>jetty-util</artifactId>
+      	<version>9.1.2-SNAPSHOT</version>
+      </dependency>
     </dependencies>
 
 </project>
