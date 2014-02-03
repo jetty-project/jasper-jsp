@@ -107,7 +107,10 @@ public class DigesterFactory {
     }
 
     private static String idFor(String url) {
-        return ServletContext.class.getResource("resources/" + url).toExternalForm();
+    	java.net.URL resource = ServletContext.class.getResource("resources/" + url);
+    	if (resource == null)
+    		resource = ServletContext.class.getResource("jsp/resources/" + url);
+        return resource.toExternalForm();
     }
 
 
