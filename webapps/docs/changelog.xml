@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<?xml-stylesheet type="text/xsl" href="tomcat-docs.xsl"?>
+<document url="changelog.html">
+
+  &project;
+
+  <properties>
+    <title>Changelog</title>
+    <no-comments />
+  </properties>
+
+<body>
+<!--
+  Subsection ordering:
+  General, Catalina, Coyote, Jasper, Cluster, WebSocket, Web applications,
+  Extras, Tribes, Other
+
+  Item Ordering:
+
+  Fixes having an issue number are sorted by their number, ascending.
+
+  There is no ordering by add/update/fix.
+
+  Other fixed issues are added to the end of the list, chronologically.
+  They eventually become mixed with the numbered issues. (I.e., numbered
+  issues to not "pop up" wrt. others).
+-->
+<section name="Tomcat 8.0.2 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>56082</bug>: Fix a concurrency bug in JULI&apos;s LogManager
+        implementation. (markt)
+      </fix>
+      <fix>
+        <bug>56085</bug>: <code>ServletContext.getRealPath(String)</code> should
+        return <code>null</code> for invalid input rather than throwing an
+        <code>IllegalArgumentException</code>. (markt)
+      </fix>
+      <fix>
+        Fix WebDAV support that was broken by the refactoring for the new
+        resources implementation. (markt)
+      </fix>
+      <scode>
+        Simplify Catalina.initDirs(). (kkolinko)
+      </scode>
+      <fix>
+        <bug>56096</bug>: When the attribute <code>rmiBindAddress</code> of the
+        JMX Remote Lifecycle Listener is specified it's value will be used when
+        constructing the address of a JMX API connector server. Patch is
+        provided by Jim Talbut. (violetagg)
+      </fix>
+      <fix>
+        When environment entry with one and the same name is defined in the web
+        deployment descriptor and with annotation then the one specified in the
+        web deployment descriptor is with priority. (violetagg)
+      </fix>
+      <fix>
+        Fix passing the value of false for <code>xmlBlockExternal</code> option
+        of Context to Jasper, as the default was changed in 8.0.1. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Enable non-blocking reads to take place on non-container threads.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <scode>
+        Simplify the code of
+        <code>o.a.c.ha.tcp.SimpleTcpCluster.createManager(String)</code>.
+        Remove unnecessary class cast. (kfujino)
+      </scode>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>56104</bug>: Correct the version number on the welcome page of the
+        Windows installer. (markt)
+      </fix>
+      <update>
+        Update Commons DBCP 2 to snapshot 164 dated 04 Feb 2014. (markt)
+      </update>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 8.0.1 (markt)" rtext="beta, 2014-02-02">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Change default value of <code>xmlBlockExternal</code> attribute of
+        Context. It is <code>true</code> now. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Correct regression in the fix for <bug>55996</bug> that meant that
+        asynchronous requests might timeout too early. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Change default value of the <code>blockExternal</code> attribute of
+        JspC task. The default value is <code>true</code>. Add support for
+        <code>-no-blockExternal</code> switch when JspC is run as a
+        standalone application. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Do not return an empty string for the
+        <code>Sec-WebSocket-Protocol</code> HTTP header when no sub-protocol has
+        been requested or no sub-protocol could be agreed as RFC6455 requires
+        that no <code>Sec-WebSocket-Protocol</code> header is returned in this
+        case. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 8.0.0 (markt)" rtext="not released">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Implement JSR 340 - Servlet 3.1. The JSR 340 implementation includes
+        contributions from Nick Williams and Jeremy Boynes. (markt)
+      </add>
+      <add>
+        Implement JSR 245 MR2 - JSP 2.3. (markt)
+      </add>
+      <add>
+        Implement JSR 341 - Unified Expression Language 3.0. (markt)
+      </add>
+      <add>
+        Implement JSR 356 - WebSockets. The JSR 356 implementation includes
+        contributions from Nick Williams, Rossen Stoyanchev and Niki Dokovski.
+        (markt)
+      </add>
+      <update>
+        <bug>46727</bug>: Refactor default servlet to make it easier to
+        sub-class to implement finer grained control of the file encoding. Based
+        on a patch by Fred Toth. (markt)
+      </update>
+      <add>
+        <bug>45995</bug>: Align Tomcat with Apache httpd and perform MIME type
+        mapping based on file extension in a case insensitive manner. (markt)
+      </add>
+      <scode>
+        Remove duplicate code that converted a Host&apos;s appBase attribute to
+        a canonical file. (markt)
+      </scode>
+      <scode>
+        <bug>51408</bug>: Replace calls to <code>Charset.defaultCharset()</code>
+        with an explicit reference to the ISO-8859-1 Charset. (markt)
+      </scode>
+      <scode>
+        Refactor initialization code to use a single, consistent approach to
+        determining the Catalina home (binary) and base (instance) directories.
+        The search order for home is <code>catalina.home</code> system property,
+        parent of current directory if boootstrap.jar is present and finally
+        current working directory. The search order for Catalina base is
+        <code>catalina.base</code> system property falling back to the value for
+        Catalina home. (markt)
+      </scode>
+      <update>
+        <bug>52092</bug>: JULI now uses the <code>OneLineFormatter</code> and
+        <code>AsyncFileHandler</code> by default. (markt)
+      </update>
+      <fix>
+        <bug>52558</bug>: Refactor <code>CometConnectionManagerValve</code> so
+        that it does not prevent the session from being serialized in when
+        running in a cluster. (markt)
+      </fix>
+      <fix>
+        <bug>52767</bug>: Remove reference to MySQL specific autoReconnect
+        property in <code>JDBCAccessLogValve</code>. (markt)
+      </fix>
+      <scode>
+        Make the Mapper type-safe. Hosts, Contexts and Wrappers are no
+        longer handled as plain objects, instead they keep their type.
+        Code using the Mapper doesn't need to cast objects returned by
+        the mapper. (rjung)
+      </scode>
+      <scode>
+        Move Manager, Loader and Resources from Container to Context since
+        Context is the only place they are used. The documentation already
+        states (and has done for some time) that Context is the only valid
+        location for these nested components. (markt)
+      </scode>
+      <scode>
+        Move the Mapper from the Connector to the Service since the Mapper is
+        identical for all Connectors of a given Service and it is common for
+        there to be multiple Connectors for a Service (http, https and ajp).
+        This means there is now only ever one Mapper per Service rather than
+        possibly multiple identically configured Mapper objects. (markt)
+      </scode>
+      <scode>
+        Remove the per Context Mapper objects and use the Mapper from the
+        Service. This removes the need to maintain two copies of the mappings
+        for Servlets and Filters. (markt)
+      </scode>
+      <add>
+        Implement a new Resources implementation that merges Aliases,
+        VirtualLoader, VirtualDirContext, JAR resources and external
+        repositories into a single framework rather than a separate one for each
+        feature. (markt)
+      </add>
+      <add>
+        URL rewrite valve, similar in functionality to mod_rewrite. (remm)
+      </add>
+      <add>
+        Port storeconfig functionality, which can persist to server.xml and
+        context.xml runtime container configuration changes. (remm)
+      </add>
+      <add>
+        <bug>54095</bug>: Add support to the Default Servlet for serving
+        gzipped versions of static resources directly from disk as an
+        alternative to Tomcat compressing them on each request. Patch by
+        Philippe Marschall. (markt)
+      </add>
+      <fix>
+        <bug>54708</bug>: Change the name of the working directory for the ROOT
+        application (located under $CATALINA_BASE/work by default) from _ to
+        ROOT. (markt)
+      </fix>
+      <add>
+        Change default configuration so that a change to the global web.xml file
+        will trigger a reload of all web applications. (markt)
+      </add>
+      <fix>
+        <bug>55101</bug>: Make BASIC authentication more tolerant of whitespace.
+        Patch provided by Brian Burch. (markt)
+      </fix>
+      <fix>
+        <bug>55166</bug>: Move JSP descriptor and tag library descriptor schemas
+        to servlet-api.jar to enable relative references between the schemas to
+        be correctly resolved. (markt)
+      </fix>
+      <scode>
+        Refactor the descriptor parsing code into a separate module that can be
+        used by both Catalina and Jasper. Includes patches provided by Jeremy
+        Boynes. (violetagg/markt)
+      </scode>
+      <scode>
+        <bug>55246</bug>: Move TLD scanning to a ServletContainerInitializer
+        provided by Jasper. Includes removal of TldConfig lifecycle listener and
+        associated Context properties. (jboynes)
+      </scode>
+      <add>
+        <bug>55317</bug>: Facilitate weaving by allowing ClassFileTransformer to
+        be added to WebppClassLoader. Patch by Nick Williams. (markt)
+      </add>
+      <fix>
+        <bug>55620</bug>: Enable Tomcat to start when either $CATALINA_HOME
+        and/or $CATALINA_BASE contains a comma character. Prevent Tomcat from
+        starting when $CATALINA_HOME and/or $CATALINA_BASE contains a semi-colon
+        on Windows. Prevent Tomcat from starting when $CATALINA_HOME and/or
+        $CATALINA_BASE contains a colon on Linux/FreeBSD/etc. (markt)
+      </fix>
+      <scode>
+        Initialize the JSP runtime in Jasper's initializer to avoid need for a
+        Jasper-specific lifecycle listener. <code>JasperListener</code> has been
+        removed. (jboynes)
+      </scode>
+      <fix>
+        Change ordering of elements of JMX objects names so components are
+        grouped more logically in JConsole. Generally, components are now
+        grouped by Host and then by Context. (markt)
+      </fix>
+      <add>
+        Context listener to allow better EE and framework integration. (remm)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        Experimental support for SPDY. Includes contributions from Sheldon Shao.
+        (costin)
+      </add>
+      <scode>
+        The default connector is now the Java NIO connector even when specifying
+        HTTP/1.1 as protocol (fhanik)
+      </scode>
+      <scode>
+        Update default value of pollerThreadCount for the NIO connector. The new
+        default value will never go above 2 regardless of available processors.
+        (fhanik)
+      </scode>
+      <fix>
+        <bug>54010</bug>: Remove some unnecessary code (duplicate calls to
+        configure the scheme as https for AJP requests originally received over
+        HTTPS). (markt)
+      </fix>
+      <scode>
+        Refactor char encoding/decoding using NIO APIs. (remm)
+      </scode>
+      <update>
+        Change the default URIEncoding for all connectors from ISO-8859-1 to
+        UTF-8. (markt)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <scode>
+        Simplify API of <code>ErrorDispatcher</code> class by using varargs.
+        (kkolinko)
+      </scode>
+      <scode>
+        Update Jasper to use the new common web.xml parsing code. Includes
+        patches by Jeremy Boynes. (markt/violetagg)
+      </scode>
+      <add>
+        Create test cases for JspC. Patch by Jeremy Boynes. (markt)
+      </add>
+      <scode>
+        <bug>55246</bug>: TLD scanning is now performed by JasperInitializer
+        (a ServletContainerInitializer) removing the need for support within the
+        Servlet container itself. The scan is now performed only once rather than
+        in two passes reducing startup time. (jboynes)
+      </scode>
+      <fix>
+        <bug>55251</bug>: Do not allow JspC task to fail silently if the web.xml
+        or web.xml fragment can not be generated. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <scode>
+        Remove unused JvmRouteSessionIDBinderListener and SessionIDMessage.
+        (kfujino)
+      </scode>
+      <scode>
+        Modify method signature in ReplicationValve. Cluster instance is not
+        necessary to argument of method. (kfujino)
+      </scode>
+      <scode>
+        Remove unused <code>expireSessionsOnShutdown</code> attribute in
+        <code>org.apache.catalina.ha.session.BackupManager</code>. (kfujino)
+      </scode>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Extend the diagnostic information provided by the Manager web
+        application to include details of the configured SSL ciphers suites for
+        each connector. (markt)
+      </add>
+      <update>
+        <bug>48550</bug>: Update examples web application to use UTF-8. (markt)
+      </update>
+      <update>
+        <bug>55383</bug>: Improve the design and correct the HTML markup of
+        the documentation web application. Patches provided by Konstantin
+        Preißer. (markt)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <scode>
+        Refactor <code>AbstractReplicatedMap</code> to use generics. A key
+        side-effect of this is that the class now implements
+        <code>Map&lt;K,V&gt;</code> rather than extends
+        <code>ConcurrentMap</code>. (markt)
+      </scode>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <scode>
+        Remove unused, deprecated code. (markt)
+      </scode>
+      <scode>
+        Remove static info String and associated getInfo() method where present.
+        (markt)
+      </scode>
+      <update>
+        (<rev>1353242</rev>, <rev>1353410</rev>):
+        Remove Ant tasks <code>jasper2</code> and <code>jkstatus</code>.
+        The correct names are <code>jasper</code> and <code>jkupdate</code>.
+        (kkolinko)
+      </update>
+      <fix>
+        <bug>53529</bug>: Clean-up the handling of
+        <code>InterruptedException</code> throughout the code base. (markt)
+      </fix>
+      <add>
+        <bug>54899</bug>: Provide an initial implementation of NetBeans support.
+        Patch provided by Brian Burch. (markt)
+      </add>
+      <fix>
+        <bug>55166</bug>: Move the JSP descriptor and tag library descriptor
+        schema defintion files from jsp-api.jar to servlet-api.jar so relative
+        includes between the J2EE, Servlet and JSP schemas are correctly
+        resolved. (markt)
+      </fix>
+      <fix>
+        <bug>55372</bug>: When starting Tomcat with the <code>jpda</code> option
+        to enable remote debugging, by default only listen on localhost for
+        connections from a debugger. Prior to this change, Tomcat listened on
+        all known addresses. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+</body>
+</document>
