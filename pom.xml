@@ -49,6 +49,7 @@
     </properties>
 
     <modules>
+        <module>apache-el</module>
         <module>apache-jasper</module>
     </modules>
 
