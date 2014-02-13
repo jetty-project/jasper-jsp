@@ -235,12 +235,38 @@ public class TldScanner {
      * Scan for TLDs in JARs in /WEB-INF/lib.
      */
     public void scanJars() {
-        JarScanner scanner = JarScannerFactory.getJarScanner(context);
-        TldScannerCallback callback = new TldScannerCallback();
-        scanner.scan(JarScanType.TLD, context, callback);
-        if (callback.scanFoundNoTLDs()) {
-            log.info(Localizer.getMessage("jsp.tldCache.noTldSummary"));
-        }
+    	Collection<URL> tldURLs = (Collection<URL>)context.getAttribute("org.eclipse.jetty.tlds");
+    	if (tldURLs != null)
+    	{
+    		for (URL url:tldURLs){
+    		
+    		 String str = url.toExternalForm();
+    		 int a = str.indexOf("jar:");
+    		 int b = str.indexOf("!/");
+    		 if (a >= 0 && b> 0) {
+    			 String fileUrl = str.substring(a+4, b);
+    			 String path = str.substring(b+2);
+    			 try {
+    				 TldResourcePath tldResourcePath =
+    						 new TldResourcePath(new URL(fileUrl), null, path);
+    				 parseTld(tldResourcePath);
+    			 } catch (Exception e) {
+    				 throw new IllegalStateException(e);
+    			 }
+    		 }
+    		 else
+    			throw new IllegalStateException("Bad tld url: "+str);
+    		}
+    	}
+    	else
+    	{
+    		JarScanner scanner = JarScannerFactory.getJarScanner(context);
+    		TldScannerCallback callback = new TldScannerCallback();
+    		scanner.scan(JarScanType.TLD, context, callback);
+    		if (callback.scanFoundNoTLDs()) {
+    			log.info(Localizer.getMessage("jsp.tldCache.noTldSummary"));
+    		}
+    	}
     }
 
     private void parseTld(String resourcePath) throws IOException, SAXException {
