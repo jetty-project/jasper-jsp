@@ -580,7 +580,6 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            target="${compile.target}"
-           optimize="${compile.optimize}"
            excludes="**/.svn/**"
            encoding="ISO-8859-1"
            includeAntRuntime="true" >
@@ -635,7 +634,6 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            target="${compile.target}"
-           optimize="${compile.optimize}"
            excludes="**/.svn/**"
            encoding="ISO-8859-1"
            includeAntRuntime="true" >
@@ -1038,7 +1036,6 @@
              debug="${compile.debug}" deprecation="${compile.deprecation}"
              source="${compile.source}"
              target="${compile.target}"
-             optimize="${compile.optimize}"
              classpath="${tomcat.classes}"
              excludes="**/CVS/**,**/.svn/**"
              encoding="ISO-8859-1"
@@ -1050,7 +1047,6 @@
              debug="${compile.debug}" deprecation="${compile.deprecation}"
              source="${compile.source}"
              target="${compile.target}"
-             optimize="${compile.optimize}"
              classpath="$tomcat.lcasses}"
              excludes="**/CVS/**,**/.svn/**"
              encoding="ISO-8859-1"
@@ -1286,7 +1282,6 @@
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
-           optimize="${compile.optimize}"
            encoding="ISO-8859-1"
            includeantruntime="true">
       <classpath refid="tomcat.test.classpath" />
@@ -1627,7 +1622,6 @@
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
-           optimize="${compile.optimize}"
            encoding="ISO-8859-1"
            includeantruntime="false">
       <classpath refid="tomcat.webservices.classpath" />
@@ -2550,7 +2544,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
           description="Deletes the dependencies that are built from source">
     <delete dir="${tomcat-dbcp.home}"/>
     <!-- Only required while working with snapshots -->
-    <delete dir="${commons-pool.home}"/>
     <delete dir="${commons-dbcp.home}"/>
   </target>
 
@@ -2723,7 +2716,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <!-- ================  be built rather than used directly ================ -->
 
   <target name="build-tomcat-dbcp" depends="build-manifests" unless="no.build.dbcp">
-    <!-- Pool2 and DBCP2 currently have slightly different source structures -->
     <copy todir="${tomcat-dbcp.home}/src">
       <fileset dir="${commons-pool.home}/src/main">
         <include name="**/*.java" />
@@ -2731,11 +2723,16 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <exclude name="**/proxy/**" />
       </fileset>
     </copy>
-    <copy todir="${tomcat-dbcp.home}">
-      <fileset dir="${commons-dbcp.home}">
+    <copy todir="${tomcat-dbcp.home}/src">
+      <fileset dir="${commons-dbcp.home}/src/main">
         <include name="**/*.java" />
         <exclude name="**/test/**" />
         <exclude name="**/managed/**" />
+      </fileset>
+    </copy>
+    <copy todir="${tomcat-dbcp.home}/src/java">
+      <fileset dir="${commons-dbcp.home}/src/main/resources">
+        <include name="**/*.properties" />
       </fileset>
     </copy>
 
@@ -2758,8 +2755,19 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <fileset dir="${tomcat-dbcp.home}/src/java/org/apache/commons" />
     </move>
     <mkdir dir="${tomcat-dbcp.home}/classes"/>
+    <!-- Make sure the build fails if the DBCP sources haven't been copied -->
+    <!-- correctly. Other problems should be detected by the following     -->
+    <!-- compilation step failing.                                         -->
+    <fail message="Repackaged DBCP factory is missing">
+      <condition>
+        <not>
+          <resourceexists>
+            <file file="${tomcat-dbcp.home}/src/java/org/apache/tomcat/dbcp/dbcp2/BasicDataSourceFactory.java"/>
+          </resourceexists>
+        </not>
+      </condition>
+    </fail>
     <javac destdir="${tomcat-dbcp.home}/classes"
-           optimize="off"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
@@ -2771,6 +2779,11 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <include name="**" />
       <classpath path="${tomcat.classes}" />
     </javac>
+    <copy todir="${tomcat-dbcp.home}/classes">
+      <fileset dir="${tomcat-dbcp.home}/src/java">
+        <include name="**/*.properties" />
+      </fileset>
+    </copy>
     <jarIt jarfile="${tomcat-dbcp.jar}"
       filesDir="${tomcat-dbcp.home}/classes"
       filesId="files.tomcat-dbcp" />
@@ -2803,7 +2816,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="downloadgz" unless="exist" depends="setproxy,testexist">
     <!-- Download and extract the package -->
-    <get src="${sourcefile}" dest="${base.path}/file.tar.gz" />
+    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${base.path}/file.tar.gz" />
     <gunzip src="${base.path}/file.tar.gz" dest="${base.path}/file.tar"/>
     <untar src="${base.path}/file.tar" dest="${base.path}"/>
     <delete file="${base.path}/file.tar"/>
@@ -2830,7 +2843,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="downloadzip" unless="exist" depends="setproxy,testexist">
     <!-- Download and extract the package -->
-    <get src="${sourcefile}" dest="${base.path}/file.zip" />
+    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${base.path}/file.zip" />
     <mkdir dir="${destdir}" />
     <unzip src="${base.path}/file.zip" dest="${destdir}"/>
     <delete file="${base.path}/file.zip"/>
@@ -2855,7 +2868,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <target name="downloadfile" unless="exist" depends="setproxy,testexist">
     <!-- Download extract the file -->
     <mkdir dir="${destdir}" />
-    <get src="${sourcefile}" dest="${destfile}" />
+    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${destfile}" />
   </target>
 
   <target name="downloadfile-2" unless="exist" depends="testexist">
@@ -2887,7 +2900,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="trydownload" if="trydownload.run" depends="trydownload.check">
     <!-- Downloads a file if not yet downloaded and the source URL is available -->
-    <get src="${sourcefile}" dest="${destfile}" />
+    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${destfile}" />
   </target>
 
   <!-- ============================ IDE Support ============================ -->
