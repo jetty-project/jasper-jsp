@@ -23,7 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import javax.naming.NamingException;
 
 /**
- * JettyJspInstanceManager
+ * SimpleInstanceManager
  * 
  * Implement the org.apache.tomcat.InstanceManager interface.
  */

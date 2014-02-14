@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-jasper-project</artifactId>
-        <version>1.0-SNAPSHOT</version>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>jasper-jsp</artifactId>
+      <version>8.0.3.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.mortbay.jetty</groupId>
-    <artifactId>jetty-jasper</artifactId>
+    <groupId>org.mortbay.jasper</groupId>
+    <artifactId>apache-jasper</artifactId>
     <packaging>jar</packaging>
-    <name>Jetty :: Jasper :: Implementation</name>
-
+    <name>MortBay :: Apache Jasper :: Implementation</name>
 
     <properties>
     </properties>
@@ -65,14 +64,9 @@
         <version>2.3.1</version>
       </dependency>
       <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-el</artifactId>
+        <groupId>org.mortbay.jasper</groupId>
+        <artifactId>apache-el</artifactId>
         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-      	<groupId>org.eclipse.jetty</groupId>
-      	<artifactId>jetty-util</artifactId>
-      	<version>9.1.2-SNAPSHOT</version>
       </dependency>
     </dependencies>
 

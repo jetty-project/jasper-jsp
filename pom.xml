@@ -7,30 +7,23 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.mortbay.jetty</groupId>
-    <artifactId>jetty-jasper-project</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>org.mortbay.jasper</groupId>
+    <artifactId>jasper-jsp</artifactId>
+    <version>8.0.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Jetty :: Jasper :: Project</name>
 
     <description>
-       A JSP implementation based off Apache Tomcat Jasper
+       A fork (well more of a branch) of Apache Tomcat Jasper to remove the tomcat server dependencies,
+       so that the JSP engine can be used by the eclipse jetty project.
     </description>
 
     <inceptionYear>2014</inceptionYear>
 
     <issueManagement>
         <system>github</system>
-        <url>https://github.com/jetty-project/jetty-jasper/issues</url>
+        <url>https://github.com/jetty-project/jasper-jsp/issues</url>
     </issueManagement>
-
-    <developers>
-        <developer>
-            <id>janb</id>
-            <name>Jan Bartel</name>
-            <email>janb@intalio.com</email>
-        </developer>
-    </developers>
 
     <licenses>
         <license>
@@ -40,9 +33,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git://github.com/jetty-project/jetty-jasper.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/jetty-project/jetty-jasper.git</developerConnection>
-        <url>https://github.com/jetty-project/jetty-jasper</url>
+        <connection>scm:git:git://github.com/jetty-project/jasper-jsp.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/jetty-project/jasper-jsp.git</developerConnection>
+        <url>https://github.com/jetty-project/jasper-jsp</url>
     </scm>
 
     <properties>
