@@ -18,9 +18,12 @@ package org.apache.juli.logging;
 
 import java.util.logging.LogManager;
 
-import org.mortbay.jetty.jsp.JettyJuliLog;
+import org.mortbay.apache.jsp.JuliLog;
 
 /**
+ * Modified to assume the existence of org.mortbay.apache.jsp.JuliLog, an implementation
+ * of which must be supplied by the consumer of this version of juli.
+ * 
  * Modified LogFactory: removed all discovery, hardcode a specific implementation
  * If you like a different logging implementation - use either the discovery-based
  * commons-logging, or better - another implementation hardcoded to your favourite
@@ -97,7 +100,7 @@ public class LogFactory {
      */
     public Log getInstance(String name)
         throws LogConfigurationException {
-        return JettyJuliLog.getInstance(name);
+        return JuliLog.getInstance(name);
     }
 
 

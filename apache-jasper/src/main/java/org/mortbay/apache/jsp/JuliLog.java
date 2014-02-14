@@ -15,23 +15,24 @@
 //  ========================================================================
 //
 
-package org.mortbay.jetty.jsp;
+package org.mortbay.apache.jsp;
 
 
 /**
  * 
  */
-public class JettyJuliLog implements org.apache.juli.logging.Log 
+// TODO Move to jetty project
+public class JuliLog implements org.apache.juli.logging.Log 
 {
     public static org.apache.juli.logging.Log getInstance(String name)
     {
-        return new JettyJuliLog(org.eclipse.jetty.util.log.Log.getLogger(name));
+        return new JuliLog(org.eclipse.jetty.util.log.Log.getLogger(name));
     }
     
     private final org.eclipse.jetty.util.log.Logger _logger;
     private final org.eclipse.jetty.util.log.StdErrLog _stdErrLog;
     
-    public JettyJuliLog(org.eclipse.jetty.util.log.Logger logger)
+    public JuliLog(org.eclipse.jetty.util.log.Logger logger)
     {
         _logger=logger;
         _stdErrLog=(logger instanceof org.eclipse.jetty.util.log.StdErrLog) ? (org.eclipse.jetty.util.log.StdErrLog)logger:null;

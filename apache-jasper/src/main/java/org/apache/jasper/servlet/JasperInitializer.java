@@ -32,7 +32,7 @@ import org.apache.jasper.security.SecurityClassLoad;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
-import org.mortbay.jetty.jsp.JettyJspInstanceManager;
+import org.apache.tomcat.SimpleInstanceManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -80,8 +80,8 @@ public class JasperInitializer implements ServletContainerInitializer {
             log.debug(Localizer.getMessage(MSG + ".onStartup", context.getServletContextName()));
         }
 
-        //Jetty specific
-        context.setAttribute(InstanceManager.class.getName(), new JettyJspInstanceManager());
+        if (context.getAttribute(InstanceManager.class.getName())==null)
+            context.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
         
         boolean validate = Boolean.parseBoolean(
                 context.getInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM));
