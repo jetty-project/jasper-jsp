@@ -30,18 +30,71 @@
            </includes>
         </resource>
       </resources>
-      <plugins>
-       <plugin>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>set-osgi-version</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>parse-version</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <version>2.4</version>
+        <executions>
+          <execution>
+            <id>artifact-jar</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
           <excludes>
             <exclude>**/org/mortbay/**</exclude>
           </excludes>
+          <archive>
+            <manifestFile>target/classes/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
         </configuration>
-       </plugin>
-      </plugins>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>2.4.0</version>
+          <extensions>true</extensions>
+          <executions>
+              <execution>
+                  <id>bundle-manifest</id>
+                  <phase>process-classes</phase>
+                  <goals>
+                      <goal>manifest</goal>
+                  </goals>
+              </execution>
+          </executions>
+          <configuration>
+              <instructions>
+                <Bundle-Name>Mortbay Jasper</Bundle-Name>
+                <Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
+                <Bundle-Classpath>.</Bundle-Classpath>
+                <Bundle-Version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</Bundle-Version>
+                <Specification-Version>2.3</Specification-Version>
+                <Implementation-Version>2.3</Implementation-Version>
+                <Export-Package>!org.mortbay.*,*</Export-Package>
+                <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
+                <_nouses>true</_nouses>
+              </instructions>
+          </configuration>
+     </plugin>
+    </plugins>
     </build>
 
     <dependencies>
@@ -49,11 +102,13 @@
         <groupId>org.eclipse.jdt.core.compiler</groupId>
         <artifactId>ecj</artifactId>
         <version>4.2.2</version>
+        <optional>true</optional>
       </dependency>
       <dependency>
         <groupId>org.apache.ant</groupId>
         <artifactId>ant</artifactId>
         <version>1.8.4</version>
+        <optional>true</optional>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty.toolchain</groupId>
