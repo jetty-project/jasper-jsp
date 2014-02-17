@@ -27,7 +27,9 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -64,6 +66,8 @@ public class TldScanner {
     private final Map<String, TldResourcePath> uriTldResourcePathMap = new HashMap<>();
     private final Map<TldResourcePath, TaglibXml> tldResourcePathTaglibXmlMap = new HashMap<>();
     private final List<String> listeners = new ArrayList<>();
+    private final Set<URL> jarTldURLs = new HashSet<URL>();
+    
 
     /**
      * Initialize with the application's ServletContext.
@@ -77,6 +81,24 @@ public class TldScanner {
         this.context = context;
 
         this.tldParser = new TldParser(namespaceAware, validation, blockExternal);
+    }
+    
+    /**
+     * Provide a set of tlds derived from jar files. This prevents scanning of jar files
+     * taking place.
+     * @param jarTldURLs
+     */
+    public void setJarTldURLs (Collection<URL> urls)
+    {
+    	jarTldURLs.addAll(urls);
+    }
+    
+    /**
+     * @return the set of pre-discovered tlds from jar files.
+     */
+    public Set<URL> getJarTldURLs ()
+    {
+    	return Collections.unmodifiableSet(jarTldURLs);
     }
 
     /**
@@ -235,11 +257,11 @@ public class TldScanner {
      * Scan for TLDs in JARs in /WEB-INF/lib.
      */
     public void scanJars() {
-    	Collection<URL> tldURLs = (Collection<URL>)context.getAttribute("org.eclipse.jetty.tlds");
-    	if (tldURLs != null)
+    	if (jarTldURLs != null)
     	{
-    		for (URL url:tldURLs){
+    		for (URL url:jarTldURLs){
     		
+System.err.println("Prefound tld: "+url);
     		 String str = url.toExternalForm();
     		 int a = str.indexOf("jar:");
     		 int b = str.indexOf("!/");
