@@ -27,7 +27,9 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -64,6 +66,8 @@ public class TldScanner {
     private final Map<String, TldResourcePath> uriTldResourcePathMap = new HashMap<>();
     private final Map<TldResourcePath, TaglibXml> tldResourcePathTaglibXmlMap = new HashMap<>();
     private final List<String> listeners = new ArrayList<>();
+    private final Set<URL> jarTldURLs = new HashSet<URL>();
+    
 
     /**
      * Initialize with the application's ServletContext.
@@ -77,6 +81,24 @@ public class TldScanner {
         this.context = context;
 
         this.tldParser = new TldParser(namespaceAware, validation, blockExternal);
+    }
+    
+    /**
+     * Provide a set of tlds derived from jar files. This prevents scanning of jar files
+     * taking place.
+     * @param jarTldURLs
+     */
+    public void setJarTldURLs (Collection<URL> urls)
+    {
+    	jarTldURLs.addAll(urls);
+    }
+    
+    /**
+     * @return the set of pre-discovered tlds from jar files.
+     */
+    public Set<URL> getJarTldURLs ()
+    {
+    	return Collections.unmodifiableSet(jarTldURLs);
     }
 
     /**
@@ -235,12 +257,36 @@ public class TldScanner {
      * Scan for TLDs in JARs in /WEB-INF/lib.
      */
     public void scanJars() {
-        JarScanner scanner = JarScannerFactory.getJarScanner(context);
-        TldScannerCallback callback = new TldScannerCallback();
-        scanner.scan(JarScanType.TLD, context, callback);
-        if (callback.scanFoundNoTLDs()) {
-            log.info(Localizer.getMessage("jsp.tldCache.noTldSummary"));
-        }
+    	if (jarTldURLs != null)
+    	{
+    		for (URL url:jarTldURLs){
+    		 String str = url.toExternalForm();
+    		 int a = str.indexOf("jar:");
+    		 int b = str.indexOf("!/");
+    		 if (a >= 0 && b> 0) {
+    			 String fileUrl = str.substring(a+4, b);
+    			 String path = str.substring(b+2);
+    			 try {
+    				 TldResourcePath tldResourcePath =
+    						 new TldResourcePath(new URL(fileUrl), null, path);
+    				 parseTld(tldResourcePath);
+    			 } catch (Exception e) {
+    				 throw new IllegalStateException(e);
+    			 }
+    		 }
+    		 else
+    			throw new IllegalStateException("Bad tld url: "+str);
+    		}
+    	}
+    	else
+    	{
+    		JarScanner scanner = JarScannerFactory.getJarScanner(context);
+    		TldScannerCallback callback = new TldScannerCallback();
+    		scanner.scan(JarScanType.TLD, context, callback);
+    		if (callback.scanFoundNoTLDs()) {
+    			log.info(Localizer.getMessage("jsp.tldCache.noTldSummary"));
+    		}
+    	}
     }
 
     private void parseTld(String resourcePath) throws IOException, SAXException {

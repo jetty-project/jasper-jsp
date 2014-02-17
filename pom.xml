@@ -43,7 +43,7 @@
 
     <modules>
         <module>apache-el</module>
-        <module>apache-jasper</module>
+        <module>apache-jsp</module>
     </modules>
 
     <build>
