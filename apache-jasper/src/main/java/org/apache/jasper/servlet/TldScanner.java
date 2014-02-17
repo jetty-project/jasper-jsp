@@ -260,8 +260,6 @@ public class TldScanner {
     	if (jarTldURLs != null)
     	{
     		for (URL url:jarTldURLs){
-    		
-System.err.println("Prefound tld: "+url);
     		 String str = url.toExternalForm();
     		 int a = str.indexOf("jar:");
     		 int b = str.indexOf("!/");
