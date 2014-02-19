@@ -15,17 +15,17 @@
 //  ========================================================================
 //
 
-package org.mortbay.apache.jsp;
+package org.apache.juli.logging;
 
 
 /**
  * A Naive impl that should be replaced by actual usages
  */
-public class JuliLog implements org.apache.juli.logging.Log 
+public class SimpleLog implements org.apache.juli.logging.Log 
 {
     public static org.apache.juli.logging.Log getInstance(String name)
     {
-        return new JuliLog();
+        return new SimpleLog();
     }
 
     @Override

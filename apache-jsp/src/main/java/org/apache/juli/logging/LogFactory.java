@@ -16,13 +16,15 @@
  */
 package org.apache.juli.logging;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ServiceLoader;
 import java.util.logging.LogManager;
 
-import org.mortbay.apache.jsp.JuliLog;
-
 /**
- * Modified to assume the existence of org.mortbay.apache.jsp.JuliLog, an implementation
- * of which must be supplied by the consumer of this version of juli.
+ * Modified to use java service discovery.
+ * 
  * 
  * Modified LogFactory: removed all discovery, hardcode a specific implementation
  * If you like a different logging implementation - use either the discovery-based
@@ -69,11 +71,44 @@ public class LogFactory {
 
     private static final LogFactory singleton = new LogFactory();
 
+    private final Constructor<? extends Log> _logConstruct;
 
     /**
      * Protected constructor that is not available for public use.
+     * @throws SecurityException 
+     * @throws NoSuchMethodException 
      */
-    private LogFactory() {
+    private LogFactory()
+    {
+        ServiceLoader<Log> logLoader = ServiceLoader.load(Log.class);
+        
+        Constructor<? extends Log> m=null;
+        for (Log log: logLoader)
+        {
+            Class<? extends Log> c=log.getClass();
+            try
+            {
+                m=c.getConstructor(String.class);
+            }
+            catch (NoSuchMethodException | SecurityException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        
+        if (m==null)
+        {
+            try
+            {
+                m=SimpleLog.class.getConstructor(String.class);
+            }
+            catch (NoSuchMethodException | SecurityException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        
+        _logConstruct=m;        
     }
 
 
@@ -100,7 +135,14 @@ public class LogFactory {
      */
     public Log getInstance(String name)
         throws LogConfigurationException {
-        return JuliLog.getInstance(name);
+        try
+        {
+            return _logConstruct.newInstance(name);
+        }
+        catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
 
