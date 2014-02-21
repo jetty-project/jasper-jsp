@@ -183,8 +183,6 @@ public class TestWebXml {
         XmlErrorHandler handler = new XmlErrorHandler();
         digester.setErrorHandler(handler);
 
-        // System.out.print(webxml.toXml() + "\n\n\n");
-
         InputSource is = new InputSource(new StringReader(webxml.toXml()));
         WebXml webxmlResult = new WebXml();
         digester.push(webxmlResult);
@@ -220,6 +218,128 @@ public class TestWebXml {
 
         // Assert that web.xml was parsed and is not empty. Default servlet is known to be there.
         Assert.assertNotNull(webXmlDefaultFragment.getServlets().get("default"));
+
+        // Manually add some version specific features to ensure that these do
+        // not cause problems for the merged web.xml
+
+        // Filters were added in 2.3 so should be excluded in 2.2
+        FilterDef filterDef = new FilterDef();
+        filterDef.setFilterClass("org.apache.tomcat.DummyFilter");
+        filterDef.setFilterName("Dummy");
+        webXmlDefaultFragment.addFilter(filterDef);
+
+        FilterMap filterMap = new FilterMap();
+        filterMap.setFilterName("Dummy");
+        filterMap.addURLPattern("/*");
+        webXmlDefaultFragment.addFilterMapping(filterMap);
+
+        // Listeners were added in 2.3 so should be excluded in 2.2
+        webXmlDefaultFragment.addListener("org.apache.tomcat.DummyListener");
+
+        // resource-env-ref was added in 2.3 so should be excluded in 2.2
+        ContextResourceEnvRef resourceEnvRef = new ContextResourceEnvRef();
+        resourceEnvRef.setName("dummy");
+        resourceEnvRef.setType("dummy");
+
+        webXmlDefaultFragment.addResourceEnvRef(resourceEnvRef);
+
+        // ejb-local-ref was added in 2.3 so should be excluded in 2.2
+        ContextLocalEjb ejbLocalRef = new ContextLocalEjb();
+        ejbLocalRef.setName("dummy");
+        ejbLocalRef.setType("Session");
+        ejbLocalRef.setLocal("dummy");
+        ejbLocalRef.setHome("dummy");
+        webXmlDefaultFragment.addEjbLocalRef(ejbLocalRef);
+
+        // Servlet/run-as was added in 2.3 so should be excluded in 2.2
+        ServletDef servletDef = new ServletDef();
+        servletDef.setServletName("Dummy");
+        servletDef.setServletClass("org.apache.tomcat.DummyServlet");
+        servletDef.setRunAs("dummy");
+        webXmlDefaultFragment.addServlet(servletDef);
+
+        webXmlDefaultFragment.addServletMapping("/dummy", "Dummy");
+
+        // resource-ref/res-sharing-scope was added in 2.3 so should be excluded
+        // in 2.2
+        ContextResource contextResource = new ContextResource();
+        contextResource.setName("dummy");
+        contextResource.setType("dummy");
+        contextResource.setAuth("Container");
+        contextResource.setScope("Shareable");
+        webXmlDefaultFragment.addResourceRef(contextResource);
+
+        // security-constraint/display-name was added in 2.3 so should be
+        // excluded in 2.2
+        SecurityConstraint sc = new SecurityConstraint();
+        sc.setDisplayName("dummy");
+        SecurityCollection collection = new SecurityCollection();
+        collection.setName("dummy");
+        collection.addPattern("/*");
+        collection.addMethod("DELETE");
+        sc.addCollection(collection);
+        webXmlDefaultFragment.addSecurityConstraint(sc);
+
+        // service-ref was added in 2.4 so should be excluded in 2.3 and earlier
+        ContextService serviceRef = new ContextService();
+        serviceRef.setName("dummy");
+        serviceRef.setInterface("dummy");
+        webXmlDefaultFragment.addServiceRef(serviceRef);
+
+        // message-destination-ref was added in 2.4 so should be excluded in 2.3
+        // and earlier
+        MessageDestinationRef mdRef = new MessageDestinationRef();
+        mdRef.setName("dummy");
+        mdRef.setType("dummy");
+        mdRef.setUsage("Consumes");
+        webXmlDefaultFragment.addMessageDestinationRef(mdRef);
+
+        // message-destination was added in 2.4 so should be excluded in 2.3
+        // and earlier
+        MessageDestination md = new MessageDestination();
+        md.setName("dummy");
+        webXmlDefaultFragment.addMessageDestination(md);
+
+        // local-encoding-mapping-list was added in 2.4 so should be excluded in
+        // 2.3 and earlier
+        webXmlDefaultFragment.addLocaleEncodingMapping("en", "UTF-8");
+
+        // jsp-config was added in Servlet 2.4
+        webXmlDefaultFragment.addTaglib("dummy", "dummy");
+
+        // filter-mapping/dispatcher added in Servlet 2.4
+        filterMap.setDispatcher("REQUEST");
+
+        // listener-[description|display-name|icon] added in Servlet 2.4
+        // None of these are supported in WebXml
+
+        // filter-mapping/dispatcher/ASYNC added in Servlet 3.0
+        filterMap.setDispatcher("ASYNC");
+
+        // error-page with just location allowed in Servlet 3.0+
+        ErrorPage errorPage = new ErrorPage();
+        errorPage.setLocation("/dummy");
+        webXmlDefaultFragment.addErrorPage(errorPage);
+
+        // async-supported added to Servlet and Filter in 3.0
+        filterDef.setAsyncSupported("false");
+        servletDef.setAsyncSupported("false");
+
+        // session-cookie-config added in 3.0
+        SessionConfig sessionConfig = new SessionConfig();
+        sessionConfig.setCookieDomain("dummy");
+        webXmlDefaultFragment.setSessionConfig(sessionConfig);
+
+        // http-method-omission added in Servlet 3.0
+        // Let this trigger a validation error as dropping it silently could
+        // be a security concern
+
+        // multi-part-config added in Servlet 3.0
+        MultipartDef multiPart = new MultipartDef();
+        servletDef.setMultipartDef(multiPart);
+
+        // deny-uncovered-http-methods added in Servlet 3.1
+        webXmlDefaultFragment.setDenyUncoveredHttpMethods(true);
 
         return webXmlDefaultFragment;
     }

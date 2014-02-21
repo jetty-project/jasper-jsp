@@ -60,6 +60,20 @@
         Generate a valid root element for the effective web.xml for a web
         application for all supported versions of web.xml. (markt)
       </fix>
+      <add>
+        Make it easier for applications embedding and/or extending Tomcat to
+        modify the <code>javaseClassLoader</code> attribute of the
+        <code>WebappClassLoader</code>. (markt)
+      </add>
+      <fix>
+        Add missing support for <code>&lt;deny-uncovered-http-methods&gt;</code>
+        element when merging web.xml files. (markt)
+      </fix>
+      <fix>
+        Improve merging process for web.xml files to take account of the
+        elements and attributes supported by the Servlet version of the merged
+        file. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -70,12 +84,28 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Change the default compiler source and compiler target versions to 1.7
+        since Tomcat 8 requires a minimum of Java 7. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
         Avoid a possible deadlock when one thread is shutting down a connection
         while another thread is trying to write to it. (markt)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <add>
+        <bug>56093</bug>: Add the SSL Valve to the documentation web
+        application. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -107,6 +137,17 @@
         which are now 128 Mb and 256 Mb respectively instead of being empty.
         Explicitly specify --LogPath path when uninstalling Windows service,
         avoiding default value for that option. (kkolinko)
+      </fix>
+      <fix>
+        <bug>56137</bug>: Explicitly use NIO connector in SSL example in
+        server.xml so it doesn't break if APR is enabled. (markt)
+      </fix>
+      <fix>
+        <bug>56139</bug>: Avoid a web application class loader leak in some unit
+        tests when running on Windows. (markt)
+      </fix>
+      <fix>
+        Correct build script to avoid building JARs with empty packages. (markt)
       </fix>
     </changelog>
   </subsection>

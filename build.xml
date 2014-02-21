@@ -177,6 +177,9 @@
   <property name="tomcat.classes.cobertura" value="${tomcat.classes}-cobertura"/>
   <property name="cobertura.report.format" value="html"/>
 
+  <!-- Workaround against http://bugs.sun.com/view_bug.do?bug_id=6202721 -->
+  <available file="/dev/urandom" property="test.jvmarg.egd" value="-Djava.security.egd=file:/dev/./urandom"/>
+  <property name="test.jvmarg.egd" value="" />
 
   <!-- Include .gitignore in src distributions. -->
   <!-- .git and .gitignore are in defaultexcludes since Ant 1.8.2 -->
@@ -284,20 +287,19 @@
   <!-- ========= Pattern sets used to control content of JAR files ========= -->
   <!-- Pattern sets for jar files in standard distributions -->
   <patternset id="files.annotations-api">
-    <include name="javax/annotation/*" />
-    <include name="javax/annotation/security/*" />
-    <include name="javax/annotation/sql/*" />
-    <include name="javax/ejb/*" />
-    <include name="javax/persistence/*" />
-    <include name="javax/xml/ws/*" />
+    <include name="javax/annotation/**" />
+    <include name="javax/ejb/**" />
+    <include name="javax/persistence/**" />
+    <include name="javax/xml/ws/**" />
   </patternset>
 
   <patternset id="files.servlet-api">
-    <include name="javax/servlet/*" />
-    <include name="javax/servlet/annotation/*" />
-    <include name="javax/servlet/descriptor/*" />
-    <include name="javax/servlet/http/*" />
-    <include name="javax/servlet/resources/*" />
+    <include name="javax/servlet/*.class" />
+    <include name="javax/servlet/*.properties" />
+    <include name="javax/servlet/annotation/**" />
+    <include name="javax/servlet/descriptor/**" />
+    <include name="javax/servlet/http/**" />
+    <include name="javax/servlet/resources/**" />
   </patternset>
 
   <patternset id="files.jsp-api">
@@ -305,7 +307,7 @@
   </patternset>
 
   <patternset id="files.el-api">
-    <include name="javax/el/*" />
+    <include name="javax/el/**" />
   </patternset>
 
   <patternset id="files.websocket-api">
@@ -332,7 +334,7 @@
   </patternset>
 
   <patternset id="files.tomcat-api">
-    <include name="org/apache/tomcat/*" />
+    <include name="org/apache/tomcat/*.class" />
   </patternset>
 
   <patternset id="files.tomcat-util">
@@ -341,7 +343,8 @@
     <include name="org/apache/tomcat/util/file/**" />
     <include name="org/apache/tomcat/util/res/**" />
     <include name="org/apache/tomcat/util/threads/**" />
-    <include name="org/apache/tomcat/util/*" />
+    <include name="org/apache/tomcat/util/*.class" />
+    <include name="org/apache/tomcat/util/*.properties" />
   </patternset>
 
   <patternset id="files.tomcat-util-scan">
@@ -372,8 +375,7 @@
   </patternset>
 
   <patternset id="files.catalina-ant">
-    <include name="org/apache/catalina/ant/*" />
-    <include name="org/apache/catalina/ant/jmx/*" />
+    <include name="org/apache/catalina/ant/**" />
   </patternset>
 
   <patternset id="files.catalina-storeconfig">
@@ -1926,8 +1928,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
           <include name="org/apache/catalina/startup/DigesterFactory.class" />
           <include name="org/apache/catalina/util/SchemaResolver.class" />
           <include name="org/apache/catalina/util/StringManager.class" />
-          <include name="org/apache/tomcat/util/*" />
-          <include name="org/apache/tomcat/util/digester/*" />
+          <include name="org/apache/tomcat/util/*.class" />
+          <include name="org/apache/tomcat/util/*.properties" />
+          <include name="org/apache/tomcat/util/digester/**" />
           <exclude name="**/package.html" />
           <exclude name="**/LocalStrings_*" />
        </fileset>
