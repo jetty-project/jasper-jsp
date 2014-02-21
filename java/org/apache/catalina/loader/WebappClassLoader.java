@@ -229,7 +229,7 @@ public class WebappClassLoader extends URLClassLoader
                 j = j.getParent();
             }
         }
-        this.j2seClassLoader = j;
+        this.javaseClassLoader = j;
 
         securityManager = System.getSecurityManager();
         if (securityManager != null) {
@@ -264,7 +264,7 @@ public class WebappClassLoader extends URLClassLoader
                 j = j.getParent();
             }
         }
-        this.j2seClassLoader = j;
+        this.javaseClassLoader = j;
 
         securityManager = System.getSecurityManager();
         if (securityManager != null) {
@@ -334,12 +334,12 @@ public class WebappClassLoader extends URLClassLoader
 
 
     /**
-     * The bootstrap class loader used to load the J2SE classes. In some
+     * The bootstrap class loader used to load the JavaSE classes. In some
      * implementations this class loader is always <code>null</null> and in
      * those cases {@link ClassLoader#getParent()} will be called recursively on
      * the system class loader and the last non-null result used.
      */
-    protected final ClassLoader j2seClassLoader;
+    private ClassLoader javaseClassLoader;
 
 
     /**
@@ -1240,9 +1240,10 @@ public class WebappClassLoader extends URLClassLoader
         // (0.2) Try loading the class with the system class loader, to prevent
         //       the webapp from overriding J2SE classes
         String resourceName = binaryNameToPath(name, false);
-        if (j2seClassLoader.getResource(resourceName) != null) {
+        ClassLoader javaseLoader = getJavaseClassLoader();
+        if (javaseLoader.getResource(resourceName) != null) {
             try {
-                clazz = j2seClassLoader.loadClass(name);
+                clazz = javaseLoader.loadClass(name);
                 if (clazz != null) {
                     if (resolve)
                         resolveClass(clazz);
@@ -1504,6 +1505,18 @@ public class WebappClassLoader extends URLClassLoader
 
 
     // ------------------------------------------------------ Protected Methods
+
+    protected ClassLoader getJavaseClassLoader() {
+        return javaseClassLoader;
+    }
+
+    protected void setJavaseClassLoader(ClassLoader classLoader) {
+        if (classLoader == null) {
+            throw new IllegalArgumentException(
+                    sm.getString("webappClassLoader.javaseClassLoaderNull"));
+        }
+        javaseClassLoader = classLoader;
+    }
 
     /**
      * Clear references.
