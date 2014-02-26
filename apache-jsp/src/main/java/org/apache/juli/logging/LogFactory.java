@@ -18,14 +18,17 @@ package org.apache.juli.logging;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ServiceLoader;
 import java.util.logging.LogManager;
 
 /**
- * Modified to use java service discovery.
+ * Modified to use java service discovery, to avoid need to replace LogFactory instance.
+ * If discovery is undesirable in some deployments, then they can replace LogFactory with a
+ * hard coded version
  * 
+ * ---------------
  * 
+ * Replaced comment:
  * Modified LogFactory: removed all discovery, hardcode a specific implementation
  * If you like a different logging implementation - use either the discovery-based
  * commons-logging, or better - another implementation hardcoded to your favourite
@@ -71,44 +74,28 @@ public class LogFactory {
 
     private static final LogFactory singleton = new LogFactory();
 
-    private final Constructor<? extends Log> _logConstruct;
+    private final Constructor<? extends Log> discoveredLogConstructor;
 
     /**
-     * Protected constructor that is not available for public use.
-     * @throws SecurityException 
-     * @throws NoSuchMethodException 
+     * Private constructor that is not available for public use.
      */
     private LogFactory()
     {
+        // Look via a ServiceLoader for a Log implementation that has 
+        // a constructor taking the String name
         ServiceLoader<Log> logLoader = ServiceLoader.load(Log.class);
-        
         Constructor<? extends Log> m=null;
-        for (Log log: logLoader)
-        {
+        for (Log log: logLoader) {
             Class<? extends Log> c=log.getClass();
-            try
-            {
+            try {
                 m=c.getConstructor(String.class);
             }
-            catch (NoSuchMethodException | SecurityException e)
-            {
-                e.printStackTrace();
+            catch (NoSuchMethodException | SecurityException e) {
+                throw new Error(e);
             }
         }
         
-        if (m==null)
-        {
-            try
-            {
-                m=SimpleLog.class.getConstructor(String.class);
-            }
-            catch (NoSuchMethodException | SecurityException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        
-        _logConstruct=m;        
+        discoveredLogConstructor=m;        
     }
 
 
@@ -135,12 +122,14 @@ public class LogFactory {
      */
     public Log getInstance(String name)
         throws LogConfigurationException {
-        try
-        {
-            return _logConstruct.newInstance(name);
+        
+        if (discoveredLogConstructor==null)
+            return DirectJDKLog.getInstance(name);
+        
+        try {
+            return discoveredLogConstructor.newInstance(name);
         }
-        catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
-        {
+        catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }

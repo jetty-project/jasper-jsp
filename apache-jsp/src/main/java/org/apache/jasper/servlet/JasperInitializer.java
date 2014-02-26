@@ -80,6 +80,7 @@ public class JasperInitializer implements ServletContainerInitializer {
             log.debug(Localizer.getMessage(MSG + ".onStartup", context.getServletContextName()));
         }
 
+        // Setup a simple default Instance Manager
         if (context.getAttribute(InstanceManager.class.getName())==null)
             context.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
         
@@ -95,7 +96,7 @@ public class JasperInitializer implements ServletContainerInitializer {
         }
 
         // scan the application for TLDs
-        TldScanner scanner = prepareScanner(context, true, validate, blockExternal);
+        TldScanner scanner = newTldScanner(context, true, validate, blockExternal);
         try {
             scanner.scan();
         } catch (IOException | SAXException e) {
@@ -112,17 +113,8 @@ public class JasperInitializer implements ServletContainerInitializer {
                         scanner.getTldResourcePathTaglibXmlMap()));
     }
     
-    /**
-     * Set up a TldScanner to look for tlds.
-     * 
-     * @param context
-     * @param namespaceAware
-     * @param validate
-     * @param blockExternal
-     * @return
-     */
-    public TldScanner prepareScanner(ServletContext context, boolean namespaceAware, boolean validate, boolean blockExternal)
+    protected TldScanner newTldScanner(ServletContext context, boolean namespaceAware, boolean validate, boolean blockExternal)
     {
-    	 return new TldScanner(context, namespaceAware, validate, blockExternal);
+         return new TldScanner(context, namespaceAware, validate, blockExternal);
     }
 }
