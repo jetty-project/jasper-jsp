@@ -115,6 +115,6 @@ public class JasperInitializer implements ServletContainerInitializer {
     
     protected TldScanner newTldScanner(ServletContext context, boolean namespaceAware, boolean validate, boolean blockExternal)
     {
-         return new TldScanner(context, namespaceAware, validate, blockExternal);
+        return new TldScanner(context, namespaceAware, validate, blockExternal);
     }
 }
