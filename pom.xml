@@ -41,6 +41,17 @@
     <properties>
     </properties>
 
+    <repositories>
+      <repository>
+        <snapshots>
+          <enabled>true</enabled>
+        </snapshots>
+        <id>sonatype-snapshots</id>
+        <name>Sonatype Jetty Snapshots</name>
+        <url>http://oss.sonatype.org/content/groups/jetty</url>
+      </repository>
+    </repositories>
+
     <modules>
         <module>apache-el</module>
         <module>apache-jsp</module>
