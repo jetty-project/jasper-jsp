@@ -156,7 +156,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     private static final long serialVersionUID = 1L;
 
-
     // ----------------------------------------------------- Instance Variables
 
 
@@ -1146,15 +1145,18 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 return;
             }
             int maxCount = 60;
+            int histoInterval = 1;
             int maxInactiveInterval = manager.getMaxInactiveInterval()/60;
-            int histoInterval = maxInactiveInterval / maxCount;
-            if ( histoInterval * maxCount < maxInactiveInterval )
-                histoInterval++;
-            if (0==histoInterval)
-                histoInterval=1;
-            maxCount = maxInactiveInterval / histoInterval;
-            if ( histoInterval * maxCount < maxInactiveInterval )
-                maxCount++;
+            if (maxInactiveInterval > 0) {
+                histoInterval = maxInactiveInterval / maxCount;
+                if (histoInterval * maxCount < maxInactiveInterval)
+                    histoInterval++;
+                if (0 == histoInterval)
+                    histoInterval = 1;
+                maxCount = maxInactiveInterval / histoInterval;
+                if (histoInterval * maxCount < maxInactiveInterval)
+                    maxCount++;
+            }
 
             writer.println(smClient.getString("managerServlet.sessions",
                     displayPath));
@@ -1165,9 +1167,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             int [] timeout = new int[maxCount];
             int notimeout = 0;
             int expired = 0;
-            long now = System.currentTimeMillis();
             for (int i = 0; i < sessions.length; i++) {
-                int time = (int)((now-sessions[i].getThisAccessedTimeInternal())/1000);
+                int time = (int) (sessions[i].getIdleTimeInternal() / 1000L);
                 if (idle >= 0 && time >= idle*60) {
                     sessions[i].expire();
                     expired++;

@@ -95,8 +95,7 @@ public class TesterFirehoseServer {
         }
 
         @OnMessage
-        public void onMessage(Session session,
-                @SuppressWarnings("unused") String msg) throws IOException {
+        public void onMessage(Session session, String msg) throws IOException {
 
             if (started) {
                 return;
@@ -108,6 +107,8 @@ public class TesterFirehoseServer {
                     started = true;
                 }
             }
+
+            System.out.println("Recieved " + msg + ", now sending data");
 
             session.getUserProperties().put(
                     "org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT",

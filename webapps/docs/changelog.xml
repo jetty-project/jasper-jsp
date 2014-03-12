@@ -53,6 +53,10 @@
         application. (markt)
       </fix>
       <fix>
+        Improve the robustness of web application undeployment based on some
+        code analysis triggered by the report for <bug>54315</bug>. (markt)
+      </fix>
+      <fix>
         <bug>56125</bug>: Correctly construct the URL for a resource that
         represents the root of a JAR file. (markt)
       </fix>
@@ -91,6 +95,23 @@
         is permitted) when a call to <code>AsyncContext.complete()</code> takes
         effect. (markt)
       </fix>
+      <fix>
+        <bug>56244</bug>: Fix MBeans descriptor for WebappClassLoader MBean.
+        (kkolinko)
+      </fix>
+      <add>
+        Add a work around for validating XML documents (often TLDs) that use
+        just the file name to refer to refer to the JavaEE schema on which they
+        are based. (markt)
+      </add>
+      <add>
+        Add methods of get the idle time from last client access time to
+        <code>org.apache.catalina.Session</code>. (kfujino)
+      </add>
+      <fix>
+        <bug>56246</bug>: Fix NullPointerException in MemoryRealm when
+        authenticating an unknown user. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -104,6 +125,10 @@
         NIO connector and a request is sent using more than one AJP message.
         Patch provided by Amund Elstad. (markt)
       </fix>
+      <add>
+        Add experimental NIO2 connector. Based on code developed by
+        Nabil Benothman. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -156,6 +181,15 @@
         <bug>56217</bug>: Improve readability by using left alignment for the
         table cell containing the request information on the Manager application
         status page. (markt)
+      </fix>
+      <fix>
+        Fixed <code>java.lang.NegativeArraySizeException</code> when using
+        "Expire sessions" command in the manager web application on a
+        context where the session timeout is disabled. (kfujino)
+      </fix>
+      <fix>
+         Add support for <code>LAST_ACCESS_AT_START</code> system property to
+         Manager web application. (kfujino)
       </fix>
     </changelog>
   </subsection>
