@@ -22,35 +22,39 @@ import javax.naming.NamingException;
 
 /**
  * SimpleInstanceManager
- * 
+ *
  * Implement the org.apache.tomcat.InstanceManager interface.
  */
-public class SimpleInstanceManager implements InstanceManager
-{
-    public SimpleInstanceManager() {    
+public class SimpleInstanceManager implements InstanceManager {
+
+    public SimpleInstanceManager() {
     }
-    
+
     @Override
-    public Object newInstance(Class<?> clazz) throws IllegalAccessException, InvocationTargetException, NamingException, InstantiationException {
+    public Object newInstance(Class<?> clazz) throws IllegalAccessException,
+            InvocationTargetException, NamingException, InstantiationException {
         return prepareInstance(clazz.newInstance());
     }
 
     @Override
-    public Object newInstance(String className) throws IllegalAccessException, InvocationTargetException, NamingException, InstantiationException,
+    public Object newInstance(String className) throws IllegalAccessException,
+            InvocationTargetException, NamingException, InstantiationException,
             ClassNotFoundException  {
         Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(className);
         return prepareInstance(clazz.newInstance());
     }
 
     @Override
-    public Object newInstance(String fqcn, ClassLoader classLoader) throws IllegalAccessException, InvocationTargetException, NamingException,
-            InstantiationException, ClassNotFoundException  {
+    public Object newInstance(String fqcn, ClassLoader classLoader) throws IllegalAccessException,
+            InvocationTargetException, NamingException, InstantiationException,
+            ClassNotFoundException  {
         Class<?> clazz = classLoader.loadClass(fqcn);
         return prepareInstance(clazz.newInstance());
     }
 
     @Override
-    public void newInstance(Object o) throws IllegalAccessException, InvocationTargetException, NamingException  {
+    public void newInstance(Object o) throws IllegalAccessException, InvocationTargetException,
+            NamingException  {
         prepareInstance(o);
     }
 
@@ -61,5 +65,4 @@ public class SimpleInstanceManager implements InstanceManager
     private Object prepareInstance(Object o) {
         return o;
     }
-
 }

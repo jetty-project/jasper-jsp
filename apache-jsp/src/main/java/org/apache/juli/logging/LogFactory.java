@@ -29,30 +29,24 @@ import java.util.logging.LogManager;
  * ---------------
  * 
  * Replaced comment:
- * Modified LogFactory: removed all discovery, hardcode a specific implementation
- * If you like a different logging implementation - use either the discovery-based
- * commons-logging, or better - another implementation hardcoded to your favourite
- * logging impl.
  *
- * Why ? Each application and deployment can choose a logging implementation -
- * that involves configuration, installing the logger jar and optional plugins, etc.
- * As part of this process - they can as well install the commons-logging implementation
- * that corresponds to their logger of choice. This completely avoids any discovery
- * problem, while still allowing the user to switch.
+ * Why? It is an attempt to strike a balance between simpler code (no discovery)
+ * and providing flexibility - particularly for those projects that embed Tomcat
+ * or some of Tomcat&apos;s components - is an alternative logging
+ * implementationnis desired.
  *
- * Note that this implementation is not just a wrapper around JDK logging ( like
- * the original commons-logging impl ). It adds 2 features - a simpler configuration
- * ( which is in fact a subset of log4j.properties ) and a formatter that is
- * less ugly.
+ * Note that this implementation is not just a wrapper around JDK logging (like
+ * the original commons-logging impl). It adds 2 features - a simpler
+ * configuration  (which is in fact a subset of log4j.properties) and a
+ * formatter that is less ugly.
  *
- * The removal of 'abstract' preserves binary backward compatibility. It is possible
- * to preserve the abstract - and introduce another ( hardcoded ) factory - but I
- * see no benefit.
+ * The removal of 'abstract' preserves binary backward compatibility. It is
+ * possible to preserve the abstract - and introduce another (hardcoded) factory
+ * - but I see no benefit.
  *
- * Since this class is not intended to be extended - and provides
- * no plugin for other LogFactory implementation - all protected methods are removed.
- * This can be changed - but again, there is little value in keeping dead code.
- * Just take a quick look at the removed code ( and it's complexity)
+ * Since this class is not intended to be extended - all protected methods are
+ * removed. This can be changed - but again, there is little value in keeping
+ * dead code. Just take a quick look at the removed code ( and it's complexity).
  *
  * --------------
  *
@@ -120,8 +114,8 @@ public class LogFactory {
      * @exception LogConfigurationException if a suitable <code>Log</code>
      *  instance cannot be returned
      */
-    public Log getInstance(String name)
-        throws LogConfigurationException {
+    public Log getInstance(String name) throws LogConfigurationException {
+        if (discoveredLogConstructor == null) {
         
         if (discoveredLogConstructor==null)
             return DirectJDKLog.getInstance(name);
@@ -130,6 +124,14 @@ public class LogFactory {
             return discoveredLogConstructor.newInstance(name);
         }
         catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+        }
+
+        try {
+            return discoveredLogConstructor.newInstance(name);
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException |
+                InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }
@@ -144,8 +146,7 @@ public class LogFactory {
      * @exception LogConfigurationException if a suitable <code>Log</code>
      *  instance cannot be returned
      */
-    public Log getInstance(Class<?> clazz)
-        throws LogConfigurationException {
+    public Log getInstance(Class<?> clazz) throws LogConfigurationException {
         return getInstance( clazz.getName());
     }
 

@@ -14,14 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.tomcat.util.security;
 
-package org.apache.tomcat.util.file;
+import java.security.PrivilegedAction;
 
-/**
- * String constants for the file package.
- */
-public final class Constants {
-
-    public static final String Package = "org.apache.tomcat.util.file";
-
+public class PrivilegedGetTccl implements PrivilegedAction<ClassLoader> {
+    @Override
+    public ClassLoader run() {
+        return Thread.currentThread().getContextClassLoader();
+    }
 }
+
+

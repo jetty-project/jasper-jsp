@@ -14,12 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.util.descriptor;
+package org.apache.tomcat.util.security;
 
-public class Constants {
+import java.security.PrivilegedAction;
 
-    public static final String PACKAGE_NAME =
-            Constants.class.getPackage().getName();
+public class PrivilegedSetTccl implements PrivilegedAction<Void> {
 
-    public static final boolean IS_SECURITY_ENABLED = (System.getSecurityManager() != null);
+    private ClassLoader cl;
+
+    public PrivilegedSetTccl(ClassLoader cl) {
+        this.cl = cl;
+    }
+
+    @Override
+    public Void run() {
+        Thread.currentThread().setContextClassLoader(cl);
+        return null;
+    }
 }

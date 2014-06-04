@@ -70,8 +70,9 @@ public class JasperInitializer implements ServletContainerInitializer {
             }
         }
 
-        // TODO we should play nice and only set this if it's null
-        JspFactory.setDefaultFactory(factory);
+        if (JspFactory.getDefaultFactory() == null) {
+            JspFactory.setDefaultFactory(factory);
+        }
     }
 
     @Override
@@ -81,9 +82,10 @@ public class JasperInitializer implements ServletContainerInitializer {
         }
 
         // Setup a simple default Instance Manager
-        if (context.getAttribute(InstanceManager.class.getName())==null)
+        if (context.getAttribute(InstanceManager.class.getName())==null) {
             context.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
-        
+        }
+
         boolean validate = Boolean.parseBoolean(
                 context.getInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM));
         String blockExternalString = context.getInitParameter(
@@ -112,9 +114,9 @@ public class JasperInitializer implements ServletContainerInitializer {
                 new TldCache(context, scanner.getUriTldResourcePathMap(),
                         scanner.getTldResourcePathTaglibXmlMap()));
     }
-    
-    protected TldScanner newTldScanner(ServletContext context, boolean namespaceAware, boolean validate, boolean blockExternal)
-    {
+
+    protected TldScanner newTldScanner(ServletContext context, boolean namespaceAware,
+            boolean validate, boolean blockExternal) {
         return new TldScanner(context, namespaceAware, validate, blockExternal);
     }
 }
