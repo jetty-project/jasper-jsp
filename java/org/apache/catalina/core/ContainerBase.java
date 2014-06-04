@@ -95,7 +95,7 @@ import org.apache.tomcat.util.res.StringManager;
  *     <td>Child container added to this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>addValve</code></td>
+ *     <td align=center><code>{@link #getPipeline() pipeline}.addValve</code></td>
  *     <td align=center><code>Valve</code></td>
  *     <td>Valve added to this Container.</td>
  *   </tr>
@@ -105,7 +105,7 @@ import org.apache.tomcat.util.res.StringManager;
  *     <td>Child container removed from this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>removeValve</code></td>
+ *     <td align=center><code>{@link #getPipeline() pipeline}.removeValve</code></td>
  *     <td align=center><code>Valve</code></td>
  *     <td>Valve removed from this Container.</td>
  *   </tr>
@@ -599,8 +599,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     public Realm getRealm() {
 
         Lock l = realmLock.readLock();
+        l.lock();
         try {
-            l.lock();
             if (realm != null)
                 return (realm);
             if (parent != null)
@@ -614,8 +614,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     protected Realm getRealmInternal() {
         Lock l = realmLock.readLock();
+        l.lock();
         try {
-            l.lock();
             return realm;
         } finally {
             l.unlock();
@@ -631,10 +631,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     public void setRealm(Realm realm) {
 
         Lock l = realmLock.writeLock();
-
+        l.lock();
         try {
-            l.lock();
-
             // Change components if necessary
             Realm oldRealm = this.realm;
             if (oldRealm == realm)
@@ -1152,6 +1150,17 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
 
         return parent.getCatalinaBase();
+    }
+
+
+    @Override
+    public File getCatalinaHome() {
+
+        if (parent == null) {
+            return null;
+        }
+
+        return parent.getCatalinaHome();
     }
 
 

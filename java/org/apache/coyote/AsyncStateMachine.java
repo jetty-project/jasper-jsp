@@ -16,12 +16,13 @@
  */
 package org.apache.coyote;
 
-import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.PrivilegedGetTccl;
+import org.apache.tomcat.util.security.PrivilegedSetTccl;
 
 /**
  * Manages the state transitions for async requests.
@@ -204,21 +205,11 @@ public class AsyncStateMachine<S> {
             state = AsyncState.STARTED;
             return SocketState.LONG;
         } else if (state == AsyncState.MUST_COMPLETE) {
-            try {
-                asyncCtxt.fireOnComplete();
-            } catch (IOException e) {
-                // Socket is in unknown state. Close it.
-                return SocketState.CLOSED;
-            }
+            asyncCtxt.fireOnComplete();
             state = AsyncState.DISPATCHED;
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.COMPLETING) {
-            try {
-                asyncCtxt.fireOnComplete();
-            } catch (IOException e) {
-                // Socket is in unknown state. Close it.
-                return SocketState.CLOSED;
-            }
+            asyncCtxt.fireOnComplete();
             state = AsyncState.DISPATCHED;
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.MUST_DISPATCH) {
@@ -289,7 +280,9 @@ public class AsyncStateMachine<S> {
                 state == AsyncState.TIMING_OUT ||
                 state == AsyncState.ERROR) {
             state = AsyncState.DISPATCHING;
-            doDispatch = true;
+            if (!ContainerThreadMarker.isContainerThread()) {
+                doDispatch = true;
+            }
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
@@ -372,30 +365,5 @@ public class AsyncStateMachine<S> {
     private void clearNonBlockingListeners() {
         processor.getRequest().listener = null;
         processor.getRequest().getResponse().listener = null;
-    }
-
-
-    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
-
-        private ClassLoader cl;
-
-        PrivilegedSetTccl(ClassLoader cl) {
-            this.cl = cl;
-        }
-
-        @Override
-        public Void run() {
-            Thread.currentThread().setContextClassLoader(cl);
-            return null;
-        }
-    }
-
-    private static class PrivilegedGetTccl
-            implements PrivilegedAction<ClassLoader> {
-
-        @Override
-        public ClassLoader run() {
-            return Thread.currentThread().getContextClassLoader();
-        }
     }
 }

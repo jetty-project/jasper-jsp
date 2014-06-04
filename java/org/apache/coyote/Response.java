@@ -25,7 +25,6 @@ import javax.servlet.WriteListener;
 
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -243,7 +242,7 @@ public final class Response {
      * request processing.
      */
     public void setErrorException(Exception ex) {
-    errorException = ex;
+        errorException = ex;
     }
 
 
@@ -264,42 +263,16 @@ public final class Response {
     // -------------------- Methods --------------------
 
 
-    public void reset()
-        throws IllegalStateException {
+    public void reset() throws IllegalStateException {
 
-        // Reset the headers only if this is the main request,
-        // not for included
-        contentType = null;
-        locale = DEFAULT_LOCALE;
-        contentLanguage = null;
-        characterEncoding = Constants.DEFAULT_CHARACTER_ENCODING;
-        contentLength = -1;
-        charsetSet = false;
-
-        status = 200;
-        message = null;
-        headers.clear();
-
-        // Force the PrintWriter to flush its data to the output
-        // stream before resetting the output stream
-        //
-        // Reset the stream
         if (commited) {
-            //String msg = sm.getString("servletOutputStreamImpl.reset.ise");
             throw new IllegalStateException();
         }
 
+        recycle();
+
+        // Reset the stream
         action(ActionCode.RESET, this);
-    }
-
-
-    public void finish() {
-        action(ActionCode.CLOSE, this);
-    }
-
-
-    public void acknowledge() {
-        action(ActionCode.ACK, this);
     }
 
 
@@ -451,7 +424,7 @@ public final class Response {
 
         MediaType m = null;
         try {
-             m = HttpParser.parseMediaType(new StringReader(type));
+             m = MediaType.parseMediaType(new StringReader(type));
         } catch (IOException e) {
             // Ignore - null test below handles this
         }
@@ -490,10 +463,6 @@ public final class Response {
         }
 
         return ret;
-    }
-
-    public void setContentLength(int contentLength) {
-        this.contentLength = contentLength;
     }
 
     public void setContentLength(long contentLength) {

@@ -31,6 +31,8 @@ import org.apache.jasper.runtime.JspFactoryImpl;
 import org.apache.jasper.security.SecurityClassLoad;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.SimpleInstanceManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -68,14 +70,20 @@ public class JasperInitializer implements ServletContainerInitializer {
             }
         }
 
-        // TODO we should play nice and only set this if it's null
-        JspFactory.setDefaultFactory(factory);
+        if (JspFactory.getDefaultFactory() == null) {
+            JspFactory.setDefaultFactory(factory);
+        }
     }
 
     @Override
     public void onStartup(Set<Class<?>> types, ServletContext context) throws ServletException {
         if (log.isDebugEnabled()) {
             log.debug(Localizer.getMessage(MSG + ".onStartup", context.getServletContextName()));
+        }
+
+        // Setup a simple default Instance Manager
+        if (context.getAttribute(InstanceManager.class.getName())==null) {
+            context.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
         }
 
         boolean validate = Boolean.parseBoolean(
@@ -90,7 +98,7 @@ public class JasperInitializer implements ServletContainerInitializer {
         }
 
         // scan the application for TLDs
-        TldScanner scanner = new TldScanner(context, true, validate, blockExternal);
+        TldScanner scanner = newTldScanner(context, true, validate, blockExternal);
         try {
             scanner.scan();
         } catch (IOException | SAXException e) {
@@ -105,5 +113,10 @@ public class JasperInitializer implements ServletContainerInitializer {
         context.setAttribute(TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME,
                 new TldCache(context, scanner.getUriTldResourcePathMap(),
                         scanner.getTldResourcePathTaglibXmlMap()));
+    }
+
+    protected TldScanner newTldScanner(ServletContext context, boolean namespaceAware,
+            boolean validate, boolean blockExternal) {
+        return new TldScanner(context, namespaceAware, validate, blockExternal);
     }
 }

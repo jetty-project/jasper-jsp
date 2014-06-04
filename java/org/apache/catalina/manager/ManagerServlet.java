@@ -54,6 +54,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
@@ -175,14 +176,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * The debugging detail level for this servlet.
      */
     protected int debug = 1;
-
-
-    /**
-     * File object representing the directory into which the deploy() command
-     * will store the WAR and context configuration files that have been
-     * uploaded.
-     */
-    protected File deployed = null;
 
 
     /**
@@ -334,14 +327,17 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         response.setContentType("text/plain; charset=" + Constants.CHARSET);
         PrintWriter writer = response.getWriter();
 
-        // Process the requested command (note - "/deploy" is not listed here)
+        // Process the requested command
         if (command == null) {
             writer.println(smClient.getString("managerServlet.noCommand"));
         } else if (command.equals("/deploy")) {
             if (war != null || config != null) {
                 deploy(writer, config, cn, war, update, smClient);
-            } else {
+            } else if (tag != null) {
                 deploy(writer, cn, tag, smClient);
+            } else {
+                writer.println(smClient.getString(
+                        "managerServlet.invalidCommand", command));
             }
         } else if (command.equals("/list")) {
             list(writer, smClient);
@@ -467,9 +463,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         versioned = (File) getServletContext().getAttribute
             (ServletContext.TEMPDIR);
 
-        // Identify the appBase of the owning Host of this Context
-        // (if any)
-        deployed = ((Host) context.getParent()).getAppBaseFile();
         configBase = new File(context.getCatalinaBase(), "conf");
         Container container = context;
         Container host = null;
@@ -629,10 +622,13 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * Deploy a web application archive (included in the current request)
      * at the specified context path.
      *
-     * @param writer Writer to render results to
-     * @param cn Name of the application to be installed
-     * @param tag Tag to be associated with the webapp
-     * @param request Servlet request we are processing
+     * @param writer   Writer to render results to
+     * @param cn       Name of the application to be installed
+     * @param tag      Tag to be associated with the webapp
+     * @param update   Flag that indicates that any existing app should be
+     *                   replaced
+     * @param request  Servlet request we are processing
+     * @param smClient i18n messages using the locale of the client
      */
     protected synchronized void deploy
         (PrintWriter writer, ContextName cn,
@@ -651,51 +647,65 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String baseName = cn.getBaseName();
         String displayPath = cn.getDisplayName();
 
-        // Check if app already exists, or undeploy it if updating
+        // If app exists deployment can only proceed if update is true
+        // Note existing WAR will be deleted and then replaced
         Context context = (Context) host.findChild(name);
-        if (update) {
-            if (context != null) {
-                undeploy(writer, cn, smClient);
-            }
-            context = (Context) host.findChild(name);
-        }
-        if (context != null) {
+        if (context != null && !update) {
             writer.println(smClient.getString("managerServlet.alreadyContext",
                     displayPath));
             return;
         }
 
-        // Calculate the base path
-        File deployedPath = deployed;
-        if (tag != null) {
-            deployedPath = new File(versioned, tag);
-            if (!deployedPath.mkdirs() && !deployedPath.isDirectory()) {
+        File deployedWar = new File(host.getAppBaseFile(), baseName + ".war");
+
+        // Determine full path for uploaded WAR
+        File uploadedWar;
+        if (tag == null) {
+            if (update) {
+                // Append ".tmp" to the file name so it won't get deployed if auto
+                // deployment is enabled. It also means the old war won't get
+                // deleted if the upload fails
+                uploadedWar = new File(deployedWar.getAbsolutePath() + ".tmp");
+                if (uploadedWar.exists() && !uploadedWar.delete()) {
+                    writer.println(smClient.getString("managerServlet.deleteFail",
+                            uploadedWar));
+                }
+            } else {
+                uploadedWar = deployedWar;
+            }
+        } else {
+            File uploadPath = new File(versioned, tag);
+            if (!uploadPath.mkdirs() && !uploadPath.isDirectory()) {
                 writer.println(smClient.getString("managerServlet.mkdirFail",
-                        deployedPath));
+                        uploadPath));
                 return;
             }
+            uploadedWar = new File(uploadPath, baseName + ".war");
         }
-
-        // Upload the web application archive to a local WAR file
-        File localWar = new File(deployedPath, baseName + ".war");
         if (debug >= 2) {
-            log("Uploading WAR file to " + localWar);
+            log("Uploading WAR file to " + uploadedWar);
         }
 
-        // Copy WAR to appBase
         try {
-            if (!isServiced(name)) {
+            if (isServiced(name)) {
+                writer.println(smClient.getString("managerServlet.inService", displayPath));
+            } else {
                 addServiced(name);
                 try {
                     // Upload WAR
-                    uploadWar(writer, request, localWar, smClient);
-                    // Copy WAR and XML to the host app base if needed
+                    uploadWar(writer, request, uploadedWar, smClient);
+                    if (update && tag == null) {
+                        if (deployedWar.exists() && !deployedWar.delete()) {
+                            writer.println(smClient.getString("managerServlet.deleteFail",
+                                    deployedWar));
+                            return;
+                        }
+                        // Rename uploaded WAR file
+                        uploadedWar.renameTo(deployedWar);
+                    }
                     if (tag != null) {
-                        deployedPath = deployed;
-                        File localWarCopy = new File(deployedPath, baseName + ".war");
-                        copy(localWar, localWarCopy);
-                        localWar = localWarCopy;
-                        copy(localWar, new File(host.getAppBaseFile(), baseName + ".war"));
+                        // Copy WAR to the host's appBase
+                        copy(uploadedWar, deployedWar);
                     }
                     // Perform new deployment
                     check(name);
@@ -710,16 +720,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             return;
         }
 
-        context = (Context) host.findChild(name);
-        if (context != null && context.getConfigured()) {
-            writer.println(smClient.getString(
-                    "managerServlet.deployed", displayPath));
-        } else {
-            // Something failed
-            writer.println(smClient.getString(
-                    "managerServlet.deployFailed", displayPath));
-        }
-
+        writeDeployResult(writer, smClient, name, displayPath);
     }
 
 
@@ -727,12 +728,15 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * Install an application for the specified path from the specified
      * web application archive.
      *
-     * @param writer Writer to render results to
-     * @param tag Revision tag to deploy from
-     * @param cn Name of the application to be installed
+     * @param writer    Writer to render results to
+     * @param tag       Revision tag to deploy from
+     * @param cn        Name of the application to be installed
+     * @param smClient  i18n messages using the locale of the client
      */
     protected void deploy(PrintWriter writer, ContextName cn, String tag,
             StringManager smClient) {
+
+        // NOTE: It is assumed that update is always true in this method.
 
         // Validate the requested context path
         if (!validateContextName(cn, writer, smClient)) {
@@ -743,27 +747,24 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String name = cn.getName();
         String displayPath = cn.getDisplayName();
 
-        // Calculate the base path
-        File deployedPath = versioned;
-        if (tag != null) {
-            deployedPath = new File(deployedPath, tag);
-        }
-
         // Find the local WAR file
-        File localWar = new File(deployedPath, baseName + ".war");
+        File localWar = new File(new File(versioned, tag), baseName + ".war");
 
-        // Check if app already exists, or undeploy it if updating
-        Context context = (Context) host.findChild(name);
-        if (context != null) {
-            undeploy(writer, cn, smClient);
-        }
+        File deployedWar = new File(host.getAppBaseFile(), baseName + ".war");
 
         // Copy WAR to appBase
         try {
-            if (!isServiced(name)) {
+            if (isServiced(name)) {
+                writer.println(smClient.getString("managerServlet.inService", displayPath));
+            } else {
                 addServiced(name);
                 try {
-                    copy(localWar, new File(host.getAppBaseFile(), baseName + ".war"));
+                    if (!deployedWar.delete()) {
+                        writer.println(smClient.getString("managerServlet.deleteFail",
+                                deployedWar));
+                        return;
+                    }
+                    copy(localWar, deployedWar);
                     // Perform new deployment
                     check(name);
                 } finally {
@@ -777,16 +778,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             return;
         }
 
-        context = (Context) host.findChild(name);
-        if (context != null && context.getConfigured()) {
-            writer.println(smClient.getString("managerServlet.deployed",
-                    displayPath));
-        } else {
-            // Something failed
-            writer.println(smClient.getString("managerServlet.deployFailed",
-                    displayPath));
-        }
-
+        writeDeployResult(writer, smClient, name, displayPath);
     }
 
 
@@ -794,14 +786,15 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * Install an application for the specified path from the specified
      * web application archive.
      *
-     * @param writer Writer to render results to
-     * @param config URL of the context configuration file to be installed
-     * @param cn Name of the application to be installed
-     * @param war URL of the web application archive to be installed
-     * @param update true to override any existing webapp on the path
+     * @param writer    Writer to render results to
+     * @param config    URL of the context configuration file to be installed
+     * @param cn        Name of the application to be installed
+     * @param war       URL of the web application archive to be installed
+     * @param update    true to override any existing webapp on the path
+     * @param smClient  i18n messages using the locale of the client
      */
     protected void deploy(PrintWriter writer, String config, ContextName cn,
-            String war, boolean update,  StringManager smClient) {
+            String war, boolean update, StringManager smClient) {
 
         if (config != null && config.length() == 0) {
             config = null;
@@ -837,15 +830,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String baseName = cn.getBaseName();
         String displayPath = cn.getDisplayName();
 
-        // Check if app already exists, or undeploy it if updating
+        // If app exists deployment can only proceed if update is true
+        // Note existing files will be deleted and then replaced
         Context context = (Context) host.findChild(name);
-        if (update) {
-            if (context != null) {
-                undeploy(writer, cn, smClient);
-            }
-            context = (Context) host.findChild(name);
-        }
-        if (context != null) {
+        if (context != null && !update) {
             writer.println(smClient.getString("managerServlet.alreadyContext",
                     displayPath));
             return;
@@ -859,7 +847,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         try {
-            if (!isServiced(name)) {
+            if (isServiced(name)) {
+                writer.println(smClient.getString("managerServlet.inService", displayPath));
+            } else {
                 addServiced(name);
                 try {
                     if (config != null) {
@@ -868,17 +858,27 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                     "managerServlet.mkdirFail",configBase));
                             return;
                         }
-                        copy(new File(config),
-                                new File(configBase, baseName + ".xml"));
+                        File localConfig = new File(configBase, baseName + ".xml");
+                        if (localConfig.isFile() && !localConfig.delete()) {
+                            writer.println(smClient.getString(
+                                    "managerServlet.deleteFail", localConfig));
+                            return;
+                        }
+                        copy(new File(config), localConfig);
                     }
                     if (war != null) {
+                        File localWar;
                         if (war.endsWith(".war")) {
-                            copy(new File(war),
-                                    new File(host.getAppBaseFile(), baseName + ".war"));
+                            localWar = new File(host.getAppBaseFile(), baseName + ".war");
                         } else {
-                            copy(new File(war),
-                                    new File(host.getAppBaseFile(), baseName));
+                            localWar = new File(host.getAppBaseFile(), baseName);
                         }
+                        if (localWar.exists() && !ExpandWar.delete(localWar)) {
+                            writer.println(smClient.getString(
+                                    "managerServlet.deleteFail", localWar));
+                            return;
+                        }
+                        copy(new File(war), localWar);
                     }
                     // Perform new deployment
                     check(name);
@@ -886,19 +886,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     removeServiced(name);
                 }
             }
-            context = (Context) host.findChild(name);
-            if (context != null && context.getConfigured() &&
-                    context.getState().isAvailable()) {
-                writer.println(smClient.getString(
-                        "managerServlet.deployed", displayPath));
-            } else if (context!=null && !context.getState().isAvailable()) {
-                writer.println(smClient.getString(
-                        "managerServlet.deployedButNotStarted", displayPath));
-            } else {
-                // Something failed
-                writer.println(smClient.getString(
-                        "managerServlet.deployFailed", displayPath));
-            }
+            writeDeployResult(writer, smClient, name, displayPath);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.install[" + displayPath + "]", t);
@@ -906,6 +894,24 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     t.toString()));
         }
 
+    }
+
+
+    private void writeDeployResult(PrintWriter writer, StringManager smClient,
+            String name, String displayPath) {
+        Context deployed = (Context) host.findChild(name);
+        if (deployed != null && deployed.getConfigured() &&
+                deployed.getState().isAvailable()) {
+            writer.println(smClient.getString(
+                    "managerServlet.deployed", displayPath));
+        } else if (deployed!=null && !deployed.getState().isAvailable()) {
+            writer.println(smClient.getString(
+                    "managerServlet.deployedButNotStarted", displayPath));
+        } else {
+            // Something failed
+            writer.println(smClient.getString(
+                    "managerServlet.deployFailed", displayPath));
+        }
     }
 
 
@@ -1360,7 +1366,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 return;
             }
 
-            if (!isServiced(name)) {
+            if (isServiced(name)) {
+                writer.println(smClient.getString("managerServlet.inService", displayPath));
+            } else {
                 addServiced(name);
                 try {
                     // Try to stop the context first to be nicer
@@ -1512,12 +1520,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             String msg = smClient.getString("managerServlet.deleteFail", war);
             throw new IOException(msg);
         }
-        ServletInputStream istream = null;
-        BufferedOutputStream ostream = null;
-        try {
-            istream = request.getInputStream();
-            ostream =
-                new BufferedOutputStream(new FileOutputStream(war), 1024);
+
+        try (ServletInputStream istream = request.getInputStream();
+                BufferedOutputStream ostream =
+                        new BufferedOutputStream(new FileOutputStream(war), 1024)) {
             byte buffer[] = new byte[1024];
             while (true) {
                 int n = istream.read(buffer);
@@ -1526,34 +1532,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 }
                 ostream.write(buffer, 0, n);
             }
-            ostream.flush();
-            ostream.close();
-            ostream = null;
-            istream.close();
-            istream = null;
         } catch (IOException e) {
             if (war.exists() && !war.delete()) {
                 writer.println(
                         smClient.getString("managerServlet.deleteFail", war));
             }
             throw e;
-        } finally {
-            if (ostream != null) {
-                try {
-                    ostream.close();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                }
-                ostream = null;
-            }
-            if (istream != null) {
-                try {
-                    istream.close();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                }
-                istream = null;
-            }
         }
 
     }
@@ -1624,11 +1608,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             if (fileSrc.isDirectory()) {
                 result = copyInternal(fileSrc, fileDest, buf);
             } else {
-                FileInputStream is = null;
-                FileOutputStream os = null;
-                try {
-                    is = new FileInputStream(fileSrc);
-                    os = new FileOutputStream(fileDest);
+                try (FileInputStream is = new FileInputStream(fileSrc);
+                        FileOutputStream os = new FileOutputStream(fileDest)){
                     int len = 0;
                     while (true) {
                         len = is.read(buf);
@@ -1639,21 +1620,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 } catch (IOException e) {
                     e.printStackTrace();
                     result = false;
-                } finally {
-                    if (is != null) {
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            // Ignore
-                        }
-                    }
-                    if (os != null) {
-                        try {
-                            os.close();
-                        } catch (IOException e) {
-                            // Ignore
-                        }
-                    }
                 }
             }
         }

@@ -42,6 +42,7 @@ import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -109,6 +110,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Queue<String> messages = handler.getMessages();
         Assert.assertEquals(1, messages.size());
         Assert.assertEquals(MESSAGE_STRING_1, messages.peek());
+
+        ((WsWebSocketContainer) wsContainer).destroy();
     }
 
 
@@ -358,6 +361,9 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         long timeout = System.currentTimeMillis() - lastSend;
 
+        // Clear the server side block and prevent and further blocks to allow
+        // the server to shutdown cleanly
+        BlockingPojo.clearBlock();
 
         String msg = "Time out was [" + timeout + "] ms";
 
@@ -388,6 +394,11 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
     private void doTestWriteTimeoutServer(boolean setTimeoutOnContainer)
             throws Exception {
 
+        // This will never work for BIO
+        Assume.assumeFalse(
+                "Skipping test. This feature will never work for BIO connector.",
+                getProtocol().equals(Http11Protocol.class.getName()));
+
         /*
          * Note: There are all sorts of horrible uses of statics in this test
          *       because the API uses classes and the tests really need access
@@ -396,11 +407,6 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         timoutOnContainer = setTimeoutOnContainer;
 
         Tomcat tomcat = getTomcatInstance();
-
-        if (getProtocol().equals(Http11Protocol.class.getName())) {
-            // This will never work for BIO
-            return;
-        }
 
         // Must have a real docBase - just use temp
         Context ctx =
@@ -459,6 +465,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                     (ServerContainer) sce.getServletContext().getAttribute(
                             Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
             try {
+                // Reset blocking state
+                BlockingPojo.resetBlock();
                 sc.addEndpoint(BlockingPojo.class);
             } catch (DeploymentException e) {
                 throw new IllegalStateException(e);
@@ -469,11 +477,35 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
     @ServerEndpoint("/block")
     public static class BlockingPojo {
+
+        private static Object monitor = new Object();
+        // Enable blockign by default
+        private static boolean block = true;
+
+        /**
+         * Clear any current block.
+         */
+        public static void clearBlock() {
+            synchronized (monitor) {
+                BlockingPojo.block = false;
+                monitor.notifyAll();
+            }
+        }
+
+        public static void resetBlock() {
+            synchronized (monitor) {
+                block = true;
+            }
+        }
         @SuppressWarnings("unused")
         @OnMessage
         public void echoTextMessage(Session session, String msg, boolean last) {
             try {
-                Thread.sleep(60000);
+                synchronized (monitor) {
+                    while (block) {
+                        monitor.wait();
+                    }
+                }
             } catch (InterruptedException e) {
                 // Ignore
             }
@@ -485,7 +517,11 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         public void echoBinaryMessage(Session session, ByteBuffer msg,
                 boolean last) {
             try {
-                Thread.sleep(TIMEOUT_MS * 10);
+                synchronized (monitor) {
+                    while (block) {
+                        monitor.wait();
+                    }
+                }
             } catch (InterruptedException e) {
                 // Ignore
             }

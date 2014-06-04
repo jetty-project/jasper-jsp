@@ -75,7 +75,7 @@ set "EXECUTABLE=%CATALINA_HOME%\bin\tomcat@VERSION_MAJOR@.exe"
 
 rem Set default Service name
 set SERVICE_NAME=Tomcat@VERSION_MAJOR@
-set DISPLAYNAME=Apache Tomcat @VERSION_MAJOR@ %SERVICE_NAME%
+set DISPLAYNAME=Apache Tomcat @VERSION_MAJOR_MINOR@ %SERVICE_NAME%
 
 if "x%1x" == "xx" goto displayUsage
 set SERVICE_CMD=%1
@@ -85,7 +85,7 @@ if "x%1x" == "xx" goto checkServiceCmd
 if "x%1x" == "x/userx" goto runAsUser
 if "x%1x" == "x--userx" goto runAsUser
 set SERVICE_NAME=%1
-set DISPLAYNAME=Apache Tomcat @VERSION_MAJOR@ %1
+set DISPLAYNAME=Apache Tomcat @VERSION_MAJOR_MINOR@ %1
 shift
 if "x%1x" == "xx" goto checkServiceCmd
 goto checkUser
@@ -100,7 +100,7 @@ goto end
 if /i %SERVICE_CMD% == install goto doInstall
 if /i %SERVICE_CMD% == remove goto doRemove
 if /i %SERVICE_CMD% == uninstall goto doRemove
-echo Unknown parameter "%1"
+echo Unknown parameter "%SERVICE_CMD%"
 :displayUsage
 echo.
 echo Usage: service.bat install/remove [service_name] [/user username]
@@ -128,12 +128,13 @@ echo Using CATALINA_BASE:    "%CATALINA_BASE%"
 echo Using JAVA_HOME:        "%JAVA_HOME%"
 echo Using JRE_HOME:         "%JRE_HOME%"
 
-rem Set the server jvm from JAVA_HOME
+rem Try to use the server jvm
 set "JVM=%JRE_HOME%\bin\server\jvm.dll"
 if exist "%JVM%" goto foundJvm
-rem Set the client jvm from JAVA_HOME
+rem Try to use the client jvm
 set "JVM=%JRE_HOME%\bin\client\jvm.dll"
 if exist "%JVM%" goto foundJvm
+echo Warning: Neither 'server' nor 'client' jvm.dll was found at JRE_HOME.
 set JVM=auto
 :foundJvm
 echo Using JVM:              "%JVM%"

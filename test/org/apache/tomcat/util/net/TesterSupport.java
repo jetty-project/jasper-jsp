@@ -23,15 +23,12 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.security.KeyManagementException;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
@@ -52,30 +49,6 @@ import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
 public final class TesterSupport {
-
-    protected static final boolean RFC_5746_SUPPORTED;
-
-    static {
-        boolean result = false;
-        SSLContext context;
-        try {
-            context = SSLContext.getInstance("TLS");
-            context.init(null, null, null);
-            SSLServerSocketFactory ssf = context.getServerSocketFactory();
-            String ciphers[] = ssf.getSupportedCipherSuites();
-            for (String cipher : ciphers) {
-                if ("TLS_EMPTY_RENEGOTIATION_INFO_SCSV".equals(cipher)) {
-                    result = true;
-                    break;
-                }
-            }
-        } catch (NoSuchAlgorithmException e) {
-            // Assume no RFC 5746 support
-        } catch (KeyManagementException e) {
-            // Assume no RFC 5746 support
-        }
-        RFC_5746_SUPPORTED = result;
-    }
 
     public static void initSsl(Tomcat tomcat) {
         initSsl(tomcat, "localhost.jks", null, null);
@@ -148,20 +121,14 @@ public final class TesterSupport {
     private static KeyStore getKeyStore(String keystore) throws Exception {
         File keystoreFile = new File(keystore);
         KeyStore ks = KeyStore.getInstance("JKS");
-        InputStream is = null;
-        try {
-            is = new FileInputStream(keystoreFile);
+        try (InputStream is = new FileInputStream(keystoreFile)) {
             ks.load(is, "changeit".toCharArray());
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException ioe) {
-                    // Ignore
-                }
-            }
         }
         return ks;
+    }
+
+    protected static boolean isMacOs() {
+        return System.getProperty("os.name").toLowerCase().startsWith("mac os x");
     }
 
     protected static boolean isRenegotiationSupported(Tomcat tomcat) {
@@ -170,6 +137,11 @@ public final class TesterSupport {
             // Disabled by default in 1.1.20 windows binary (2010-07-27)
             return false;
         }
+        if (protocol.contains("NioProtocol") || (protocol.contains("Nio2Protocol") && isMacOs())) {
+            // Doesn't work on all platforms - see BZ 56448.
+            return false;
+        }
+
         return true;
     }
 

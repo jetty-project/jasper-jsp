@@ -42,13 +42,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -69,7 +65,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
 public class WsWebSocketContainer
@@ -109,43 +104,9 @@ public class WsWebSocketContainer
             StringManager.getManager(Constants.PACKAGE_NAME);
     private static final Random random = new Random();
     private static final byte[] crlf = new byte[] {13, 10};
-    private static final AsynchronousChannelGroup asynchronousChannelGroup;
 
-    static {
-        AsynchronousChannelGroup result = null;
-
-        // Need to do this with the right thread context class loader else the
-        // first web app to call this will trigger a leak
-        ClassLoader original = Thread.currentThread().getContextClassLoader();
-
-        try {
-            Thread.currentThread().setContextClassLoader(
-                    AsyncIOThreadFactory.class.getClassLoader());
-
-            // These are the same settings as the default
-            // AsynchronousChannelGroup
-            int initialSize = Runtime.getRuntime().availableProcessors();
-            ExecutorService executorService = new ThreadPoolExecutor(
-                    0,
-                    Integer.MAX_VALUE,
-                    Long.MAX_VALUE, TimeUnit.MILLISECONDS,
-                    new SynchronousQueue<Runnable>(),
-                    new AsyncIOThreadFactory());
-
-            try {
-                result = AsynchronousChannelGroup.withCachedThreadPool(
-                        executorService, initialSize);
-            } catch (IOException e) {
-                // No good reason for this to happen.
-                throw new IllegalStateException(sm.getString(
-                        "wsWebSocketContainer.asynchronousChannelGroupFail"));
-            }
-        } finally {
-            Thread.currentThread().setContextClassLoader(original);
-        }
-
-        asynchronousChannelGroup = result;
-    }
+    private volatile AsynchronousChannelGroup asynchronousChannelGroup = null;
+    private final Object asynchronousChannelGroupLock = new Object();
 
     private final Log log = LogFactory.getLog(WsWebSocketContainer.class);
     private final Map<Class<?>, Set<WsSession>> endpointSessionMap =
@@ -190,8 +151,12 @@ public class WsWebSocketContainer
             }
         }
 
-        ClientEndpointConfig config = ClientEndpointConfig.Builder.create().
-                configurator(configurator).
+        ClientEndpointConfig.Builder builder = ClientEndpointConfig.Builder.create();
+        // Avoid NPE when using RI API JAR - see BZ 56343
+        if (configurator != null) {
+            builder.configurator(configurator);
+        }
+        ClientEndpointConfig config = builder.
                 decoders(Arrays.asList(annotation.decoders())).
                 encoders(Arrays.asList(annotation.encoders())).
                 build();
@@ -281,8 +246,7 @@ public class WsWebSocketContainer
 
         AsynchronousSocketChannel socketChannel;
         try {
-            socketChannel =
-                    AsynchronousSocketChannel.open(asynchronousChannelGroup);
+            socketChannel = AsynchronousSocketChannel.open(getAsynchronousChannelGroup());
         } catch (IOException ioe) {
             throw new DeploymentException(sm.getString(
                     "wsWebSocketContainer.asynchronousSocketChannelFail"), ioe);
@@ -359,7 +323,7 @@ public class WsWebSocketContainer
 
         WsSession wsSession = new WsSession(endpoint, wsRemoteEndpointClient,
                 this, null, null, null, null, null, subProtocol,
-                Collections.<String, String> emptyMap(), false,
+                Collections.<String, String> emptyMap(), secure,
                 clientEndpointConfiguration);
         endpoint.onOpen(wsSession, clientEndpointConfiguration);
         registerSession(endpoint, wsSession);
@@ -794,6 +758,33 @@ public class WsWebSocketContainer
                         "wsWebSocketContainer.sessionCloseFail", session.getId()), ioe);
             }
         }
+
+        // Only unregister with AsyncChannelGroupUtil if this instance
+        // registered with it
+        if (asynchronousChannelGroup != null) {
+            synchronized (asynchronousChannelGroupLock) {
+                if (asynchronousChannelGroup != null) {
+                    AsyncChannelGroupUtil.unregister();
+                    asynchronousChannelGroup = null;
+                }
+            }
+        }
+    }
+
+
+    private AsynchronousChannelGroup getAsynchronousChannelGroup() {
+        // Use AsyncChannelGroupUtil to share a common group amongst all
+        // WebSocket clients
+        AsynchronousChannelGroup result = asynchronousChannelGroup;
+        if (result == null) {
+            synchronized (asynchronousChannelGroupLock) {
+                if (asynchronousChannelGroup == null) {
+                    asynchronousChannelGroup = AsyncChannelGroupUtil.register();
+                }
+                result = asynchronousChannelGroup;
+            }
+        }
+        return result;
     }
 
 
@@ -830,24 +821,5 @@ public class WsWebSocketContainer
     @Override
     public int getProcessPeriod() {
         return processPeriod;
-    }
-
-
-    /**
-     * Create threads for AsyncIO that have the right context class loader to
-     * prevent memory leaks.
-     */
-    private static class AsyncIOThreadFactory implements ThreadFactory {
-
-        private AtomicInteger count = new AtomicInteger(0);
-
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r);
-            t.setName("WebSocketClient-AsyncIO-" + count.incrementAndGet());
-            t.setContextClassLoader(this.getClass().getClassLoader());
-            t.setDaemon(true);
-            return t;
-        }
     }
 }

@@ -88,10 +88,16 @@
   <!--                       globalXsltFile[null]                           -->
   <!--                                                                      -->
   <!--   globalXsltFile      Site wide configuration version of             -->
-  <!--                       localXsltFile This argument is expected        -->
-  <!--                       to be a physical file. [null]                  -->
+  <!--                       localXsltFile. This argument must either be an -->
+  <!--                       absolute or relative (to either                -->
+  <!--                       $CATALINA_BASE/conf or $CATALINA_HOME/conf)    -->
+  <!--                       path that points to a location below either    -->
+  <!--                       $CATALINA_BASE/conf (checked first) or         -->
+  <!--                       $CATALINA_HOME/conf (checked second).[null]    -->
   <!--                                                                      -->
-  <!--                                                                      -->
+  <!--   showServerInfo      Should server information be presented in the  -->
+  <!--                       response sent to clients when directory        -->
+  <!--                       listings is enabled? [true]                    -->
 
     <servlet>
         <servlet-name>default</servlet-name>

@@ -182,6 +182,8 @@ public class StandardHost extends ContainerBase implements Host {
 
     private boolean undeployOldVersions = false;
 
+    private boolean failCtxIfServletStartFails = false;
+
 
     // ------------------------------------------------------------- Properties
 
@@ -648,6 +650,21 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
 
+    public boolean isFailCtxIfServletStartFails() {
+        return failCtxIfServletStartFails;
+    }
+
+
+    public void setFailCtxIfServletStartFails(
+            boolean failCtxIfServletStartFails) {
+        boolean oldFailCtxIfServletStartFails = this.failCtxIfServletStartFails;
+        this.failCtxIfServletStartFails = failCtxIfServletStartFails;
+        support.firePropertyChange("failCtxIfServletStartFails",
+                oldFailCtxIfServletStartFails,
+                failCtxIfServletStartFails);
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -733,7 +750,7 @@ public class StandardHost extends ContainerBase implements Host {
                 childClassLoaders.entrySet()) {
             ClassLoader cl = entry.getKey();
             if (cl instanceof WebappClassLoader) {
-                if (!((WebappClassLoader) cl).isStarted()) {
+                if (!((WebappClassLoader) cl).getState().isAvailable()) {
                     result.add(entry.getValue());
                 }
             }

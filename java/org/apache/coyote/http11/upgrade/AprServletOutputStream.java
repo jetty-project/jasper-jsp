@@ -38,8 +38,8 @@ public class AprServletOutputStream extends AbstractServletOutputStream<Long> {
     private final ByteBuffer sslOutputBuffer;
 
     public AprServletOutputStream(SocketWrapper<Long> socketWrapper,
-            AprEndpoint endpoint) {
-        super(socketWrapper);
+            int asyncWriteBufferSize, AprEndpoint endpoint) {
+        super(socketWrapper, asyncWriteBufferSize);
         this.endpoint = endpoint;
         this.socket = socketWrapper.getSocket().longValue();
         if (endpoint.isSSLEnabled()) {
@@ -62,8 +62,8 @@ public class AprServletOutputStream extends AbstractServletOutputStream<Long> {
         Lock readLock = socketWrapper.getBlockingStatusReadLock();
         WriteLock writeLock = socketWrapper.getBlockingStatusWriteLock();
 
+        readLock.lock();
         try {
-            readLock.lock();
             if (socketWrapper.getBlockingStatus() == block) {
                 return doWriteInternal(b, off, len);
             }
@@ -71,8 +71,8 @@ public class AprServletOutputStream extends AbstractServletOutputStream<Long> {
             readLock.unlock();
         }
 
+        writeLock.lock();
         try {
-            writeLock.lock();
             // Set the current settings for this socket
             socketWrapper.setBlockingStatus(block);
             if (block) {
@@ -82,8 +82,8 @@ public class AprServletOutputStream extends AbstractServletOutputStream<Long> {
             }
 
             // Downgrade the lock
+            readLock.lock();
             try {
-                readLock.lock();
                 writeLock.unlock();
                 return doWriteInternal(b, off, len);
             } finally {

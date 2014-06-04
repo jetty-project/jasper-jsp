@@ -44,13 +44,6 @@ public final class CookieSupport {
     public static final boolean ALLOW_HTTP_SEPARATORS_IN_V0;
 
     /**
-     * If set to false, we don't use the IE6/7 Max-Age/Expires work around.
-     * Default is usually true. If STRICT_SERVLET_COMPLIANCE==true then default
-     * is false. Explicitly setting always takes priority.
-     */
-    public static final boolean ALWAYS_ADD_EXPIRES;
-
-    /**
      * If set to true, the <code>/</code> character will be treated as a
      * separator. Default is usually false. If STRICT_SERVLET_COMPLIANCE==true
      * then default is true. Explicitly setting always takes priority.
@@ -97,15 +90,6 @@ public final class CookieSupport {
                 "org.apache.tomcat.util.http.ServerCookie.ALLOW_HTTP_SEPARATORS_IN_V0",
                 "false")).booleanValue();
 
-        String alwaysAddExpires = System.getProperty(
-        "org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES");
-        if (alwaysAddExpires == null) {
-            ALWAYS_ADD_EXPIRES = !STRICT_SERVLET_COMPLIANCE;
-        } else {
-            ALWAYS_ADD_EXPIRES =
-                Boolean.valueOf(alwaysAddExpires).booleanValue();
-        }
-
         String preserveCookieHeader = System.getProperty(
                 "org.apache.tomcat.util.http.ServerCookie.PRESERVE_COOKIE_HEADER");
         if (preserveCookieHeader == null) {
@@ -147,11 +131,11 @@ public final class CookieSupport {
             V0_SEPARATOR_FLAGS[i] = false;
             HTTP_SEPARATOR_FLAGS[i] = false;
         }
-        for (int i = 0; i < V0_SEPARATORS.length; i++) {
-            V0_SEPARATOR_FLAGS[V0_SEPARATORS[i]] = true;
+        for (char V0_SEPARATOR : V0_SEPARATORS) {
+            V0_SEPARATOR_FLAGS[V0_SEPARATOR] = true;
         }
-        for (int i = 0; i < HTTP_SEPARATORS.length; i++) {
-            HTTP_SEPARATOR_FLAGS[HTTP_SEPARATORS[i]] = true;
+        for (char HTTP_SEPARATOR : HTTP_SEPARATORS) {
+            HTTP_SEPARATOR_FLAGS[HTTP_SEPARATOR] = true;
         }
 
     }

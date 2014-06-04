@@ -66,7 +66,24 @@ public abstract class AbstractTestResourceSet {
 
     @Test
     public final void testGetResourceRoot() {
-        WebResource webResource = resourceRoot.getResource(getMount() + "/");
+        doTestGetResourceRoot(true);
+    }
+
+    @Test
+    public final void testGetResourceRootNoSlash() {
+        doTestGetResourceRoot(false);
+    }
+
+
+    private void doTestGetResourceRoot(boolean slash) {
+        String mount = getMount();
+        if (!slash && mount.length() == 0) {
+            return;
+        }
+        mount = mount + (slash ? "/" : "");
+
+        WebResource webResource = resourceRoot.getResource(mount);
+
         Assert.assertTrue(webResource.isDirectory());
         String expected;
         if (getMount().length() > 0) {
@@ -75,7 +92,7 @@ public abstract class AbstractTestResourceSet {
             expected = "";
         }
         Assert.assertEquals(expected, webResource.getName());
-        Assert.assertEquals(getMount() + "/", webResource.getWebappPath());
+        Assert.assertEquals(mount + (!slash ? "/" : ""), webResource.getWebappPath());
     }
 
     @Test
@@ -135,7 +152,22 @@ public abstract class AbstractTestResourceSet {
 
     @Test
     public final void testListRoot() {
-        String[] results = resourceRoot.list(getMount() + "/");
+        doTestListRoot(true);
+    }
+
+    @Test
+    public final void testListRootNoSlash() {
+        doTestListRoot(false);
+    }
+
+
+    private void doTestListRoot(boolean slash) {
+        String mount = getMount();
+        if (!slash && mount.length() == 0) {
+            return;
+        }
+
+        String[] results = resourceRoot.list(mount + (slash ? "/" : ""));
 
         Set<String> expected = new HashSet<>();
         expected.add("d1");
@@ -143,8 +175,15 @@ public abstract class AbstractTestResourceSet {
         expected.add("f1.txt");
         expected.add("f2.txt");
 
+        // Directories created by Subversion 1.6 and earlier clients
+        Set<String> optional = new HashSet<>();
+        optional.add(".svn");
+        // Files visible in some tests only
+        optional.add(getMount() + ".ignore-me.txt");
+
         for (String result : results) {
-            Assert.assertTrue(result, expected.remove(result));
+            Assert.assertTrue(result,
+                    expected.remove(result) || optional.remove(result));
         }
         Assert.assertEquals(0, expected.size());
     }
@@ -156,8 +195,15 @@ public abstract class AbstractTestResourceSet {
         Set<String> expected = new HashSet<>();
         expected.add("d1-f1.txt");
 
+        // Directories created by Subversion 1.6 and earlier clients
+        Set<String> optional = new HashSet<>();
+        optional.add(".svn");
+        // Files visible in some tests only
+        optional.add(".ignore-me.txt");
+
         for (String result : results) {
-            Assert.assertTrue(result, expected.remove(result));
+            Assert.assertTrue(result,
+                    expected.remove(result) || optional.remove(result));
         }
         Assert.assertEquals(0, expected.size());
     }
@@ -169,8 +215,15 @@ public abstract class AbstractTestResourceSet {
         Set<String> expected = new HashSet<>();
         expected.add("d1-f1.txt");
 
+        // Directories created by Subversion 1.6 and earlier clients
+        Set<String> optional = new HashSet<>();
+        optional.add(".svn");
+        // Files visible in some tests only
+        optional.add(".ignore-me.txt");
+
         for (String result : results) {
-            Assert.assertTrue(result, expected.remove(result));
+            Assert.assertTrue(result,
+                    expected.remove(result) || optional.remove(result));
         }
         Assert.assertEquals(0, expected.size());
     }
@@ -192,7 +245,22 @@ public abstract class AbstractTestResourceSet {
 
     @Test
     public final void testListWebAppPathsRoot() {
-        Set<String> results = resourceRoot.listWebAppPaths(getMount() + "/");
+        doTestListWebAppPathsRoot(true);
+    }
+
+    @Test
+    public final void testListWebAppPathsRootNoSlash() {
+        doTestListWebAppPathsRoot(false);
+    }
+
+
+    private void doTestListWebAppPathsRoot(boolean slash) {
+        String mount = getMount();
+        if (!slash && mount.length() == 0) {
+            return;
+        }
+
+        Set<String> results = resourceRoot.listWebAppPaths(mount + (slash ? "/" : ""));
 
         Set<String> expected = new HashSet<>();
         expected.add(getMount() + "/d1/");
@@ -200,8 +268,15 @@ public abstract class AbstractTestResourceSet {
         expected.add(getMount() + "/f1.txt");
         expected.add(getMount() + "/f2.txt");
 
+        // Directories created by Subversion 1.6 and earlier clients
+        Set<String> optional = new HashSet<>();
+        optional.add(getMount() + "/.svn/");
+        // Files visible in some tests only
+        optional.add(getMount() + "/.ignore-me.txt");
+
         for (String result : results) {
-            Assert.assertTrue(result, expected.remove(result));
+            Assert.assertTrue(result,
+                    expected.remove(result) || optional.remove(result));
         }
         Assert.assertEquals(0, expected.size());
     }
@@ -213,8 +288,15 @@ public abstract class AbstractTestResourceSet {
         Set<String> expected = new HashSet<>();
         expected.add(getMount() + "/d1/d1-f1.txt");
 
+        // Directories created by Subversion 1.6 and earlier clients
+        Set<String> optional = new HashSet<>();
+        optional.add(getMount() + "/d1/.svn/");
+        // Files visible in some tests only
+        optional.add(getMount() + "/d1/.ignore-me.txt");
+
         for (String result : results) {
-            Assert.assertTrue(result, expected.remove(result));
+            Assert.assertTrue(result,
+                    expected.remove(result) || optional.remove(result));
         }
         Assert.assertEquals(0, expected.size());
     }
@@ -226,8 +308,15 @@ public abstract class AbstractTestResourceSet {
         Set<String> expected = new HashSet<>();
         expected.add(getMount() + "/d1/d1-f1.txt");
 
+        // Directories created by Subversion 1.6 and earlier clients
+        Set<String> optional = new HashSet<>();
+        optional.add(getMount() + "/d1/.svn/");
+        // Files visible in some tests only
+        optional.add(getMount() + "/d1/.ignore-me.txt");
+
         for (String result : results) {
-            Assert.assertTrue(result, expected.remove(result));
+            Assert.assertTrue(result,
+                    expected.remove(result) || optional.remove(result));
         }
         Assert.assertEquals(0, expected.size());
     }

@@ -291,6 +291,13 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <!-- Increment is in sync block so it is safe. Volatile is used so reading
+         thread sees latest value.  -->
+    <Class name="org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject" />
+    <Method name="allocate" />
+    <Bug pattern="VO_VOLATILE_INCREMENT" />
+  </Match>
+  <Match>
     <!-- Return value is ignored but a null result will trigger an exception -->
     <Class name="org.apache.tomcat.jdbc.pool.ConnectionPool$ConnectionFuture" />
     <Method name="get" />
@@ -521,7 +528,10 @@
   <!-- Test code -->
   <Match>
     <!-- Code is deliberately unused -->
-    <Class name="javax.servlet.http.TestCookie" />
+    <Or>
+      <Class name="javax.servlet.http.TestCookie" />
+      <Class name="javax.servlet.http.TestCookieStrict" />
+    </Or>
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
   <Match>
@@ -661,8 +671,11 @@
   </Match>
   <Match>
     <!-- Return value of latch is intentionally ignored -->
-    <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClient"/>
-    <Method name="testConnectToServerEndpointSSL"/>
+    <Or>
+      <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClient"/>
+      <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClientSSL"/>
+    </Or>
+    <Method name="testConnectToServerEndpoint"/>
     <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
   </Match>
   <Match>

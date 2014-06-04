@@ -31,9 +31,11 @@ import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.servlet.RequestDispatcher;
@@ -46,13 +48,18 @@ import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
@@ -62,6 +69,12 @@ import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.PrivilegedGetTccl;
+import org.apache.tomcat.util.security.PrivilegedSetTccl;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.ext.EntityResolver2;
 
 
 /**
@@ -120,6 +133,10 @@ public class DefaultServlet extends HttpServlet {
      */
     protected static final URLEncoder urlEncoder;
 
+    private static final DocumentBuilderFactory factory;
+
+    private static final SecureEntityResolver secureEntityResolver;
+
     /**
      * Full range marker.
      */
@@ -150,6 +167,16 @@ public class DefaultServlet extends HttpServlet {
         urlEncoder.addSafeCharacter('.');
         urlEncoder.addSafeCharacter('*');
         urlEncoder.addSafeCharacter('/');
+
+        if (Globals.IS_SECURITY_ENABLED) {
+            factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            factory.setValidating(false);
+            secureEntityResolver = new SecureEntityResolver();
+        } else {
+            factory = null;
+            secureEntityResolver = null;
+        }
     }
 
 
@@ -226,6 +253,11 @@ public class DefaultServlet extends HttpServlet {
      */
     protected boolean useAcceptRanges = true;
 
+    /**
+     * Flag to determine if server information is presented.
+     */
+    protected boolean showServerInfo = true;
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -292,6 +324,10 @@ public class DefaultServlet extends HttpServlet {
 
         if (resources == null) {
             throw new UnavailableException("No resources");
+        }
+
+        if (getServletConfig().getInitParameter("showServerInfo") != null) {
+            showServerInfo = Boolean.parseBoolean(getServletConfig().getInitParameter("showServerInfo"));
         }
     }
 
@@ -688,13 +724,11 @@ public class DefaultServlet extends HttpServlet {
             } else {
                 // We're included
                 // SRV.9.3 says we must throw a FNFE
-                throw new FileNotFoundException(
-                        sm.getString("defaultServlet.missingResource",
-                    requestUri));
+                throw new FileNotFoundException(sm.getString(
+                        "defaultServlet.missingResource", requestUri));
             }
 
-            response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                               requestUri);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, requestUri);
             return;
         }
 
@@ -709,35 +743,29 @@ public class DefaultServlet extends HttpServlet {
                 // We're included
                 // Spec doesn't say what to do in this case but a FNFE seems
                 // reasonable
-                throw new FileNotFoundException(
-                        sm.getString("defaultServlet.missingResource",
-                    requestUri));
+                throw new FileNotFoundException(sm.getString(
+                        "defaultServlet.missingResource", requestUri));
             }
 
-            response.sendError(HttpServletResponse.SC_FORBIDDEN,
-                               requestUri);
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, requestUri);
             return;
         }
 
         // If the resource is not a collection, and the resource path
         // ends with "/" or "\", return NOT FOUND
-        if (resource.isFile()) {
-            if (path.endsWith("/") || (path.endsWith("\\"))) {
-                // Check if we're included so we can return the appropriate
-                // missing resource name in the error
-                String requestUri = (String) request.getAttribute(
-                        RequestDispatcher.INCLUDE_REQUEST_URI);
-                if (requestUri == null) {
-                    requestUri = request.getRequestURI();
-                }
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                                   requestUri);
-                return;
+        if (resource.isFile() && (path.endsWith("/") || path.endsWith("\\"))) {
+            // Check if we're included so we can return the appropriate
+            // missing resource name in the error
+            String requestUri = (String) request.getAttribute(
+                    RequestDispatcher.INCLUDE_REQUEST_URI);
+            if (requestUri == null) {
+                requestUri = request.getRequestURI();
             }
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, requestUri);
+            return;
         }
 
-        boolean isError =
-            response.getStatus() >= HttpServletResponse.SC_BAD_REQUEST;
+        boolean isError = response.getStatus() >= HttpServletResponse.SC_BAD_REQUEST;
 
         boolean included = false;
         // Check if the conditions specified in the optional If headers are
@@ -746,11 +774,9 @@ public class DefaultServlet extends HttpServlet {
             // Checking If headers
             included = (request.getAttribute(
                     RequestDispatcher.INCLUDE_CONTEXT_PATH) != null);
-            if (!included && !isError &&
-                    !checkIfHeaders(request, response, resource)) {
+            if (!included && !isError && !checkIfHeaders(request, response, resource)) {
                 return;
             }
-
         }
 
         // Find content type.
@@ -822,16 +848,13 @@ public class DefaultServlet extends HttpServlet {
             if (contentLength == 0L) {
                 serveContent = false;
             }
-
         }
 
         ServletOutputStream ostream = null;
         PrintWriter writer = null;
 
         if (serveContent) {
-
             // Trying to retrieve the servlet output stream
-
             try {
                 ostream = response.getOutputStream();
             } catch (IllegalStateException e) {
@@ -850,7 +873,6 @@ public class DefaultServlet extends HttpServlet {
                     throw e;
                 }
             }
-
         }
 
         // Check to see if a Filter, Valve of wrapper has written some content.
@@ -893,27 +915,48 @@ public class DefaultServlet extends HttpServlet {
                 }
             }
 
-            InputStream renderResult = null;
             if (serveContent) {
-                if (resource.isDirectory()) {
-                    // Serve the directory browser
-                    renderResult = render(getPathPrefix(request), resource);
-                } else {
-                    renderResult = resource.getInputStream();
-                }
-
-                // Copy the input stream to our output stream
                 try {
                     response.setBufferSize(output);
                 } catch (IllegalStateException e) {
                     // Silent catch
                 }
-                if (ostream != null) {
-                    if (!checkSendfile(request, response, resource,
-                            contentLength, null))
-                        copy(resource, renderResult, ostream);
-                } else {
+                InputStream renderResult = null;
+                if (ostream == null) {
+                    // Output via a writer so can't use sendfile or write
+                    // content directly.
+                    if (resource.isDirectory()) {
+                        renderResult = render(getPathPrefix(request), resource);
+                    } else {
+                        renderResult = resource.getInputStream();
+                    }
                     copy(resource, renderResult, writer, encoding);
+                } else {
+                    // Output is via an InputStream
+                    if (resource.isDirectory()) {
+                        renderResult = render(getPathPrefix(request), resource);
+                    } else {
+                        // Output is content of resource
+                        if (!checkSendfile(request, response, resource,
+                                contentLength, null)) {
+                            // sendfile not possible so check if resource
+                            // content is available directly
+                            byte[] resourceBody = resource.getContent();
+                            if (resourceBody == null) {
+                                // Resource content not available, use
+                                // inputstream
+                                renderResult = resource.getInputStream();
+                            } else {
+                                // Use the resource content directly
+                                ostream.write(resourceBody);
+                            }
+                        }
+                    }
+                    // If a stream was configured, it needs to be copied to
+                    // the output (this method closes the stream)
+                    if (renderResult != null) {
+                        copy(resource, renderResult, ostream);
+                    }
                 }
             }
 
@@ -958,12 +1001,9 @@ public class DefaultServlet extends HttpServlet {
                         throw new IllegalStateException();
                     }
                 }
-
             } else {
-
                 response.setContentType("multipart/byteranges; boundary="
                                         + mimeSeparation);
-
                 if (serveContent) {
                     try {
                         response.setBufferSize(output);
@@ -971,8 +1011,7 @@ public class DefaultServlet extends HttpServlet {
                         // Silent catch
                     }
                     if (ostream != null) {
-                        copy(resource, ostream, ranges.iterator(),
-                             contentType);
+                        copy(resource, ostream, ranges.iterator(), contentType);
                     } else {
                         // we should not get here
                         throw new IllegalStateException();
@@ -1190,13 +1229,12 @@ public class DefaultServlet extends HttpServlet {
     protected InputStream render(String contextPath, WebResource resource)
         throws IOException, ServletException {
 
-        InputStream xsltInputStream =
-            findXsltInputStream(resource);
+        Source xsltSource = findXsltSource(resource);
 
-        if (xsltInputStream==null) {
+        if (xsltSource == null) {
             return renderHtml(contextPath, resource);
         }
-        return renderXml(contextPath, resource, xsltInputStream);
+        return renderXml(contextPath, resource, xsltSource);
 
     }
 
@@ -1209,7 +1247,7 @@ public class DefaultServlet extends HttpServlet {
      */
     protected InputStream renderXml(String contextPath,
                                     WebResource resource,
-                                    InputStream xsltInputStream)
+                                    Source xsltSource)
         throws IOException, ServletException {
 
         StringBuilder sb = new StringBuilder();
@@ -1283,15 +1321,30 @@ public class DefaultServlet extends HttpServlet {
             sb.append("]]></readme>");
         }
 
-
         sb.append("</listing>");
 
-
+        // Prevent possible memory leak. Ensure Transformer and
+        // TransformerFactory are not loaded from the web application.
+        ClassLoader original;
+        if (Globals.IS_SECURITY_ENABLED) {
+            PrivilegedGetTccl pa = new PrivilegedGetTccl();
+            original = AccessController.doPrivileged(pa);
+        } else {
+            original = Thread.currentThread().getContextClassLoader();
+        }
         try {
+            if (Globals.IS_SECURITY_ENABLED) {
+                PrivilegedSetTccl pa =
+                        new PrivilegedSetTccl(DefaultServlet.class.getClassLoader());
+                AccessController.doPrivileged(pa);
+            } else {
+                Thread.currentThread().setContextClassLoader(
+                        DefaultServlet.class.getClassLoader());
+            }
+
             TransformerFactory tFactory = TransformerFactory.newInstance();
             Source xmlSource = new StreamSource(new StringReader(sb.toString()));
-            Source xslSource = new StreamSource(xsltInputStream);
-            Transformer transformer = tFactory.newTransformer(xslSource);
+            Transformer transformer = tFactory.newTransformer(xsltSource);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             OutputStreamWriter osWriter = new OutputStreamWriter(stream, "UTF8");
@@ -1301,6 +1354,13 @@ public class DefaultServlet extends HttpServlet {
             return (new ByteArrayInputStream(stream.toByteArray()));
         } catch (TransformerException e) {
             throw new ServletException("XSL transformer error", e);
+        } finally {
+            if (Globals.IS_SECURITY_ENABLED) {
+                PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
+                AccessController.doPrivileged(pa);
+            } else {
+                Thread.currentThread().setContextClassLoader(original);
+            }
         }
     }
 
@@ -1438,7 +1498,9 @@ public class DefaultServlet extends HttpServlet {
             sb.append("<HR size=\"1\" noshade=\"noshade\">");
         }
 
-        sb.append("<h3>").append(ServerInfo.getServerInfo()).append("</h3>");
+        if (showServerInfo) {
+            sb.append("<h3>").append(ServerInfo.getServerInfo()).append("</h3>");
+        }
         sb.append("</body>\r\n");
         sb.append("</html>\r\n");
 
@@ -1494,9 +1556,9 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Return the xsl template inputstream (if possible)
+     * Return a Source for the xsl template (if possible)
      */
-    protected InputStream findXsltInputStream(WebResource directory)
+    protected Source findXsltSource(WebResource directory)
         throws IOException {
 
         if (localXsltFile != null) {
@@ -1505,7 +1567,11 @@ public class DefaultServlet extends HttpServlet {
             if (resource.isFile()) {
                 InputStream is = resource.getInputStream();
                 if (is != null) {
-                    return is;
+                    if (Globals.IS_SECURITY_ENABLED) {
+                        return secureXslt(is);
+                    } else {
+                        return new StreamSource(is);
+                    }
                 }
             }
             if (debug > 10) {
@@ -1516,8 +1582,13 @@ public class DefaultServlet extends HttpServlet {
         if (contextXsltFile != null) {
             InputStream is =
                 getServletContext().getResourceAsStream(contextXsltFile);
-            if (is != null)
-                return is;
+            if (is != null) {
+                if (Globals.IS_SECURITY_ENABLED) {
+                    return secureXslt(is);
+                } else {
+                    return new StreamSource(is);
+                }
+            }
 
             if (debug > 10)
                 log("contextXsltFile '" + contextXsltFile + "' not found");
@@ -1526,20 +1597,14 @@ public class DefaultServlet extends HttpServlet {
         /*  Open and read in file in one fell swoop to reduce chance
          *  chance of leaving handle open.
          */
-        if (globalXsltFile!=null) {
-            FileInputStream fis = null;
-
-            try {
-                File f = new File(globalXsltFile);
-                if (f.exists()){
-                    fis =new FileInputStream(f);
+        if (globalXsltFile != null) {
+            File f = validateGlobalXsltFile();
+            if (f != null){
+                try (FileInputStream fis = new FileInputStream(f)){
                     byte b[] = new byte[(int)f.length()]; /* danger! */
                     fis.read(b);
-                    return new ByteArrayInputStream(b);
+                    return new StreamSource(new ByteArrayInputStream(b));
                 }
-            } finally {
-                if (fis!=null)
-                    fis.close();
             }
         }
 
@@ -1547,8 +1612,77 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-    // -------------------------------------------------------- protected Methods
+    private File validateGlobalXsltFile() {
+        Context context = resources.getContext();
 
+        File baseConf = new File(context.getCatalinaBase(), "conf");
+        File result = validateGlobalXsltFile(baseConf);
+        if (result == null) {
+            File homeConf = new File(context.getCatalinaHome(), "conf");
+            if (!baseConf.equals(homeConf)) {
+                result = validateGlobalXsltFile(homeConf);
+            }
+        }
+
+        return result;
+    }
+
+
+    private File validateGlobalXsltFile(File base) {
+        File candidate = new File(globalXsltFile);
+        if (!candidate.isAbsolute()) {
+            candidate = new File(base, globalXsltFile);
+        }
+
+        if (!candidate.isFile()) {
+            return null;
+        }
+
+        // First check that the resulting path is under the provided base
+        try {
+            if (!candidate.getCanonicalPath().startsWith(base.getCanonicalPath())) {
+                return null;
+            }
+        } catch (IOException ioe) {
+            return null;
+        }
+
+        // Next check that an .xsl or .xslt file has been specified
+        String nameLower = candidate.getName().toLowerCase(Locale.ENGLISH);
+        if (!nameLower.endsWith(".xslt") && !nameLower.endsWith(".xsl")) {
+            return null;
+        }
+
+        return candidate;
+    }
+
+
+    private Source secureXslt(InputStream is) {
+        // Need to filter out any external entities
+        Source result = null;
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            builder.setEntityResolver(secureEntityResolver);
+            Document document = builder.parse(is);
+            result = new DOMSource(document);
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            if (debug > 0) {
+                log(e.getMessage(), e);
+            }
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
+        }
+        return result;
+    }
+
+
+    // -------------------------------------------------------- protected Methods
 
     /**
      * Check if sendfile can be used.
@@ -2042,9 +2176,6 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-    // ------------------------------------------------------ Range Inner Class
-
-
     protected static class Range {
 
         public long start;
@@ -2058,6 +2189,36 @@ public class DefaultServlet extends HttpServlet {
             if (end >= length)
                 end = length - 1;
             return (start >= 0) && (end >= 0) && (start <= end) && (length > 0);
+        }
+    }
+
+
+    /**
+     * This is secure in the sense that any attempt to use an external entity
+     * will trigger an exception.
+     */
+    private static class SecureEntityResolver implements EntityResolver2  {
+
+        @Override
+        public InputSource resolveEntity(String publicId, String systemId)
+                throws SAXException, IOException {
+            throw new SAXException(sm.getString("defaultServlet.blockExternalEntity",
+                    publicId, systemId));
+        }
+
+        @Override
+        public InputSource getExternalSubset(String name, String baseURI)
+                throws SAXException, IOException {
+            throw new SAXException(sm.getString("defaultServlet.blockExternalSubset",
+                    name, baseURI));
+        }
+
+        @Override
+        public InputSource resolveEntity(String name, String publicId,
+                String baseURI, String systemId) throws SAXException,
+                IOException {
+            throw new SAXException(sm.getString("defaultServlet.blockExternalEntity2",
+                    name, publicId, baseURI, systemId));
         }
     }
 }

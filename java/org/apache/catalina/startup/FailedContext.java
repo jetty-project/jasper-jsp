@@ -690,6 +690,9 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public File getCatalinaBase() { return null; }
 
     @Override
+    public File getCatalinaHome() { return null; }
+
+    @Override
     public void setAddWebinfClassesResources(boolean addWebinfClassesResources) {
         // NO-OP
     }
@@ -748,5 +751,10 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     @Override
     public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
         // NO-OP
+    }
+
+    @Override
+    public Object getNamingToken() {
+        return null;
     }
 }
