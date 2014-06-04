@@ -277,6 +277,11 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public File getCatalinaHome() {
+        return null;
+    }
+
+    @Override
     public void addLifecycleListener(LifecycleListener listener) {
         // NO-OP
     }
@@ -1213,4 +1218,8 @@ public class TesterContext implements Context {
         // NO-OP
     }
 
+    @Override
+    public Object getNamingToken() {
+        return null;
+    }
 }

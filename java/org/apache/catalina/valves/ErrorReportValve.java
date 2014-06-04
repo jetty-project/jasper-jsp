@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.valves;
 
-
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Scanner;
@@ -48,6 +47,10 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ErrorReportValve extends ValveBase {
 
+    private boolean showReport = true;
+
+    private boolean showServerInfo = true;
+
     //------------------------------------------------------ Constructor
     public ErrorReportValve() {
         super(true);
@@ -58,7 +61,9 @@ public class ErrorReportValve extends ValveBase {
 
     /**
      * Invoke the next Valve in the sequence. When the invoke returns, check
-     * the response state, and output an error report is necessary.
+     * the response state. If the status code is greater than or equal to 400
+     * or an uncaught exception was thrown then the error handling will be
+     * triggered.
      *
      * @param request The servlet request to be processed
      * @param response The servlet response to be created
@@ -67,8 +72,7 @@ public class ErrorReportValve extends ValveBase {
      * @exception ServletException if a servlet error occurs
      */
     @Override
-    public void invoke(Request request, Response response)
-        throws IOException, ServletException {
+    public void invoke(Request request, Response response) throws IOException, ServletException {
 
         // Perform the request
         getNext().invoke(request, response);
@@ -77,8 +81,7 @@ public class ErrorReportValve extends ValveBase {
             return;
         }
 
-        Throwable throwable =
-                (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+        Throwable throwable = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 
         if (request.isAsyncStarted() && ((response.getStatus() < 400 &&
                 throwable == null) || request.isAsyncDispatching())) {
@@ -86,7 +89,6 @@ public class ErrorReportValve extends ValveBase {
         }
 
         if (throwable != null) {
-
             // The response is an error
             response.setError();
 
@@ -97,9 +99,7 @@ public class ErrorReportValve extends ValveBase {
                 // Ignore
             }
 
-            response.sendError
-                (HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
         response.setSuspended(false);
@@ -127,16 +127,14 @@ public class ErrorReportValve extends ValveBase {
      * @param throwable The exception that occurred (which possibly wraps
      *  a root cause exception
      */
-    protected void report(Request request, Response response,
-                          Throwable throwable) {
+    protected void report(Request request, Response response, Throwable throwable) {
 
         // Do nothing on non-HTTP responses
         int statusCode = response.getStatus();
 
         // Do nothing on a 1xx, 2xx and 3xx status
         // Do nothing if anything has been written already
-        if (statusCode < 400 || response.getContentWritten() > 0 ||
-                !response.isError()) {
+        if (statusCode < 400 || response.getContentWritten() > 0 || !response.isError()) {
             return;
         }
 
@@ -145,8 +143,7 @@ public class ErrorReportValve extends ValveBase {
             if (throwable != null) {
                 String exceptionMessage = throwable.getMessage();
                 if (exceptionMessage != null && exceptionMessage.length() > 0) {
-                    message = RequestUtil.filter(
-                            (new Scanner(exceptionMessage)).nextLine());
+                    message = RequestUtil.filter((new Scanner(exceptionMessage)).nextLine());
                 }
             }
             if (message == null) {
@@ -175,69 +172,80 @@ public class ErrorReportValve extends ValveBase {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("<!DOCTYPE html><html><head><title>");
-        sb.append(ServerInfo.getServerInfo()).append(" - ");
-        sb.append(smClient.getString("errorReportValve.errorReport"));
-        sb.append("</title>");
-        sb.append("<style type=\"text/css\">");
-        sb.append(org.apache.catalina.util.TomcatCSS.TOMCAT_CSS);
-        sb.append("</style> ");
+        sb.append("<!DOCTYPE html><html><head>");
+        if(showServerInfo || showReport){
+            sb.append("<title>");
+            if(showServerInfo) {
+                sb.append(ServerInfo.getServerInfo()).append(" - ");
+            }
+            sb.append(smClient.getString("errorReportValve.errorReport"));
+            sb.append("</title>");
+            sb.append("<style type=\"text/css\">");
+            sb.append(org.apache.catalina.util.TomcatCSS.TOMCAT_CSS);
+            sb.append("</style> ");
+        } else {
+            sb.append("<title>");
+            sb.append(smClient.getString("errorReportValve.errorReport"));
+            sb.append("</title>");
+        }
         sb.append("</head><body>");
         sb.append("<h1>");
         sb.append(smClient.getString("errorReportValve.statusHeader",
-                               "" + statusCode, message)).append("</h1>");
-        sb.append("<div class=\"line\"></div>");
-        sb.append("<p><b>type</b> ");
-        if (throwable != null) {
-            sb.append(smClient.getString("errorReportValve.exceptionReport"));
-        } else {
-            sb.append(smClient.getString("errorReportValve.statusReport"));
-        }
-        sb.append("</p>");
-        sb.append("<p><b>");
-        sb.append(smClient.getString("errorReportValve.message"));
-        sb.append("</b> <u>");
-        sb.append(message).append("</u></p>");
-        sb.append("<p><b>");
-        sb.append(smClient.getString("errorReportValve.description"));
-        sb.append("</b> <u>");
-        sb.append(report);
-        sb.append("</u></p>");
-
-        if (throwable != null) {
-
-            String stackTrace = getPartialServletStackTrace(throwable);
+                String.valueOf(statusCode), message)).append("</h1>");
+        if (showReport) {
+            sb.append("<div class=\"line\"></div>");
+            sb.append("<p><b>type</b> ");
+            if (throwable != null) {
+                sb.append(smClient.getString("errorReportValve.exceptionReport"));
+            } else {
+                sb.append(smClient.getString("errorReportValve.statusReport"));
+            }
+            sb.append("</p>");
             sb.append("<p><b>");
-            sb.append(smClient.getString("errorReportValve.exception"));
-            sb.append("</b></p><pre>");
-            sb.append(RequestUtil.filter(stackTrace));
-            sb.append("</pre>");
+            sb.append(smClient.getString("errorReportValve.message"));
+            sb.append("</b> <u>");
+            sb.append(message).append("</u></p>");
+            sb.append("<p><b>");
+            sb.append(smClient.getString("errorReportValve.description"));
+            sb.append("</b> <u>");
+            sb.append(report);
+            sb.append("</u></p>");
+            if (throwable != null) {
 
-            int loops = 0;
-            Throwable rootCause = throwable.getCause();
-            while (rootCause != null && (loops < 10)) {
-                stackTrace = getPartialServletStackTrace(rootCause);
+                String stackTrace = getPartialServletStackTrace(throwable);
                 sb.append("<p><b>");
-                sb.append(smClient.getString("errorReportValve.rootCause"));
+                sb.append(smClient.getString("errorReportValve.exception"));
                 sb.append("</b></p><pre>");
                 sb.append(RequestUtil.filter(stackTrace));
                 sb.append("</pre>");
-                // In case root cause is somehow heavily nested
-                rootCause = rootCause.getCause();
-                loops++;
+
+                int loops = 0;
+                Throwable rootCause = throwable.getCause();
+                while (rootCause != null && (loops < 10)) {
+                    stackTrace = getPartialServletStackTrace(rootCause);
+                    sb.append("<p><b>");
+                    sb.append(smClient.getString("errorReportValve.rootCause"));
+                    sb.append("</b></p><pre>");
+                    sb.append(RequestUtil.filter(stackTrace));
+                    sb.append("</pre>");
+                    // In case root cause is somehow heavily nested
+                    rootCause = rootCause.getCause();
+                    loops++;
+                }
+
+                sb.append("<p><b>");
+                sb.append(smClient.getString("errorReportValve.note"));
+                sb.append("</b> <u>");
+                sb.append(smClient.getString("errorReportValve.rootCauseInLogs",
+                        showServerInfo?ServerInfo.getServerInfo():""));
+                sb.append("</u></p>");
+
             }
-
-            sb.append("<p><b>");
-            sb.append(smClient.getString("errorReportValve.note"));
-            sb.append("</b> <u>");
-            sb.append(smClient.getString("errorReportValve.rootCauseInLogs",
-                                   ServerInfo.getServerInfo()));
-            sb.append("</u></p>");
-
+            sb.append("<hr class=\"line\">");
         }
-
-        sb.append("<hr class=\"line\">");
-        sb.append("<h3>").append(ServerInfo.getServerInfo()).append("</h3>");
+        if (showServerInfo) {
+            sb.append("<h3>").append(ServerInfo.getServerInfo()).append("</h3>");
+        }
         sb.append("</body></html>");
 
         try {
@@ -289,5 +297,31 @@ public class ErrorReportValve extends ValveBase {
             }
         }
         return trace.toString();
+    }
+
+    /**
+     * Enables/Disables full error reports
+     *
+     * @param showReport
+     */
+    public void setShowReport(boolean showReport) {
+        this.showReport = showReport;
+    }
+
+    public boolean isShowReport() {
+        return showReport;
+    }
+
+    /**
+     * Enables/Disables server info on error pages
+     *
+     * @param showServerInfo
+     */
+    public void setShowServerInfo(boolean showServerInfo) {
+        this.showServerInfo = showServerInfo;
+    }
+
+    public boolean isShowServerInfo() {
+        return showServerInfo;
     }
 }

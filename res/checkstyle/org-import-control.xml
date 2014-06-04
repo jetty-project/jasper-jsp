@@ -102,6 +102,7 @@
     <allow pkg="org.apache.tomcat" exact-match="true"/>
     <allow pkg="org.apache.tomcat.util.descriptor"/>
     <allow pkg="org.apache.tomcat.util.scan"/>
+    <allow pkg="org.apache.tomcat.util.security"/>
     <allow pkg="org.apache.tools.ant"/>
     <allow pkg="org.eclipse.jdt"/>
   </subpackage>
@@ -123,6 +124,18 @@
     <allow pkg="javax.servlet"/>
     <subpackage name="buildutil">
       <allow pkg="org.apache.tools.ant"/>
+    </subpackage>
+    <subpackage name="dbcp">
+      <allow pkg="org.apache.juli"/>
+      <subpackage name="dbcp2">
+        <allow pkg="org.apache.tomcat.dbcp.dbcp2"/>
+        <allow pkg="org.apache.tomcat.dbcp.pool2"/>
+      </subpackage>
+      <subpackage name="pool2">
+        <subpackage name="impl">
+          <allow pkg="org.apache.tomcat.dbcp.pool2"/>
+        </subpackage>
+      </subpackage>
     </subpackage>
     <subpackage name="jni">
       <subpackage name="socket">

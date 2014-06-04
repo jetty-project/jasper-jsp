@@ -19,7 +19,6 @@ package javax.servlet.http;
 import java.util.BitSet;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -30,8 +29,6 @@ public class TestCookie {
     public static final BitSet CTL;   // <any US-ASCII control character (octets 0 - 31) and DEL (127)>
     public static final BitSet SEPARATORS;
     public static final BitSet TOKEN; // 1*<any CHAR except CTLs or separators>
-
-    public static final BitSet NETSCAPE_NAME; // "any character except comma, semicolon and whitespace"
 
     static {
         CHAR = new BitSet(256);
@@ -50,13 +47,6 @@ public class TestCookie {
         TOKEN.or(CHAR); // any CHAR
         TOKEN.andNot(CTL); // except CTLs
         TOKEN.andNot(SEPARATORS); // or separators
-
-        NETSCAPE_NAME = new BitSet(256);
-        NETSCAPE_NAME.or(CHAR);
-        NETSCAPE_NAME.andNot(CTL);
-        NETSCAPE_NAME.clear(';');
-        NETSCAPE_NAME.clear(',');
-        NETSCAPE_NAME.clear(' ');
     }
 
     @Test
@@ -76,86 +66,88 @@ public class TestCookie {
         Assert.assertEquals(0, cookie.getVersion());
     }
 
+    @Test()
+    public void defaultImpliesNetscape() {
+        // $Foo is allowed by Netscape but not by RFC2109
+        Cookie cookie = new Cookie("$Foo", null);
+        Assert.assertEquals("$Foo", cookie.getName());
+    }
+
     @Test
-    public void actualCharactersAllowedInName() {
-        checkCharInName(NETSCAPE_NAME);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void leadingDollar() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("$Version", null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
     public void tokenVersion() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Version", null);
+        Cookie cookie = new Cookie("Version", null);
+        Assert.assertEquals("Version", cookie.getName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributeVersion() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Comment", null);
+        Cookie cookie = new Cookie("Comment", null);
+        Assert.assertEquals("Comment", cookie.getName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributeDiscard() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Discard", null);
+        Cookie cookie = new Cookie("Discard", null);
+        Assert.assertEquals("Discard", cookie.getName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributeExpires() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Expires", null);
+        Cookie cookie = new Cookie("Expires", null);
+        Assert.assertEquals("Expires", cookie.getName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributeMaxAge() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Max-Age", null);
+        Cookie cookie = new Cookie("Max-Age", null);
+        Assert.assertEquals("Max-Age", cookie.getName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributeDomain() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Domain", null);
+        Cookie cookie = new Cookie("Domain", null);
+        Assert.assertEquals("Domain", cookie.getName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributePath() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Path", null);
+        Cookie cookie = new Cookie("Path", null);
+        Assert.assertEquals("Path", cookie.getName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributeSecure() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("Secure", null);
+        Cookie cookie = new Cookie("Secure", null);
+        Assert.assertEquals("Secure", cookie.getName());
     }
 
-    @Ignore("HttpOnly is not checked for")
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void attributeHttpOnly() {
-        @SuppressWarnings("unused")
-        Cookie c = new Cookie("HttpOnly", null);
+        Cookie cookie = new Cookie("HttpOnly", null);
+        Assert.assertEquals("HttpOnly", cookie.getName());
     }
 
-    public static void checkCharInName(BitSet allowed) {
+    @Test
+    public void strictNamingImpliesRFC2109() {
+        // Not using strict naming here so this should be OK
+        @SuppressWarnings("unused")
+        Cookie cookie = new Cookie("@Foo", null);
+    }
+
+    public static void checkCharInName(CookieNameValidator validator, BitSet allowed) {
         for (char ch = 0; ch < allowed.size(); ch++) {
-            Boolean expected = Boolean.valueOf(allowed.get(ch));
+            boolean expected = allowed.get(ch);
             String name = "X" + ch + "X";
-            Boolean actual;
             try {
-                @SuppressWarnings("unused")
-                Cookie c = new Cookie(name, null);
-                actual = Boolean.TRUE;
+                validator.validate(name);
+                if (!expected) {
+                    Assert.fail(String.format("Char %d should not be allowed", Integer.valueOf(ch)));
+                }
             } catch (IllegalArgumentException e) {
-                actual = Boolean.FALSE;
+                if (expected) {
+                    Assert.fail(String.format("Char %d should be allowed", Integer.valueOf(ch)));
+                }
             }
-            String msg = String.format("Check for char %d in name", Integer.valueOf(ch));
-            Assert.assertEquals(msg, expected, actual);
         }
     }
 }

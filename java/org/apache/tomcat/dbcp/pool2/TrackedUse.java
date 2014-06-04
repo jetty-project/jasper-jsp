@@ -14,14 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.apache.tomcat.util.file;
+package org.apache.tomcat.dbcp.pool2;
 
 /**
- * String constants for the file package.
+ * This interface allows pooled objects to make information available about when
+ * and how they were used available to the object pool. The object pool may, but
+ * is not required, to use this information to make more informed decisions when
+ * determining the state of a pooled object - for instance whether or not the
+ * object has been abandoned.
+ *
+ * @since 2.0
  */
-public final class Constants {
+public interface TrackedUse {
 
-    public static final String Package = "org.apache.tomcat.util.file";
-
+    /**
+     * Get the last time this object was used in ms.
+     *
+     * @return long time in ms
+     */
+    long getLastUsed();
 }

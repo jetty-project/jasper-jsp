@@ -158,6 +158,7 @@ public abstract class AbstractReplicatedMap<K,V>
      * @param initialCapacity int - the size of this map, see HashMap
      * @param loadFactor float - load factor, see HashMap
      * @param cls - a list of classloaders to be used for deserialization of objects.
+     * @param terminate - Flag for whether to terminate this map that failed to start.
      */
     public AbstractReplicatedMap(MapOwner owner,
                                  Channel channel,
@@ -192,6 +193,7 @@ public abstract class AbstractReplicatedMap<K,V>
      * @param timeout long
      * @param channelSendOptions int
      * @param cls ClassLoader[]
+     * @param terminate - Flag for whether to terminate this map that failed to start.
      */
     protected void init(MapOwner owner, Channel channel, String mapContextName,
             long timeout, int channelSendOptions,ClassLoader[] cls, boolean terminate) {
@@ -379,7 +381,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
     public Member[] getMapMembersExcl(Member[] exclude) {
         synchronized (mapMembers) {
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings("unchecked") // mapMembers has the correct type
             HashMap<Member, Long> list = (HashMap<Member, Long>)mapMembers.clone();
             for (int i=0; i<exclude.length;i++) list.remove(exclude[i]);
             return getMapMembers(list);
@@ -416,10 +418,9 @@ public abstract class AbstractReplicatedMap<K,V>
             }
             //check to see if the message is diffable
             MapMessage msg = null;
-            if (rentry != null && rentry.isDiffable() &&
-                    (isDirty || complete)) {
+            if (rentry != null && rentry.isDiffable() && (isDirty || complete)) {
+                rentry.lock();
                 try {
-                    rentry.lock();
                     //construct a diff message
                     msg = new MapMessage(mapContextName, MapMessage.MSG_BACKUP,
                                          true, (Serializable) entry.getKey(), null,
@@ -432,7 +433,6 @@ public abstract class AbstractReplicatedMap<K,V>
                 } finally {
                     rentry.unlock();
                 }
-
             }
             if (msg == null && complete) {
                 //construct a complete
@@ -440,7 +440,6 @@ public abstract class AbstractReplicatedMap<K,V>
                                      false, (Serializable) entry.getKey(),
                                      (Serializable) entry.getValue(),
                                      null, entry.getPrimary(),entry.getBackupNodes());
-
             }
             if (msg == null) {
                 //construct a access message
@@ -656,8 +655,8 @@ public abstract class AbstractReplicatedMap<K,V>
                 if (entry.getValue() instanceof ReplicatedMapEntry) {
                     ReplicatedMapEntry diff = (ReplicatedMapEntry) entry.getValue();
                     if (mapmsg.isDiff()) {
+                        diff.lock();
                         try {
-                            diff.lock();
                             diff.applyDiff(mapmsg.getDiffValue(), 0, mapmsg.getDiffValue().length);
                         } catch (Exception x) {
                             log.error("Unable to apply diff to key:" + entry.getKey(), x);
@@ -1259,8 +1258,8 @@ public abstract class AbstractReplicatedMap<K,V>
         public void apply(byte[] data, int offset, int length, boolean diff) throws IOException, ClassNotFoundException {
             if (isDiffable() && diff) {
                 ReplicatedMapEntry rentry = (ReplicatedMapEntry) value;
+                rentry.lock();
                 try {
-                    rentry.lock();
                     rentry.applyDiff(data, offset, length);
                 } finally {
                     rentry.unlock();

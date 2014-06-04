@@ -652,10 +652,8 @@ public class TestRequest extends TomcatBaseTest {
         conn.setRequestProperty("Content-Type",
                 "multipart/form-data; boundary=" + boundary);
 
-        PrintWriter writer = null;
-        try {
-            writer = new PrintWriter(new OutputStreamWriter(
-                    conn.getOutputStream(), "UTF-8"), true);
+        try (OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream(), "UTF-8");
+                PrintWriter writer = new PrintWriter(osw, true)) {
             writer.append("--" + boundary).append("\r\n");
             writer.append("Content-Disposition: form-data; name=\"part\"\r\n");
             writer.append("Content-Type: text/plain; charset=UTF-8\r\n");
@@ -667,10 +665,6 @@ public class TestRequest extends TomcatBaseTest {
             writer.flush();
 
             writer.append("--" + boundary + "--").append("\r\n");
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
         }
     }
 
@@ -679,22 +673,126 @@ public class TestRequest extends TomcatBaseTest {
         List<String> response = new ArrayList<>();
         int status = conn.getResponseCode();
         if (status == HttpURLConnection.HTTP_OK) {
-            BufferedReader reader = null;
-            try {
-                reader = new BufferedReader(new InputStreamReader(
-                        conn.getInputStream(), "UTF-8"));
+            try (InputStreamReader isr = new InputStreamReader(conn.getInputStream(), "UTF-8");
+                    BufferedReader reader = new BufferedReader(isr)) {
                 String line = null;
                 while ((line = reader.readLine()) != null) {
                     response.add(line);
                 }
                 assertTrue(response.contains("Part ��"));
-            } finally {
-                if (reader != null) {
-                    reader.close();
-                }
             }
         } else {
             fail("OK status was expected: " + status);
+        }
+    }
+
+    @Test
+    public void testBug56501a() throws Exception {
+        doBug56501("/path", "/path", "/path");
+    }
+
+    @Test
+    public void testBug56501b() throws Exception {
+        doBug56501("/path", "/path/", "/path");
+    }
+
+    @Test
+    public void testBug56501c() throws Exception {
+        doBug56501("/path", "/path/xxx", "/path");
+    }
+
+    @Test
+    public void testBug56501d() throws Exception {
+        doBug56501("", "", "");
+    }
+
+    @Test
+    public void testBug56501e() throws Exception {
+        doBug56501("", "/", "");
+    }
+
+    @Test
+    public void testBug56501f() throws Exception {
+        doBug56501("", "/xxx", "");
+    }
+
+    @Test
+    public void testBug56501g() throws Exception {
+        doBug56501("/path/abc", "/path/abc", "/path/abc");
+    }
+
+    @Test
+    public void testBug56501h() throws Exception {
+        doBug56501("/path/abc", "/path/abc/", "/path/abc");
+    }
+
+    @Test
+    public void testBug56501i() throws Exception {
+        doBug56501("/path/abc", "/path/abc/xxx", "/path/abc");
+    }
+
+    @Test
+    public void testBug56501j() throws Exception {
+        doBug56501("/pa_th/abc", "/pa%5Fth/abc", "/pa%5Fth/abc");
+    }
+
+    @Test
+    public void testBug56501k() throws Exception {
+        doBug56501("/pa_th/abc", "/pa%5Fth/abc/", "/pa%5Fth/abc");
+    }
+
+    @Test
+    public void testBug56501l() throws Exception {
+        doBug56501("/pa_th/abc", "/pa%5Fth/abc/xxx", "/pa%5Fth/abc");
+    }
+
+    @Test
+    public void testBug56501m() throws Exception {
+        doBug56501("/pa_th/abc", "/pa_th/abc", "/pa_th/abc");
+    }
+
+    @Test
+    public void testBug56501n() throws Exception {
+        doBug56501("/pa_th/abc", "/pa_th/abc/", "/pa_th/abc");
+    }
+
+    @Test
+    public void testBug56501o() throws Exception {
+        doBug56501("/pa_th/abc", "/pa_th/abc/xxx", "/pa_th/abc");
+    }
+
+    private void doBug56501(String deployPath, String requestPath, String expected)
+            throws Exception {
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        Context ctx = tomcat.addContext(deployPath,
+                System.getProperty("java.io.tmpdir"));
+
+        Tomcat.addServlet(ctx, "servlet", new Bug56501Servelet());
+        ctx.addServletMapping("/*", "servlet");
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() + requestPath);
+        String resultPath = res.toString();
+        if (resultPath == null) {
+            resultPath = "";
+        }
+        assertEquals(expected, resultPath);
+    }
+
+    private class Bug56501Servelet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.getWriter().print(req.getContextPath());
         }
     }
 }

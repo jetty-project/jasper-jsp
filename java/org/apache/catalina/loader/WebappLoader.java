@@ -444,7 +444,11 @@ public class WebappLoader extends LifecycleMBeanBase
 
         // Throw away our current class loader
         if (classLoader != null) {
-            ((Lifecycle) classLoader).stop();
+            try {
+                classLoader.stop();
+            } finally {
+                classLoader.destroy();
+            }
         }
 
         try {

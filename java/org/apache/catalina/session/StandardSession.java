@@ -808,7 +808,9 @@ public class StandardSession implements HttpSession, Session, Serializable {
         synchronized (this) {
             // Check again, now we are inside the sync so this code only runs once
             // Double check locking - isValid needs to be volatile
-            if (!isValid)
+            // The check of expiring is to ensure that an infinite loop is not
+            // entered as per bug 56339
+            if (expiring || !isValid)
                 return;
 
             if (manager == null)
@@ -824,10 +826,10 @@ public class StandardSession implements HttpSession, Session, Serializable {
             // The call to expire() may not have been triggered by the webapp.
             // Make sure the webapp's class loader is set when calling the
             // listeners
-            ClassLoader oldContextClassLoader = null;
-            try {
-                oldContextClassLoader = context.bind(Globals.IS_SECURITY_ENABLED, null);
-                if (notify) {
+            if (notify) {
+                ClassLoader oldContextClassLoader = null;
+                try {
+                    oldContextClassLoader = context.bind(Globals.IS_SECURITY_ENABLED, null);
                     Object listeners[] = context.getApplicationLifecycleListeners();
                     if (listeners != null && listeners.length > 0) {
                         HttpSessionEvent event =
@@ -857,9 +859,9 @@ public class StandardSession implements HttpSession, Session, Serializable {
                             }
                         }
                     }
+                } finally {
+                    context.unbind(Globals.IS_SECURITY_ENABLED, oldContextClassLoader);
                 }
-            } finally {
-                context.unbind(Globals.IS_SECURITY_ENABLED, oldContextClassLoader);
             }
 
             if (ACTIVITY_CHECK) {
@@ -892,9 +894,15 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
             // Unbind any objects associated with this session
             String keys[] = keys();
-            for (int i = 0; i < keys.length; i++)
-                removeAttributeInternal(keys[i], notify);
-
+            ClassLoader oldContextClassLoader = null;
+            try {
+                oldContextClassLoader = context.bind(Globals.IS_SECURITY_ENABLED, null);
+                for (int i = 0; i < keys.length; i++) {
+                    removeAttributeInternal(keys[i], notify);
+                }
+            } finally {
+                context.unbind(Globals.IS_SECURITY_ENABLED, oldContextClassLoader);
+            }
         }
 
     }

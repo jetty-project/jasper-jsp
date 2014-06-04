@@ -219,7 +219,6 @@ public class OutputBuffer extends Writer
 
     // --------------------------------------------------------- Public Methods
 
-
     /**
      * Recycle the output buffer.
      */
@@ -300,8 +299,7 @@ public class OutputBuffer extends Writer
                 CoyoteAdapter.ADAPTER_NOTES);
         req.inputBuffer.close();
 
-        coyoteResponse.finish();
-
+        coyoteResponse.action(ActionCode.CLOSE, null);
     }
 
 
@@ -311,8 +309,7 @@ public class OutputBuffer extends Writer
      * @throws IOException An underlying IOException occurred
      */
     @Override
-    public void flush()
-        throws IOException {
+    public void flush() throws IOException {
         doFlush(true);
     }
 
@@ -322,8 +319,7 @@ public class OutputBuffer extends Writer
      *
      * @throws IOException An underlying IOException occurred
      */
-    protected void doFlush(boolean realFlush)
-        throws IOException {
+    protected void doFlush(boolean realFlush) throws IOException {
 
         if (suspended) {
             return;
@@ -346,13 +342,11 @@ public class OutputBuffer extends Writer
         }
 
         if (realFlush) {
-            coyoteResponse.action(ActionCode.CLIENT_FLUSH,
-                                  coyoteResponse);
+            coyoteResponse.action(ActionCode.CLIENT_FLUSH, null);
             // If some exception occurred earlier, or if some IOE occurred
             // here, notify the servlet with an IOE
             if (coyoteResponse.isExceptionPresent()) {
-                throw new ClientAbortException
-                    (coyoteResponse.getErrorException());
+                throw new ClientAbortException(coyoteResponse.getErrorException());
             }
         }
 
@@ -360,7 +354,6 @@ public class OutputBuffer extends Writer
 
 
     // ------------------------------------------------- Bytes Handling Methods
-
 
     /**
      * Sends the buffer data to the client output, checking the

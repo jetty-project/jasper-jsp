@@ -26,19 +26,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.apache.catalina.Cluster;
-import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
-import org.apache.catalina.Valve;
-import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
-import org.apache.catalina.ha.tcp.ReplicationValve;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.io.ReplicationStream;
@@ -78,11 +72,6 @@ public class DeltaManager extends ClusterManagerBase{
      */
     protected static final String managerName = "DeltaManager";
     protected String name = null;
-
-    /**
-     * cached replication valve cluster container!
-     */
-    private volatile ReplicationValve replicationValve = null ;
 
     private boolean expireSessionsOnShutdown = false;
     private boolean notifySessionListenersOnReplication = true;
@@ -602,13 +591,13 @@ public class DeltaManager extends ClusterManagerBase{
      */
     protected DeltaRequest deserializeDeltaRequest(DeltaSession session, byte[] data)
             throws ClassNotFoundException, IOException {
+        session.lock();
         try {
-            session.lock();
             ReplicationStream ois = getReplicationStream(data);
             session.getDeltaRequest().readExternal(ois);
             ois.close();
             return session.getDeltaRequest();
-        }finally {
+        } finally {
             session.unlock();
         }
     }
@@ -623,10 +612,10 @@ public class DeltaManager extends ClusterManagerBase{
      */
     protected byte[] serializeDeltaRequest(DeltaSession session, DeltaRequest deltaRequest)
             throws IOException {
+        session.lock();
         try {
-            session.lock();
             return deltaRequest.serialize();
-        }finally {
+        } finally {
             session.unlock();
         }
     }
@@ -731,20 +720,6 @@ public class DeltaManager extends ClusterManagerBase{
 
         // Load unloaded sessions, if any
         try {
-            //the channel is already running
-            Cluster cluster = getCluster() ;
-            // stop remove cluster binding
-            if(cluster == null) {
-                Context context = getContext() ;
-                if (context != null) {
-                    cluster = context.getCluster();
-                    if(cluster instanceof CatalinaCluster) {
-                        setCluster((CatalinaCluster) cluster);
-                    } else {
-                        cluster = null;
-                    }
-                }
-            }
             if (cluster == null) {
                 log.error(sm.getString("deltaManager.noCluster", getName()));
                 return;
@@ -763,9 +738,6 @@ public class DeltaManager extends ClusterManagerBase{
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("deltaManager.startClustering", getName()));
             }
-            //to survice context reloads, as only a stop/start is called, not
-            // createManager
-            cluster.registerManager(this);
 
             getAllClusterSessions();
 
@@ -841,36 +813,6 @@ public class DeltaManager extends ClusterManagerBase{
            }
         } else {
             if (log.isInfoEnabled()) log.info(sm.getString("deltaManager.noMembers", getName()));
-        }
-    }
-
-    /**
-     * Register cross context session at replication valve thread local
-     * @param session cross context session
-     */
-    protected void registerSessionAtReplicationValve(DeltaSession session) {
-        if(replicationValve == null) {
-            Context context = getContext();
-            if(context instanceof StandardContext &&
-                    ((StandardContext)context).getCrossContext()) {
-                CatalinaCluster cluster = getCluster() ;
-                if(cluster != null) {
-                    Valve[] valves = cluster.getValves();
-                    if(valves != null && valves.length > 0) {
-                        for(int i=0; replicationValve == null && i < valves.length ; i++ ){
-                            if(valves[i] instanceof ReplicationValve) replicationValve =
-                                    (ReplicationValve)valves[i] ;
-                        }//for
-
-                        if(replicationValve == null && log.isDebugEnabled()) {
-                            log.debug("no ReplicationValve found for CrossContext Support");
-                        }//endif
-                    }//end if
-                }//endif
-            }//end if
-        }//end if
-        if(replicationValve != null) {
-            replicationValve.registerReplicationSession(session);
         }
     }
 
@@ -967,9 +909,7 @@ public class DeltaManager extends ClusterManagerBase{
         }
 
         // Require a new random number generator if we are restarted
-        getCluster().removeManager(this);
         super.stopInternal();
-        replicationValve = null;
     }
 
     // -------------------------------------------------------- Replication
@@ -1116,7 +1056,7 @@ public class DeltaManager extends ClusterManagerBase{
             log.error(sm.getString("deltaManager.createMessage.unableCreateDeltaRequest",
                     sessionId), x);
             return null;
-        }finally {
+        } finally {
             if (session!=null) session.unlock();
         }
 
@@ -1354,12 +1294,12 @@ public class DeltaManager extends ClusterManagerBase{
                 log.debug(sm.getString("deltaManager.receiveMessage.delta",
                         getName(), msg.getSessionID()));
             }
+            session.lock();
             try {
-                session.lock();
                 DeltaRequest dreq = deserializeDeltaRequest(session, delta);
                 dreq.execute(session, isNotifyListenersOnReplication());
                 session.setPrimarySession(false);
-            }finally {
+            } finally {
                 session.unlock();
             }
         }
@@ -1560,7 +1500,6 @@ public class DeltaManager extends ClusterManagerBase{
     public ClusterManager cloneFromTemplate() {
         DeltaManager result = new DeltaManager();
         clone(result);
-        result.replicationValve = replicationValve;
         result.expireSessionsOnShutdown = expireSessionsOnShutdown;
         result.notifySessionListenersOnReplication = notifySessionListenersOnReplication;
         result.notifyContainerListenersOnReplication = notifyContainerListenersOnReplication;

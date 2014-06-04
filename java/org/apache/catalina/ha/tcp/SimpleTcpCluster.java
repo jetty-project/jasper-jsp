@@ -33,9 +33,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
-import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Valve;
@@ -58,7 +56,6 @@ import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -72,8 +69,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Peter Rossbach
  */
 public class SimpleTcpCluster extends LifecycleMBeanBase
-        implements CatalinaCluster, LifecycleListener, MembershipListener,
-        ChannelListener{
+        implements CatalinaCluster, MembershipListener, ChannelListener{
 
     public static final Log log = LogFactory.getLog(SimpleTcpCluster.class);
 
@@ -511,19 +507,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     }
 
 
-    /**
-     * Use as base to handle start/stop/periodic Events from host. Currently
-     * only log the messages as trace level.
-     *
-     * @see org.apache.catalina.LifecycleListener#lifecycleEvent(org.apache.catalina.LifecycleEvent)
-     */
-    @Override
-    public void lifecycleEvent(LifecycleEvent lifecycleEvent) {
-        if (log.isTraceEnabled())
-            log.trace(sm.getString("SimpleTcpCluster.event.log", lifecycleEvent.getType(), lifecycleEvent.getData()));
-    }
-
-
     // ------------------------------------------------------ public
 
     @Override
@@ -587,10 +570,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     /**
      * register all cluster valve to host or engine
-     * @throws Exception
-     * @throws ClassNotFoundException
      */
-    protected void registerClusterValve() throws Exception {
+    protected void registerClusterValve() {
         if(container != null ) {
             for (Iterator<Valve> iter = valves.iterator(); iter.hasNext();) {
                 ClusterValve valve = (ClusterValve) iter.next();
@@ -598,10 +579,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
                     log.debug("Invoking addValve on " + getContainer()
                             + " with class=" + valve.getClass().getName());
                 if (valve != null) {
-                    IntrospectionUtils.callMethodN(getContainer(), "addValve",
-                            new Object[] { valve },
-                            new Class[] { org.apache.catalina.Valve.class });
-
+                    container.getPipeline().addValve(valve);
                     valve.setCluster(this);
                 }
             }
@@ -610,20 +588,16 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     /**
      * unregister all cluster valve to host or engine
-     * @throws Exception
-     * @throws ClassNotFoundException
      */
-    protected void unregisterClusterValve() throws Exception {
+    protected void unregisterClusterValve() {
         for (Iterator<Valve> iter = valves.iterator(); iter.hasNext();) {
             ClusterValve valve = (ClusterValve) iter.next();
             if (log.isDebugEnabled())
                 log.debug("Invoking removeValve on " + getContainer()
                         + " with class=" + valve.getClass().getName());
             if (valve != null) {
-                IntrospectionUtils.callMethodN(getContainer(), "removeValve",
-                    new Object[] { valve },
-                    new Class[] { org.apache.catalina.Valve.class });
-                valve.setCluster(this);
+                container.getPipeline().removeValve(valve);
+                valve.setCluster(null);
             }
         }
     }

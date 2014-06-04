@@ -30,7 +30,6 @@ import java.util.jar.Manifest;
 import org.apache.catalina.Context;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -129,44 +128,29 @@ public final class ExtensionValidator {
 
         String appName = context.getName();
         ArrayList<ManifestResource> appManifestResources = new ArrayList<>();
-        // If the application context is null it does not exist and
-        // therefore is not valid
-        if (resources == null) return false;
-        // Find the Manifest for the Web Application
-        InputStream inputStream = null;
-        try {
-            WebResource resource =
-                    resources.getResource("/META-INF/MANIFEST.MF");
-            if (resource.isFile()) {
-                inputStream = resource.getInputStream();
+
+        // Web application manifest
+        WebResource resource = resources.getResource("/META-INF/MANIFEST.MF");
+        if (resource.isFile()) {
+            try (InputStream inputStream = resource.getInputStream()) {
                 Manifest manifest = new Manifest(inputStream);
-                inputStream.close();
-                inputStream = null;
                 ManifestResource mre = new ManifestResource
                     (sm.getString("extensionValidator.web-application-manifest"),
                     manifest, ManifestResource.WAR);
                 appManifestResources.add(mre);
             }
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                }
-            }
         }
 
-        // Primarily used for error reporting
-        String jarName = null;
-        WebResource[] jars = resources.listResources("/WEB-INF/lib");
-        for (WebResource jar : jars) {
-            jarName = jar.getName();
-            if (jarName.toLowerCase(Locale.ENGLISH).endsWith(".jar") &&
-                    jar.isFile()) {
-
-                Manifest jmanifest = jar.getManifest();
-                if (jmanifest != null) {
+        // Web application library manifests
+        WebResource[] manifestResources =
+                resources.getClassLoaderResources("/META-INF/MANIFEST.MF");
+        for (WebResource manifestResource : manifestResources) {
+            if (manifestResource.isFile()) {
+                // Primarily used for error reporting
+                String jarName = manifestResource.getURL().toExternalForm();
+                Manifest jmanifest = null;
+                try (InputStream is = manifestResource.getInputStream()) {
+                    jmanifest = new Manifest(is);
                     ManifestResource mre = new ManifestResource(jarName,
                             jmanifest, ManifestResource.APPLICATION);
                     appManifestResources.add(mre);
@@ -344,27 +328,11 @@ public final class ExtensionValidator {
      * @param inStream Input stream to a WAR or JAR file
      * @return The WAR's or JAR's manifest
      */
-    private static Manifest getManifest(InputStream inStream)
-            throws IOException {
-
+    private static Manifest getManifest(InputStream inStream) throws IOException {
         Manifest manifest = null;
-        JarInputStream jin = null;
-
-        try {
-            jin = new JarInputStream(inStream);
+        try (JarInputStream jin = new JarInputStream(inStream)) {
             manifest = jin.getManifest();
-            jin.close();
-            jin = null;
-        } finally {
-            if (jin != null) {
-                try {
-                    jin.close();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                }
-            }
         }
-
         return manifest;
     }
 

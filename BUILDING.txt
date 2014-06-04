@@ -45,23 +45,18 @@ source distribution, do the following:
     Note regarding later versions of Java:
 
       As documented elsewhere, one of components in Apache Tomcat includes
-      a private copy of the Apache Commons DBCP library. The source code
-      for this library is downloaded, processed by the build script
-      (renaming the packages) and compiled.
+      a private copy of the Apache Commons DBCP library.
 
-      Due to changes in JDBC interfaces implemented by the library between
-      versions of Java SE specification, the library has to target specific
-      version of Java and can be compiled only with the JDK version
-      implementing this version of specification.
+      The JDBC interfaces implemented by DBCP frequently change in non-backwards
+      compatible ways between versions of the Java SE specification. Therefore,
+      it is likely that DBCP will only compile with the specific version of Java
+      listed above and that compilation will fail if a later version of Java is
+      used.
 
       See Apache Commons DBCP project web site for more details on
       available versions of the library and its requirements,
 
         http://commons.apache.org/dbcp/
-
-      If you really want to use a later version of JDK to build Tomcat,
-      several workarounds are possible. One of them is to skip building
-      the component (tomcat-dbcp.jar).
 
  3. Install the JDK according to the instructions included with the release.
 
@@ -69,11 +64,11 @@ source distribution, do the following:
     into which you installed the JDK release.
 
 
-(2) Install Apache Ant 1.8.x on your computer
+(2) Install Apache Ant version 1.8.2 or later on your computer
 
- 1. If Apache Ant 1.8.x is already installed on your computer, skip to (3).
+ 1. If Apache Ant version 1.8.2 or later is already installed on your computer, skip to (3).
 
- 2. Download a binary distribution of Ant 1.8.x from:
+ 2. Download a binary distribution of Ant from:
 
         http://ant.apache.org/bindownload.cgi
 
@@ -352,7 +347,13 @@ For example:
 
 (7.3) Other configuration options
 
- 1. It is possible to enable generation of access log file when the tests
+ 1. It is possible to configure the directory where JUnit reports are
+ written to. It is configured by "test.reports" property. The default
+ value is
+
+        output/build/logs
+
+ 2. It is possible to enable generation of access log file when the tests
  are run. This is off by default and can be enabled by the following
  property:
 
@@ -363,7 +364,7 @@ For example:
 
         output/build/logs
 
- 2. The testsuite respects logging configuration as configured by
+ 3. The testsuite respects logging configuration as configured by
  ${tomcat.source}/conf/logging.properties
 
  The log files will be written to the temporary directory used by the
@@ -371,16 +372,23 @@ For example:
 
         output/test-tmp/logs
 
- 3. It is possible to configure formatter used by JUnit reports. For
- example the following property disables generation of separate report
+ 4. It is possible to configure formatter used by JUnit reports.
+ Configuration properties are "junit.formatter.type",
+ "junit.formatter.extension" and "junit.formatter.usefile".
+
+ For example the following property disables generation of separate report
  files:
 
         junit.formatter.usefile=false
 
- 4. Optional support is provided for the Cobertura code coverage tool. It
+ 5. Optional support is provided for the Cobertura code coverage tool. It
  can be enabled using the following property:
 
         test.cobertura=true
+
+ The report files by default are written to
+
+        output/coverage
 
 * NOTE: Cobertura is licensed under GPL v2 with parts of it being under
   Apache License v1.1. See http://cobertura.sf.net for details. Using it

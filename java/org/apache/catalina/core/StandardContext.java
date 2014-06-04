@@ -129,6 +129,8 @@ import org.apache.tomcat.util.descriptor.web.MessageDestinationRef;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.scan.StandardJarScanner;
+import org.apache.tomcat.util.security.PrivilegedGetTccl;
+import org.apache.tomcat.util.security.PrivilegedSetTccl;
 
 /**
  * Standard implementation of the <b>Context</b> interface.  Each
@@ -808,6 +810,8 @@ public class StandardContext extends ContainerBase
 
     private String containerSciFilter;
 
+    private Boolean failCtxIfServletStartFails;
+
     protected static final ThreadBindingListener DEFAULT_NAMING_LISTENER = (new ThreadBindingListener() {
         @Override
         public void bind() {}
@@ -816,7 +820,16 @@ public class StandardContext extends ContainerBase
     });
     protected ThreadBindingListener threadBindingListener = DEFAULT_NAMING_LISTENER;
 
+    private final Object namingToken = new Object();
+
+
     // ----------------------------------------------------- Context Properties
+
+    @Override
+    public Object getNamingToken() {
+        return namingToken;
+    }
+
 
     @Override
     public void setContainerSciFilter(String containerSciFilter) {
@@ -1648,12 +1661,13 @@ public class StandardContext extends ContainerBase
                                    this.distributable);
 
         // Bugzilla 32866
-        if(getManager() != null) {
+        Manager manager = getManager();
+        if(manager != null) {
             if(log.isDebugEnabled()) {
                 log.debug("Propagating distributable=" + distributable
                           + " to manager");
             }
-            getManager().setDistributable(distributable);
+            manager.setDistributable(distributable);
         }
     }
 
@@ -2615,8 +2629,32 @@ public class StandardContext extends ContainerBase
                 this.renewThreadsWhenStoppingContext);
     }
 
-    // -------------------------------------------------------- Context Methods
+    public Boolean getFailCtxIfServletStartFails() {
+        return failCtxIfServletStartFails;
+    }
 
+    public void setFailCtxIfServletStartFails(
+            Boolean failCtxIfServletStartFails) {
+        Boolean oldFailCtxIfServletStartFails = this.failCtxIfServletStartFails;
+        this.failCtxIfServletStartFails = failCtxIfServletStartFails;
+        support.firePropertyChange("failCtxIfServletStartFails",
+                oldFailCtxIfServletStartFails,
+                failCtxIfServletStartFails);
+    }
+
+    protected boolean getComputedFailCtxIfServletStartFails() {
+        if(failCtxIfServletStartFails != null) {
+            return failCtxIfServletStartFails.booleanValue();
+        }
+        //else look at Host config
+        if(getParent() instanceof StandardHost) {
+            return ((StandardHost)getParent()).isFailCtxIfServletStartFails();
+        }
+        //else
+        return false;
+    }
+
+    // -------------------------------------------------------- Context Methods
 
     /**
      * Add a new Listener class name to the set of Listeners
@@ -4885,7 +4923,7 @@ public class StandardContext extends ContainerBase
      * @param children Array of wrappers for all currently defined
      *  servlets (including those not declared load on startup)
      */
-    public void loadOnStartup(Container children[]) {
+    public boolean loadOnStartup(Container children[]) {
 
         // Collect "load on startup" servlets that need to be initialized
         TreeMap<Integer, ArrayList<Wrapper>> map = new TreeMap<>();
@@ -4913,10 +4951,14 @@ public class StandardContext extends ContainerBase
                                       getName()), StandardWrapper.getRootCause(e));
                     // NOTE: load errors (including a servlet that throws
                     // UnavailableException from tht init() method) are NOT
-                    // fatal to application startup
+                    // fatal to application startup, excepted if failDeploymentIfServletLoadedOnStartupFails is specified
+                    if(getComputedFailCtxIfServletStartFails()) {
+                        return false;
+                    }
                 }
             }
         }
+        return true;
 
     }
 
@@ -5172,7 +5214,7 @@ public class StandardContext extends ContainerBase
                 // Start manager
                 Manager manager = getManager();
                 if ((manager != null) && (manager instanceof Lifecycle)) {
-                    ((Lifecycle) getManager()).start();
+                    ((Lifecycle) manager).start();
                 }
             } catch(Exception e) {
                 log.error("Error manager.start()", e);
@@ -5189,7 +5231,10 @@ public class StandardContext extends ContainerBase
 
             // Load and initialize all "load on startup" servlets
             if (ok) {
-                loadOnStartup(findChildren());
+                if (!loadOnStartup(findChildren())){
+                    log.error("Error loadOnStartup");
+                    ok = false;
+                }
             }
 
             // Start ContainerBackgroundProcessor thread
@@ -5715,7 +5760,7 @@ public class StandardContext extends ContainerBase
 
         if (isUseNaming()) {
             try {
-                ContextBindings.bindThread(this, this);
+                ContextBindings.bindThread(this, getNamingToken());
             } catch (NamingException e) {
                 // Silent catch, as this is a normal case during the early
                 // startup stages
@@ -5732,7 +5777,7 @@ public class StandardContext extends ContainerBase
     protected void unbindThread(ClassLoader oldContextClassLoader) {
 
         if (isUseNaming()) {
-            ContextBindings.unbindThread(this, this);
+            ContextBindings.unbindThread(this, getNamingToken());
         }
 
         unbind(false, oldContextClassLoader);
@@ -5806,30 +5851,6 @@ public class StandardContext extends ContainerBase
             AccessController.doPrivileged(pa);
         } else {
             Thread.currentThread().setContextClassLoader(originalClassLoader);
-        }
-    }
-
-
-    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
-
-        private ClassLoader cl;
-
-        PrivilegedSetTccl(ClassLoader cl) {
-            this.cl = cl;
-        }
-
-        @Override
-        public Void run() {
-            Thread.currentThread().setContextClassLoader(cl);
-            return null;
-        }
-    }
-
-
-    private static class PrivilegedGetTccl implements PrivilegedAction<ClassLoader> {
-        @Override
-        public ClassLoader run() {
-            return Thread.currentThread().getContextClassLoader();
         }
     }
 
@@ -6143,11 +6164,15 @@ public class StandardContext extends ContainerBase
      */
     private void checkUnusualURLPattern(String urlPattern) {
         if (log.isInfoEnabled()) {
-            if(urlPattern.endsWith("*") && (urlPattern.length() < 2 ||
-                    urlPattern.charAt(urlPattern.length()-2) != '/')) {
+            // First group checks for '*' or '/foo*' style patterns
+            // Second group checks for *.foo.bar style patterns
+            if((urlPattern.endsWith("*") && (urlPattern.length() < 2 ||
+                        urlPattern.charAt(urlPattern.length()-2) != '/')) ||
+                    urlPattern.startsWith("*.") && urlPattern.length() > 2 &&
+                        urlPattern.lastIndexOf('.') > 1) {
                 log.info("Suspicious url pattern: \"" + urlPattern + "\"" +
                         " in context [" + getName() + "] - see" +
-                        " section SRV.11.2 of the Servlet specification" );
+                        " sections 12.1 and 12.2 of the Servlet specification");
             }
         }
     }
@@ -6173,9 +6198,7 @@ public class StandardContext extends ContainerBase
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(stream));
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String strRead = "";
             while (strRead != null) {
                 sb.append(strRead);
@@ -6183,12 +6206,6 @@ public class StandardContext extends ContainerBase
             }
         } catch (IOException e) {
             return "";
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ioe) {/*Ignore*/}
-            }
         }
 
         return sb.toString();

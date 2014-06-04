@@ -42,6 +42,7 @@ import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
@@ -133,12 +134,13 @@ public class WebappClassLoader extends URLClassLoader
      */
     private static final List<String> JVM_THREAD_GROUP_NAMES = new ArrayList<>();
 
-    private static final String JVN_THREAD_GROUP_SYSTEM = "system";
+    private static final String JVM_THREAD_GROUP_SYSTEM = "system";
 
     private static final String CLASS_FILE_SUFFIX = ".class";
+    private static final String SERVICES_PREFIX = "/META-INF/services/";
 
     static {
-        JVM_THREAD_GROUP_NAMES.add(JVN_THREAD_GROUP_SYSTEM);
+        JVM_THREAD_GROUP_NAMES.add(JVM_THREAD_GROUP_SYSTEM);
         JVM_THREAD_GROUP_NAMES.add("RMI Runtime");
     }
 
@@ -196,7 +198,8 @@ public class WebappClassLoader extends URLClassLoader
      * {@link #packageTriggersDeny}.
      */
     protected final Matcher packageTriggersPermit =
-            Pattern.compile("^javax\\.servlet\\.jsp\\.jstl\\.").matcher("");
+            Pattern.compile("^javax\\.servlet\\.jsp\\.jstl\\.|" +
+                    "^org\\.apache\\.tomcat\\.jdbc\\.").matcher("");
 
 
     /**
@@ -343,12 +346,6 @@ public class WebappClassLoader extends URLClassLoader
 
 
     /**
-     * Has this component been started?
-     */
-    protected boolean started = false;
-
-
-    /**
      * need conversion for properties files
      */
     protected boolean needConvert = false;
@@ -423,6 +420,16 @@ public class WebappClassLoader extends URLClassLoader
      * resources.
      */
     private boolean hasExternalRepositories = false;
+
+
+    /**
+     * Repositories managed by this class rather than the super class.
+     */
+    private List<URL> localRepositories = new ArrayList<>();
+
+
+    private volatile LifecycleState state = LifecycleState.NEW;
+
 
     // ------------------------------------------------------------- Properties
 
@@ -712,7 +719,7 @@ public class WebappClassLoader extends URLClassLoader
 
         result.resources = this.resources;
         result.delegate = this.delegate;
-        result.started = this.started;
+        result.state = this.state;
         result.needConvert = this.needConvert;
         result.clearReferencesStatic = this.clearReferencesStatic;
         result.clearReferencesStopThreads = this.clearReferencesStopThreads;
@@ -845,10 +852,7 @@ public class WebappClassLoader extends URLClassLoader
         if (log.isDebugEnabled())
             log.debug("    findClass(" + name + ")");
 
-        // Cannot load anything from local repositories if class loader is stopped
-        if (!started) {
-            throw new ClassNotFoundException(name);
-        }
+        checkStateForClassLoading(name);
 
         // (1) Permission to define this class when using a SecurityManager
         if (securityManager != null) {
@@ -1208,14 +1212,8 @@ public class WebappClassLoader extends URLClassLoader
             log.debug("loadClass(" + name + ", " + resolve + ")");
         Class<?> clazz = null;
 
-        // Log access to stopped classloader
-        if (!started) {
-            try {
-                throw new IllegalStateException();
-            } catch (IllegalStateException e) {
-                log.info(sm.getString("webappClassLoader.stopped", name), e);
-            }
-        }
+        // Log access to stopped class loader
+        checkStateForClassLoading(name);
 
         // (0) Check our previously loaded local class cache
         clazz = findLoadedClass0(name);
@@ -1324,7 +1322,20 @@ public class WebappClassLoader extends URLClassLoader
         }
 
         throw new ClassNotFoundException(name);
+    }
 
+
+    protected void checkStateForClassLoading(String className) throws ClassNotFoundException {
+        // It is not permitted to load new classes once the web application has
+        // been stopped.
+        if (!state.isAvailable()) {
+            String msg = sm.getString("webappClassLoader.stopped", className);
+            IllegalStateException cause = new IllegalStateException(msg);
+            ClassNotFoundException cnfe = new ClassNotFoundException();
+            cnfe.initCause(cause);
+            log.info(msg, cnfe);
+            throw cnfe;
+        }
     }
 
 
@@ -1371,7 +1382,10 @@ public class WebappClassLoader extends URLClassLoader
      */
     @Override
     public URL[] getURLs() {
-        return super.getURLs();
+        ArrayList<URL> result = new ArrayList<>();
+        result.addAll(localRepositories);
+        result.addAll(Arrays.asList(super.getURLs()));
+        return result.toArray(new URL[result.size()]);
     }
 
 
@@ -1417,7 +1431,7 @@ public class WebappClassLoader extends URLClassLoader
      */
     @Override
     public LifecycleState getState() {
-        return LifecycleState.NEW;
+        return state;
     }
 
 
@@ -1432,7 +1446,7 @@ public class WebappClassLoader extends URLClassLoader
 
     @Override
     public void init() {
-        // NOOP
+        state = LifecycleState.INITIALIZED;
     }
 
 
@@ -1444,20 +1458,23 @@ public class WebappClassLoader extends URLClassLoader
     @Override
     public void start() throws LifecycleException {
 
+        state = LifecycleState.STARTING_PREP;
+
         WebResource classes = resources.getResource("/WEB-INF/classes");
         if (classes.isDirectory() && classes.canRead()) {
-            addURL(classes.getURL());
+            localRepositories.add(classes.getURL());
         }
         WebResource[] jars = resources.listResources("/WEB-INF/lib");
         for (WebResource jar : jars) {
             if (jar.getName().endsWith(".jar") && jar.isFile() && jar.canRead()) {
-                addURL(jar.getURL());
+                localRepositories.add(jar.getURL());
                 jarModificationTimes.put(
                         jar.getName(), Long.valueOf(jar.getLastModified()));
             }
         }
 
-        started = true;
+        state = LifecycleState.STARTING;
+
         String encoding = null;
         try {
             encoding = System.getProperty("file.encoding");
@@ -1468,12 +1485,9 @@ public class WebappClassLoader extends URLClassLoader
             needConvert = true;
         }
 
+        state = LifecycleState.STARTED;
     }
 
-
-    public boolean isStarted() {
-        return started;
-    }
 
     /**
      * Stop the class loader.
@@ -1483,11 +1497,13 @@ public class WebappClassLoader extends URLClassLoader
     @Override
     public void stop() throws LifecycleException {
 
+        state = LifecycleState.STOPPING_PREP;
+
         // Clearing references should be done before setting started to
         // false, due to possible side effects
         clearReferences();
 
-        started = false;
+        state = LifecycleState.STOPPING;
 
         resourceEntries.clear();
         jarModificationTimes.clear();
@@ -1495,12 +1511,21 @@ public class WebappClassLoader extends URLClassLoader
 
         permissionList.clear();
         loaderPC.clear();
+
+        state = LifecycleState.STOPPED;
     }
 
 
     @Override
     public void destroy() {
-        // NOOP
+        state = LifecycleState.DESTROYING;
+
+        try {
+            super.close();
+        } catch (IOException ioe) {
+            log.warn(sm.getString("webappClassLoader.superCloseFail"), ioe);
+        }
+        state = LifecycleState.DESTROYED;
     }
 
 
@@ -1583,13 +1608,12 @@ public class WebappClassLoader extends URLClassLoader
      * If only apps cleaned up after themselves...
      */
     private final void clearReferencesJdbc() {
-        InputStream is = getResourceAsStream(
-                "org/apache/catalina/loader/JdbcLeakPrevention.class");
         // We know roughly how big the class will be (~ 1K) so allow 2k as a
         // starting point
         byte[] classBytes = new byte[2048];
         int offset = 0;
-        try {
+        try (InputStream is = getResourceAsStream(
+                "org/apache/catalina/loader/JdbcLeakPrevention.class")) {
             int read = is.read(classBytes, offset, classBytes.length-offset);
             while (read > -1) {
                 offset += read;
@@ -1618,16 +1642,6 @@ public class WebappClassLoader extends URLClassLoader
             ExceptionUtils.handleThrowable(t);
             log.warn(sm.getString(
                     "webappClassLoader.jdbcRemoveFailed", getContextName()), t);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException ioe) {
-                    log.warn(sm.getString(
-                            "webappClassLoader.jdbcRemoveStreamError",
-                            getContextName()), ioe);
-                }
-            }
         }
     }
 
@@ -1808,12 +1822,12 @@ public class WebappClassLoader extends URLClassLoader
                     if (isRequestThread(thread)) {
                         log.error(sm.getString("webappClassLoader.warnRequestThread",
                                 getContextName(), threadName));
-                        log.error(sm.getString("webappClassLoader.stackTraceRequestThread",
+                        log.info(sm.getString("webappClassLoader.stackTraceRequestThread",
                                 threadName, getStackTrace(thread)));
                     } else {
                         log.error(sm.getString("webappClassLoader.warnThread",
                                 getContextName(), threadName));
-                        log.error(sm.getString("webappClassLoader.stackTrace",
+                        log.info(sm.getString("webappClassLoader.stackTrace",
                                 threadName, getStackTrace(thread)));
                     }
 
@@ -2521,19 +2535,25 @@ public class WebappClassLoader extends URLClassLoader
      */
     protected ResourceEntry findResourceInternal(final String name, final String path) {
 
-        if (!started) {
+        if (!state.isAvailable()) {
             log.info(sm.getString("webappClassLoader.stopped", name));
             return null;
         }
 
-        if ((name == null) || (path == null))
+        if (name == null || path == null) {
             return null;
+        }
 
         ResourceEntry entry = resourceEntries.get(path);
-        if (entry != null)
+        if (entry != null) {
             return entry;
+        }
 
         boolean isClassResource = path.endsWith(CLASS_FILE_SUFFIX);
+        boolean isCacheable = isClassResource;
+        if (!isCacheable) {
+             isCacheable = path.startsWith(SERVICES_PREFIX);
+        }
 
         WebResource resource = null;
 
@@ -2550,25 +2570,26 @@ public class WebappClassLoader extends URLClassLoader
         entry.codeBase = entry.source;
         entry.lastModified = resource.getLastModified();
 
-        if (needConvert) {
-            if (path.endsWith(".properties")) {
-                fileNeedConvert = true;
-            }
+        if (needConvert && path.endsWith(".properties")) {
+            fileNeedConvert = true;
         }
 
         /* Only cache the binary content if there is some content
-         * available and either:
+         * available one of the following is true:
          * a) It is a class file since the binary content is only cached
          *    until the class has been loaded
          *    or
          * b) The file needs conversion to address encoding issues (see
          *    below)
+         *    or
+         * c) The resource is a service provider configuration file located
+         *    under META=INF/services
          *
          * In all other cases do not cache the content to prevent
          * excessive memory usage if large resources are present (see
          * https://issues.apache.org/bugzilla/show_bug.cgi?id=53081).
          */
-        if (isClassResource || fileNeedConvert) {
+        if (isCacheable || fileNeedConvert) {
             byte[] binaryContent = resource.getContent();
             if (binaryContent != null) {
                  if (fileNeedConvert) {
@@ -2628,7 +2649,6 @@ public class WebappClassLoader extends URLClassLoader
         }
 
         return entry;
-
     }
 
 

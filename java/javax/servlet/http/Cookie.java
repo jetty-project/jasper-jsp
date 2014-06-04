@@ -384,7 +384,7 @@ public class Cookie implements Cloneable, Serializable {
 
 class CookieNameValidator {
     private static final String LSTRING_FILE = "javax.servlet.http.LocalStrings";
-    private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
+    protected static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
     protected final BitSet allowed;
 
@@ -401,16 +401,7 @@ class CookieNameValidator {
         if (name == null || name.length() == 0) {
             throw new IllegalArgumentException(lStrings.getString("err.cookie_name_blank"));
         }
-        if (!isToken(name) ||
-                name.equalsIgnoreCase("Comment") ||
-                name.equalsIgnoreCase("Discard") ||
-                name.equalsIgnoreCase("Domain") ||
-                name.equalsIgnoreCase("Expires") ||
-                name.equalsIgnoreCase("Max-Age") ||
-                name.equalsIgnoreCase("Path") ||
-                name.equalsIgnoreCase("Secure") ||
-                name.equalsIgnoreCase("Version") ||
-                name.startsWith("$")) {
+        if (!isToken(name)) {
             String errMsg = lStrings.getString("err.cookie_name_is_token");
             throw new IllegalArgumentException(MessageFormat.format(errMsg, name));
         }
@@ -430,17 +421,20 @@ class CookieNameValidator {
 }
 
 class NetscapeValidator extends CookieNameValidator {
-    private static final String NETSCAPE_SEPARATORS = ",; ";
+    // the Netscape specification describes NAME=VALUE as
+    // "a sequence of characters excluding semi-colon, comma and white space"
+    // we also exclude the '=' character that separates NAME from VALUE
+    private static final String NETSCAPE_SEPARATORS = ",; " + "=";
 
     NetscapeValidator() {
         super(NETSCAPE_SEPARATORS);
     }
 }
 
-class RFC2109Validator extends CookieNameValidator {
+class RFC6265Validator extends CookieNameValidator {
     private static final String RFC2616_SEPARATORS = "()<>@,;:\\\"/[]?={} \t";
 
-    RFC2109Validator() {
+    RFC6265Validator() {
         super(RFC2616_SEPARATORS);
 
         // special treatment to allow for FWD_SLASH_IS_SEPARATOR property
@@ -453,6 +447,20 @@ class RFC2109Validator extends CookieNameValidator {
         }
         if (allowSlash) {
             allowed.set('/');
+        }
+    }
+}
+
+class RFC2109Validator extends RFC6265Validator {
+    RFC2109Validator() {
+    }
+
+    @Override
+    void validate(String name) {
+        super.validate(name);
+        if (name.charAt(0) == '$') {
+            String errMsg = lStrings.getString("err.cookie_name_is_token");
+            throw new IllegalArgumentException(MessageFormat.format(errMsg, name));
         }
     }
 }

@@ -126,8 +126,14 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         accessLogEnabled = Boolean.parseBoolean(
             System.getProperty("tomcat.test.accesslog", "false"));
         if (accessLogEnabled) {
+            String accessLogDirectory = System
+                    .getProperty("tomcat.test.reports");
+            if (accessLogDirectory == null) {
+                accessLogDirectory = new File(getBuildDirectory(), "logs")
+                        .toString();
+            }
             AccessLogValve alv = new AccessLogValve();
-            alv.setDirectory(getBuildDirectory() + "/logs");
+            alv.setDirectory(accessLogDirectory);
             alv.setPattern("%h %l %u %t \"%r\" %s %b %I %D");
             tomcat.getHost().getPipeline().addValve(alv);
         }
@@ -256,21 +262,11 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             is = connection.getErrorStream();
         }
         if (is != null) {
-            BufferedInputStream bis = null;
-            try {
-                bis = new BufferedInputStream(is);
+            try (BufferedInputStream bis = new BufferedInputStream(is)) {
                 byte[] buf = new byte[2048];
                 int rd = 0;
                 while((rd = bis.read(buf)) > 0) {
                     out.append(buf, 0, rd);
-                }
-            } finally {
-                if (bis != null) {
-                    try {
-                        bis.close();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
                 }
             }
         }
@@ -349,22 +345,11 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         connection.connect();
 
         // Write the request body
-        OutputStream os = null;
-        try {
-            os = connection.getOutputStream();
-            while (streamer!=null && streamer.available()>0) {
+        try (OutputStream os = connection.getOutputStream()) {
+            while (streamer != null && streamer.available() > 0) {
                 byte[] next = streamer.next();
                 os.write(next);
                 os.flush();
-            }
-
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException ioe) {
-                    // Ignore
-                }
             }
         }
 
@@ -380,24 +365,22 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             is = connection.getErrorStream();
         }
 
-        BufferedInputStream bis = null;
-        try {
-            bis = new BufferedInputStream(is);
+        try (BufferedInputStream bis = new BufferedInputStream(is)) {
             byte[] buf = new byte[2048];
             int rd = 0;
             while((rd = bis.read(buf)) > 0) {
                 out.append(buf, 0, rd);
             }
-        } finally {
-            if (bis != null) {
-                try {
-                    bis.close();
-                } catch (IOException e) {
-                    // Ignore
-                }
-            }
         }
         return rc;
+    }
+
+    protected static String getStatusCode(String statusLine) {
+        if (statusLine == null || statusLine.length() < 12) {
+            return statusLine;
+        } else {
+            return statusLine.substring(9, 12);
+        }
     }
 
     private static class TomcatWithFastSessionIDs extends Tomcat {

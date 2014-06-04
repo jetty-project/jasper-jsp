@@ -17,8 +17,8 @@
 -->
 <jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
 <jsp:directive.tag body-content="scriptless" />
-<a href="#" onclick="window.alert(&quot;1${'foo'}1&quot;)">foo</a>
-<a href="#" onclick="window.alert(&quot;2bar2&quot;)">bar</a>
+<a href="#" onclick="window.alert(&quot;1${'foo'}1&lt;&amp;&gt;&quot;)">foo</a>
+<a href="#" onclick="window.alert(&quot;2bar2&lt;&amp;&gt;&quot;)">bar</a>
 <a href="#" onclick="window.alert(&quot;3${text}3&quot;)">foo</a>
 <a href="#" onclick="window.alert(&quot;4${'&amp;'}4&quot;)">foo</a>
 <a href="#" onclick="window.alert(&quot;5${'&amp;apos;'}5&quot;)">foo</a>

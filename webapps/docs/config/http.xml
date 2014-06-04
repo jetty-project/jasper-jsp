@@ -344,8 +344,8 @@
 
     <attribute name="connectionLinger" required="false">
       <p>The number of seconds during which the sockets used by this
-      <strong>Connector</strong> will linger when they are closed.
-      If not specified, the JVM default will be used.</p>
+      <strong>Connector</strong> will linger when they are closed. The default
+      value is <code>-1</code> which disables socket linger.</p>
     </attribute>
 
     <attribute name="connectionTimeout" required="false">
@@ -530,6 +530,14 @@
       </p>
     </attribute>
 
+    <attribute name="upgradeAsyncWriteBufferSize" required="false">
+      <p>The default size of the buffer to allocate to for asynchronous writes
+      that can not be completed in a single operation. Data that can't be
+      written immediately will be stored in this buffer until it can be written.
+      If more data needs to be stored than space is available in the buffer than
+      the size of the buffer will be increased for the duration of the write. If
+      not specified the default value of 8192 will be used.</p>
+    </attribute>
   </attributes>
 
   </subsection>
@@ -668,7 +676,9 @@
 
       <attribute name="useSendfile" required="false">
         <p>(bool)Use this attribute to enable or disable sendfile capability.
-        The default value is <code>true</code>.</p>
+        The default value is <code>true</code>. Note that the use of sendfile
+        will disable any compression that Tomcat may otherwise have performed on
+        the response.</p>
       </attribute>
 
       <attribute name="socket.directBuffer" required="false">
@@ -801,7 +811,9 @@
 
       <attribute name="useSendfile" required="false">
         <p>(bool)Use this attribute to enable or disable sendfile capability.
-        The default value is <code>true</code>.</p>
+        The default value is <code>true</code>. Note that the use of sendfile
+        will disable any compression that Tomcat may otherwise have performed on
+        the response.</p>
       </attribute>
 
       <attribute name="socket.directBuffer" required="false">
@@ -809,6 +821,19 @@
         ByteBuffers. Default is <code>false</code>.<br/>
         When you are using direct buffers, make sure you allocate the
         appropriate amount of memory for the direct memory space. On Sun's JDK
+        that would be something like <code>-XX:MaxDirectMemorySize=256m</code>.
+        </p>
+      </attribute>
+
+      <attribute name="socket.directSslBuffer" required="false">
+        <p>(bool)Boolean value, whether to use direct ByteBuffers or java mapped
+        ByteBuffers for the SSL buffers. If <code>true</code> then
+        <code>java.nio.ByteBuffer.allocateDirect()</code> is used to allocate
+        the buffers, if <code>false</code> then
+        <code>java.nio.ByteBuffer.allocate()</code> is used. The default value
+        is <code>false</code>.<br/>
+        When you are using direct buffers, make sure you allocate the
+        appropriate amount of memory for the direct memory space. On Oracle's JDK
         that would be something like <code>-XX:MaxDirectMemorySize=256m</code>.
         </p>
       </attribute>
@@ -938,7 +963,9 @@
 
       <attribute name="useSendfile" required="false">
         <p>(bool)Use this attribute to enable or disable sendfile capability.
-        The default value is <code>true</code>.</p>
+        The default value is <code>true</code>. Note that the use of sendfile
+        will disable any compression that Tomcat may otherwise have performed on
+        the response.</p>
       </attribute>
 
     </attributes>
@@ -1361,7 +1388,7 @@
         <th />
         <th>Java Blocking Connector<br />BIO</th>
         <th>Java Nio Blocking Connector<br />NIO</th>
-        <th>Java Nio2 Blocking Connector<br />NIO</th>
+        <th>Java Nio2 Blocking Connector<br />NIO2</th>
         <th>APR/native Connector<br />APR</th>
       </tr>
       <tr>

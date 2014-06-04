@@ -247,11 +247,13 @@ public class HostManagerServlet
         boolean deployOnStartup = booleanParameter(request, "deployOnStartup", true, htmlMode);
         boolean deployXML = booleanParameter(request, "deployXML", true, htmlMode);
         boolean unpackWARs = booleanParameter(request, "unpackWARs", true, htmlMode);
+        boolean copyXML = booleanParameter(request, "copyXML", false, htmlMode);
         add(writer, name, aliases, appBase, manager,
             autoDeploy,
             deployOnStartup,
             deployXML,
             unpackWARs,
+            copyXML,
             smClient);
     }
 
@@ -328,6 +330,7 @@ public class HostManagerServlet
          boolean deployOnStartup,
          boolean deployXML,
          boolean unpackWARs,
+         boolean copyXML,
          StringManager smClient) {
         if (debug >= 1) {
             log(sm.getString("hostManagerServlet.add", name));
@@ -350,11 +353,11 @@ public class HostManagerServlet
         // Validate and create appBase
         File appBaseFile = null;
         File file = null;
-        if (appBase == null || appBase.length() == 0) {
-            file = new File(name);
-        } else {
-            file = new File(appBase);
+        String applicationBase = appBase;
+        if (applicationBase == null || applicationBase.length() == 0) {
+            applicationBase = name;
         }
+        file = new File(applicationBase);
         if (!file.isAbsolute())
             file = new File(engine.getCatalinaBase(), file.getPath());
         try {
@@ -379,11 +382,9 @@ public class HostManagerServlet
                         "hostManagerServlet.configBaseCreateFail", name));
                 return;
             }
-            InputStream is = null;
-            OutputStream os = null;
-            try {
-                is = getServletContext().getResourceAsStream("/manager.xml");
-                os = new FileOutputStream(new File(configBaseFile, "manager.xml"));
+            try (InputStream is = getServletContext().getResourceAsStream("/manager.xml");
+                    OutputStream os = new FileOutputStream(
+                            new File(configBaseFile, "manager.xml"))) {
                 byte buffer[] = new byte[512];
                 int len = buffer.length;
                 while (true) {
@@ -396,26 +397,11 @@ public class HostManagerServlet
                 writer.println(smClient.getString(
                         "hostManagerServlet.managerXml"));
                 return;
-            } finally {
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
-                if (os != null) {
-                    try {
-                        os.close();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
             }
         }
 
         StandardHost host = new StandardHost();
-        host.setAppBase(appBase);
+        host.setAppBase(applicationBase);
         host.setName(name);
 
         host.addLifecycleListener(new HostConfig());
@@ -431,6 +417,7 @@ public class HostManagerServlet
         host.setDeployOnStartup(deployOnStartup);
         host.setDeployXML(deployXML);
         host.setUnpackWARs(unpackWARs);
+        host.setCopyXML(copyXML);
 
         // Add new host
         try {

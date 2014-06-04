@@ -43,6 +43,7 @@ public final class SecurityClassLoad {
         loadCoyotePackage(loader);
         loadLoaderPackage(loader);
         loadRealmPackage(loader);
+        loadServletsPackage(loader);
         loadSessionPackage(loader);
         loadUtilPackage(loader);
         loadValvesPackage(loader);
@@ -100,12 +101,6 @@ public final class SecurityClassLoad {
         loader.loadClass
             (basePackage +
              "ApplicationHttpRequest$AttributeNamesEnumerator");
-        loader.loadClass
-            (basePackage +
-             "StandardContext$PrivilegedGetTccl");
-        loader.loadClass
-            (basePackage +
-             "StandardContext$PrivilegedSetTccl");
     }
 
 
@@ -126,6 +121,18 @@ public final class SecurityClassLoad {
     }
 
 
+    private static final void loadServletsPackage(ClassLoader loader)
+            throws Exception {
+        final String basePackage = "org.apache.catalina.servlets.";
+        // Avoid a possible memory leak in the DefaultServlet when running with
+        // a security manager. The DefaultServlet needs to load an XML parser
+        // when running under a security manager. We want this to be loaded by
+        // the container rather than a web application to prevent a memory leak
+        // via web application class loader.
+        loader.loadClass(basePackage + "DefaultServlet");
+    }
+
+
     private static final void loadSessionPackage(ClassLoader loader)
             throws Exception {
         final String basePackage = "org.apache.catalina.session.";
@@ -142,6 +149,7 @@ public final class SecurityClassLoad {
             throws Exception {
         final String basePackage = "org.apache.catalina.util.";
         loader.loadClass(basePackage + "ParameterMap");
+        loader.loadClass(basePackage + "RequestUtil");
     }
 
 
@@ -268,6 +276,7 @@ public final class SecurityClassLoad {
         clazz.newInstance();
         loader.loadClass(basePackage + "util.http.HttpMessages");
         loader.loadClass(basePackage + "util.http.parser.HttpParser");
+        loader.loadClass(basePackage + "util.http.parser.HttpParser$SkipConstantResult");
         loader.loadClass(basePackage + "util.http.parser.MediaType");
         loader.loadClass(basePackage + "util.http.parser.MediaTypeCache");
         // net
@@ -280,9 +289,9 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage +
                 "util.net.NioBlockingSelector$BlockPoller$3");
         loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
-        // threads
-        loader.loadClass
-            (basePackage + "util.threads.TaskThreadFactory$PrivilegedSetTccl");
+        // security
+        loader.loadClass(basePackage + "util.security.PrivilegedGetTccl");
+        loader.loadClass(basePackage + "util.security.PrivilegedSetTccl");
     }
 }
 

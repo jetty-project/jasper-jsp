@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.core.StandardContext;
@@ -91,11 +92,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     public void testNonBlockingReadIgnoreIsReady() throws Exception {
         // TODO Investigate options to get this test to pass with the HTTP BIO
         //      connector.
-        if (getTomcatInstance().getConnector().getProtocol().equals(
-                "org.apache.coyote.http11.Http11Protocol")) {
-            throw new IOException(
-                    "Forced failure as this test requires true non-blocking IO");
-        }
+        Assume.assumeFalse(
+                "Skipping as this test requires true non-blocking IO",
+                getTomcatInstance().getConnector().getProtocol()
+                        .equals("org.apache.coyote.http11.Http11Protocol"));
         doTestNonBlockingRead(true);
     }
 
@@ -627,7 +627,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         @Override
         public void onWritePossible() throws IOException {
             long start = System.currentTimeMillis();
-            long end = System.currentTimeMillis();
             int before = written;
             while (written < WRITE_SIZE &&
                     ctx.getResponse().getOutputStream().isReady()) {
@@ -640,7 +639,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 // calling complete
                 ctx.getResponse().flushBuffer();
             }
-            log.info("Write took:" + (end - start) +
+            log.info("Write took: " + (System.currentTimeMillis() - start) +
                     " ms. Bytes before=" + before + " after=" + written);
             // only call complete if we have emptied the buffer
             if (ctx.getResponse().getOutputStream().isReady() &&
@@ -746,22 +745,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         connection.connect();
 
         // Write the request body
-        OutputStream os = null;
-        try {
-            os = connection.getOutputStream();
+        try (OutputStream os = connection.getOutputStream()) {
             while (streamer != null && streamer.available() > 0) {
                 byte[] next = streamer.next();
                 os.write(next);
                 os.flush();
-            }
-
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException ioe) {
-                    // Ignore
-                }
             }
         }
 
@@ -777,10 +765,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
         if (rc == HttpServletResponse.SC_OK) {
             connection.getInputStream().close();
-            // Should never be null here but just to be safe
-            if (os != null) {
-                os.close();
-            }
             connection.disconnect();
         }
         return rc;
