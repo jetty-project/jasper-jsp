@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-parent</artifactId>
-        <version>21</version>
+        <version>22</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -16,6 +16,7 @@
     <description>
        A fork (well more of a branch) of Apache Tomcat Jasper to remove the tomcat server dependencies,
        so that the JSP engine can be used by the Eclipse Jetty project.
+    </description>
 
     <inceptionYear>2014</inceptionYear>
 

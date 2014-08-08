@@ -64,12 +64,18 @@
                     <include>org/apache/tomcat/util/buf/**</include>
                     <include>org/apache/tomcat/util/res/**</include>
                     <include>org/apache/tomcat/util/security/**</include>
+                    <include>META-INF/NOTICE</include>
+                    <include>META-INF/LICENSE</include>
                   </includes>
                 </filter>
                 <filter>
                   <artifact>*:*</artifact>
                   <excludes>
-                    <exclude>META-INF/**</exclude>
+                    <exclude>META-INF/services/**</exclude>
+                    <exclude>META-INF/web-fragment.xml</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                    <exclude>META-INF/MANIFEST.MF</exclude>
                   </excludes>
                 </filter>
               </filters>
@@ -97,23 +103,6 @@
           </execution>
         </executions>
       </plugin>
-      <!-- plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>artifact-jar</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <archive>
-            <manifestFile>target/classes/META-INF/MANIFEST.MF</manifestFile>
-          </archive>
-        </configuration>
-      </plugin -->
       <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
@@ -160,21 +149,6 @@
     </plugins>
     </build>
 
-<!--
-                    org.apache.jasper.compiler.*,
-                    org.apache.jasper.el.*,
-                    org.apache.jasper.util.*,
-                    org.apache.jasper.xmlparser.*,
-                    org.apache.jasper.tagplugins.*,
-                    org.apache.jasper.tagplugins.jstl.*,
-                    org.apache.jasper.tagplugins.jstl.core.*,
-                    org.apache.jasper.servlet.*,
-                    org.apache.jasper.security.*,
-                    org.apache.jasper.resources.*,
-                    org.apache.jasper.runtime.*
-                    javax.servlet.jsp.el.*,
-                    javax.servlet.jsp.tagext.*,
--->
     <dependencies>
       <dependency>
          <groupId>org.mortbay.jasper</groupId>
