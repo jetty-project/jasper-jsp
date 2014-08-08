@@ -11,25 +11,79 @@
     <packaging>jar</packaging>
     <name>MortBay :: Apache Jasper :: JSP Implementation</name>
 
-    <properties>
-    </properties>
 
     <build>
-      <resources>
-        <resource>
-          <directory>src/main/java</directory>
-           <includes>
-             <include>**/*.properties</include>
-           </includes>
-        </resource>
-        <resource>
-          <directory>src/main/resources</directory>
-           <includes>
-             <include>**/*</include>
-           </includes>
-        </resource>
-      </resources>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.3</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <excludes>
+                 <exclude>org.apache.tomcat:tomcat-el-api</exclude>
+                 <exclude>org.apache.tomcat:tomcat-jasper-el</exclude>
+                 <exclude>org.mortbay.jasper:apache-el</exclude>
+                </excludes>
+              </artifactSet>
+              <filters>
+                <filter>
+                  <artifact>org.apache.tomcat:tomcat-juli</artifact>
+                  <includes>
+                    <include>org/apache/juli/logging/**</include>
+                  </includes>
+                </filter>
+                <filter>
+                  <artifact>org.apache.tomcat:tomcat-api</artifact>
+                  <includes>
+                    <include>org/apache/tomcat/**</include>
+                  </includes>
+                </filter>
+                <filter>
+                  <artifact>org.apache.tomcat:tomcat-util-scan</artifact>
+                  <includes>
+                    <include>org/apache/tomcat/util/scan/**</include>
+                    <include>org/apache/tomcat/util/file/**</include>
+                    <include>org/apache/tomcat/util/digester/**</include>
+                    <include>org/apache/tomcat/util/descriptor/*</include>
+                    <include>org/apache/tomcat/util/descriptor/tagplugin/**</include>
+                    <include>org/apache/tomcat/util/descriptor/tld/**</include>
+                    <include>org/apache/tomcat/util/descriptor/web/**</include>
+                  </includes>
+                </filter>
+                <filter>
+                  <artifact>org.apache.tomcat:tomcat-util</artifact>
+                  <includes>
+                    <include>org/apache/tomcat/util/*</include>
+                    <include>org/apache/tomcat/util/buf/**</include>
+                    <include>org/apache/tomcat/util/res/**</include>
+                    <include>org/apache/tomcat/util/security/**</include>
+                  </includes>
+                </filter>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/**</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                  <resource>META-INF/MANIFEST.MF</resource>
+                  <file>target/classes/META-INF/MANIFEST.MF</file>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
@@ -43,7 +97,7 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
+      <!-- plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
@@ -55,14 +109,11 @@
           </execution>
         </executions>
         <configuration>
-          <excludes>
-            <exclude>**/org/mortbay/**</exclude>
-          </excludes>
           <archive>
             <manifestFile>target/classes/META-INF/MANIFEST.MF</manifestFile>
           </archive>
         </configuration>
-      </plugin>
+      </plugin -->
       <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
@@ -84,7 +135,23 @@
                 <Bundle-Version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</Bundle-Version>
                 <Specification-Version>2.3</Specification-Version>
                 <Implementation-Version>2.3</Implementation-Version>
-                <Export-Package>!org.mortbay.*,*</Export-Package>
+                <Export-Package>!org.mortbay.*,
+                    org.apache.juli.logging.*,
+                    org.apache.tomcat,
+                    org.apache.tomcat.util.scan.*,
+                    org.apache.tomcat.util.file.*,
+                    org.apache.tomcat.util.digester.*,
+                    org.apache.tomcat.util.descriptor.*
+                    org.apache.tomcat.util.descriptor.tagplugin.*,
+                    org.apache.tomcat.util.descriptor.tld.*,
+                    org.apache.tomcat.util.descriptor.web.*,
+                    org.apache.tomcat.util,
+                    org.apache.tomcat.util.buf.*,
+                    org.apache.tomcat.util.res.*,
+                    org.apache.tomcat.util.security.*,
+                    javax.servlet.jsp.*,
+                    org.apache.jasper.*
+</Export-Package>
                 <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
                 <_nouses>true</_nouses>
               </instructions>
@@ -93,43 +160,41 @@
     </plugins>
     </build>
 
+<!--
+                    org.apache.jasper.compiler.*,
+                    org.apache.jasper.el.*,
+                    org.apache.jasper.util.*,
+                    org.apache.jasper.xmlparser.*,
+                    org.apache.jasper.tagplugins.*,
+                    org.apache.jasper.tagplugins.jstl.*,
+                    org.apache.jasper.tagplugins.jstl.core.*,
+                    org.apache.jasper.servlet.*,
+                    org.apache.jasper.security.*,
+                    org.apache.jasper.resources.*,
+                    org.apache.jasper.runtime.*
+                    javax.servlet.jsp.el.*,
+                    javax.servlet.jsp.tagext.*,
+-->
     <dependencies>
       <dependency>
-        <groupId>org.eclipse.jdt.core.compiler</groupId>
-        <artifactId>ecj</artifactId>
-        <version>4.2.2</version>
-        <optional>true</optional>
+         <groupId>org.mortbay.jasper</groupId>
+         <artifactId>apache-el</artifactId>
+         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.ant</groupId>
-        <artifactId>ant</artifactId>
-        <version>1.8.4</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty.toolchain</groupId>
-        <artifactId>jetty-schemas</artifactId>
-        <version>3.1.M0</version>
-      </dependency>
-      <dependency>
-         <groupId>javax.servlet</groupId>
-         <artifactId>javax.servlet-api</artifactId>
-         <version>3.1.0</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.annotation</groupId>
-        <artifactId>javax.annotation-api</artifactId>
-        <version>1.2</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.servlet.jsp</groupId>
-        <artifactId>javax.servlet.jsp-api</artifactId>
-        <version>2.3.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mortbay.jasper</groupId>
-        <artifactId>apache-el</artifactId>
-        <version>${project.version}</version>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>tomcat-jasper</artifactId>
+        <version>${tomcat.version}</version>
+        <exclusions>
+          <exclusion>
+             <groupId>org.apache.tomcat</groupId>
+             <artifactId>tomcat-servlet-api</artifactId>
+          </exclusion>
+          <exclusion>
+             <groupId>org.eclipse.jdt.core.compiler</groupId>
+             <artifactId>ecj</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
 

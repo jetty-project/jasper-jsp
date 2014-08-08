@@ -15,8 +15,7 @@
 
     <description>
        A fork (well more of a branch) of Apache Tomcat Jasper to remove the tomcat server dependencies,
-       so that the JSP engine can be used by the eclipse jetty project.
-    </description>
+       so that the JSP engine can be used by the Eclipse Jetty project.
 
     <inceptionYear>2014</inceptionYear>
 
@@ -39,6 +38,7 @@
     </scm>
 
     <properties>
+       <tomcat.version>8.0.9</tomcat.version>
     </properties>
 
     <repositories>
