@@ -152,12 +152,13 @@
          <groupId>javax.servlet</groupId>
          <artifactId>javax.servlet-api</artifactId>
          <version>3.1.0</version>
-	 <scope>provided</scope>
+         <optional>true</optional>
       </dependency>
       <dependency>
          <groupId>org.apache.tomcat</groupId>
          <artifactId>tomcat-jasper-el</artifactId>
          <version>${tomcat.version}</version>
+         <optional>true</optional>
       </dependency>
 
     </dependencies>
