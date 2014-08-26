@@ -14,7 +14,7 @@
     <name>Jetty :: Jasper :: Project</name>
 
     <description>
-       A fork (well more of a branch) of Apache Tomcat Jasper to remove the tomcat server dependencies,
+       A rebundling of Apache Tomcat Jasper to remove the tomcat server dependencies,
        so that the JSP engine can be used by the Eclipse Jetty project.
     </description>
 

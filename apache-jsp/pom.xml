@@ -180,22 +180,26 @@
                 <Specification-Version>2.3</Specification-Version>
                 <Implementation-Version>2.3</Implementation-Version>
                 <Export-Package>!org.mortbay.*,
-                    org.apache.juli.logging.*,
-                    org.apache.tomcat,
-                    org.apache.tomcat.util.scan.*,
-                    org.apache.tomcat.util.file.*,
-                    org.apache.tomcat.util.digester.*,
-                    org.apache.tomcat.util.descriptor.*
-                    org.apache.tomcat.util.descriptor.tagplugin.*,
-                    org.apache.tomcat.util.descriptor.tld.*,
-                    org.apache.tomcat.util.descriptor.web.*,
-                    org.apache.tomcat.util,
-                    org.apache.tomcat.util.buf.*,
-                    org.apache.tomcat.util.res.*,
-                    org.apache.tomcat.util.security.*,
-                    javax.servlet.jsp.*,
-                    org.apache.jasper.*
-</Export-Package>
+                    org.apache.juli.logging.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.tomcat;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.tomcat.util.scan.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.tomcat.util.file.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.tomcat.util.digester.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.tomcat.util.descriptor.;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"*
+                    org.apache.tomcat.util.descriptor.tagplugin.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.tomcat.util.descriptor.tld.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.tomcat.util.descriptor.web.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.tomcat.util;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.tomcat.util.buf.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.tomcat.util.res.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.tomcat.util.security.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    javax.servlet.jsp.*;version="2.3",
+                    org.apache.jasper.*${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+                </Export-Package>
+                <Import-Package>!org.apache.tools.ant.*,*</Import-Package>
+                <Import-Package>javax.servlet.*;version="3.0.1",org.apache.tomcat.util.descriptor;version="8.0.9",*</Import-Package>
+                <DynamicImport-Package>org.apache.tools.ant.*</DynamicImport-Package>
+
                 <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
                 <_nouses>true</_nouses>
               </instructions>

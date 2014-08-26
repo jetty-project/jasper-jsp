@@ -37,6 +37,7 @@
               <goal>unpack-dependencies</goal>
             </goals>
             <configuration>
+              <excludeArtifactIds>javax.servlet-api</excludeArtifactIds>
               <classifier>sources</classifier>
               <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
               <outputDirectory>${project.build.directory}/sources</outputDirectory>
@@ -85,7 +86,7 @@
                   <filter>
                     <artifact>*:*</artifact>
                     <includes>
-                      <include>javax/**</include>
+                      <include>javax/el/**</include>
                       <include>org/apache/el/**</include>
                       <include>META-INF/NOTICE</include>
                       <include>META-INF/LICENSE</include>
@@ -138,7 +139,7 @@
                   <Specification-Version>3.0</Specification-Version>
                   <Implementation-Version>3.0</Implementation-Version>
                   <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
-                  <Export-Package>javax.el.*,org.apache.el.*</Export-Package>
+                  <Export-Package>!javax.servlet.*,javax.el.*;version="3.0",org.apache.el.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"</Export-Package>
                   <_nouses>true</_nouses>
                 </instructions>
             </configuration>
