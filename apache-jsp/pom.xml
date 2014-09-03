@@ -124,6 +124,18 @@
                   </includes>
                 </filter>
                 <filter>
+                  <artifact>org.apache.tomcat:tomcat-jsp-api</artifact>
+                  <excludes>
+                    <exclude>javax/servlet/jsp/resources/*</exclude>
+                  </excludes>
+                </filter>
+                <filter>
+                  <artifact>org.eclipse.jetty.toolchain:jetty-schemas</artifact>
+                  <includes>
+                    <include>javax/servlet/jsp/resources/*</include>
+                  </includes>
+                </filter>
+                <filter>
                   <artifact>*:*</artifact>
                   <excludes>
                     <exclude>META-INF/services/**</exclude>
@@ -194,11 +206,9 @@
                     org.apache.tomcat.util.res.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
                     org.apache.tomcat.util.security.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
                     javax.servlet.jsp.*;version="2.3",
-                    org.apache.jasper.*${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+                    org.apache.jasper.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"
                 </Export-Package>
-                <Import-Package>!org.apache.tools.ant.*,*</Import-Package>
-                <Import-Package>javax.servlet.*;version="3.0.1",org.apache.tomcat.util.descriptor;version="8.0.9",*</Import-Package>
-                <DynamicImport-Package>org.apache.tools.ant.*</DynamicImport-Package>
+                <Import-Package>!org.apache.tools.ant.*,javax.servlet.*;version="3.0.1",javax.servlet.resources;version="3.0.1", javax.el.*;version="3.0", org.apache.tomcat.util.descriptor;version="8.0.9",org.apache.el.*;version="8.0.9",*</Import-Package>
 
                 <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
                 <_nouses>true</_nouses>
@@ -209,6 +219,12 @@
     </build>
 
     <dependencies>
+      
+      <dependency>
+         <groupId>org.eclipse.jetty.toolchain</groupId>
+         <artifactId>jetty-schemas</artifactId>
+         <version>3.1.M0</version>
+      </dependency>
       <dependency>
          <groupId>org.mortbay.jasper</groupId>
          <artifactId>apache-el</artifactId>
