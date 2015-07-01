@@ -3,7 +3,7 @@
     <parent>
       <groupId>org.mortbay.jasper</groupId>
       <artifactId>jasper-jsp</artifactId>
-      <version>8.0.20-SNAPSHOT</version>
+      <version>8.0.23-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -202,7 +202,7 @@
                     javax.servlet.jsp.*;version="2.3",
                     org.apache.jasper.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"
                 </Export-Package>
-                <Import-Package>!org.apache.tools.ant.*,javax.servlet.*;version="3.0.1",javax.servlet.resources;version="3.0.1", javax.el.*;version="3.0", org.apache.tomcat.util.descriptor;version="8.0.20",org.apache.el.*;version="8.0.20",*</Import-Package>
+                <Import-Package>!org.apache.tools.ant.*,javax.servlet.*;version="3.0.1",javax.servlet.resources;version="3.0.1", javax.el.*;version="3.0", org.apache.tomcat.util.descriptor;version="8.0.23",org.apache.el.*;version="8.0.22",*</Import-Package>
 
                 <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
                 <_nouses>true</_nouses>
