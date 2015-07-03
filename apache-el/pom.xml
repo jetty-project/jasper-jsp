@@ -133,8 +133,22 @@
                   <Specification-Version>3.0</Specification-Version>
                   <Implementation-Version>8.0.23</Implementation-Version>
                   <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
-                  <Export-Package>!javax.servlet.*,javax.el.*;version="3.0",org.apache.el.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"</Export-Package>
-                  <Import-Package>javax.el.*;version="3.0",org.apache.el.*;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"</Import-Package>
+                  <Export-Package>!javax.servlet.*,
+                    javax.el;version="3.0",
+                    org.apache.el;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.el.lang;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.el.stream;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.el.parser;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.el.util;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"
+                  </Export-Package>
+                  <Import-Package>
+                    javax.el;version="3.0",
+                    org.apache.el;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.el.lang;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.el.stream;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.el.parser;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.el.util;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"
+                  </Import-Package>
                   <_nouses>true</_nouses>
                 </instructions>
             </configuration>
