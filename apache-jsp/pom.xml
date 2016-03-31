@@ -3,7 +3,7 @@
     <parent>
       <groupId>org.mortbay.jasper</groupId>
       <artifactId>jasper-jsp</artifactId>
-      <version>8.0.28-SNAPSHOT</version>
+      <version>8.0.33-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -267,8 +267,8 @@
                     javax.servlet.http;version="3.0.1",
                     javax.servlet.resources;version="3.0.1", 
                     javax.xml.parsers,
-                    org.apache.tomcat.util.descriptor;version="8.0.23";resolution:=optional,
-                    org.apache.tomcat.util.descriptor.tagplugin;version="8.0.23";resolution:=optional,
+                    org.apache.tomcat.util.descriptor;version="8.0.33";resolution:=optional,
+                    org.apache.tomcat.util.descriptor.tagplugin;version="8.0.33";resolution:=optional,
                     org.eclipse.jdt.core.compiler,
                     org.eclipse.jdt.internal.compiler,
                     org.eclipse.jdt.internal.compiler.classfmt,
