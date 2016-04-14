@@ -49,7 +49,7 @@
         </snapshots>
         <id>sonatype-snapshots</id>
         <name>Sonatype Jetty Snapshots</name>
-        <url>http://oss.sonatype.org/content/groups/jetty</url>
+        <url>https://oss.sonatype.org/content/groups/jetty</url>
       </repository>
     </repositories>
 
