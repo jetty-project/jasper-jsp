@@ -3,7 +3,7 @@
     <parent>
       <groupId>org.mortbay.jasper</groupId>
       <artifactId>jasper-jsp</artifactId>
-      <version>8.0.34-SNAPSHOT</version>
+      <version>8.5.4-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -60,9 +60,9 @@
             <links>
               <link>http://docs.oracle.com/javase/7/docs/api/</link>
               <link>http://docs.oracle.com/javaee/7/api/</link>
-              <link>http://tomcat.apache.org/tomcat-8.0-doc/jspapi/</link>
-              <link>http://tomcat.apache.org/tomcat-8.0-doc/elapi/</link>
-              <link>http://tomcat.apache.org/tomcat-8.0-doc/api/</link>
+              <link>http://tomcat.apache.org/tomcat-8.5-doc/jspapi/</link>
+              <link>http://tomcat.apache.org/tomcat-8.5-doc/elapi/</link>
+              <link>http://tomcat.apache.org/tomcat-8.5-doc/api/</link>
             </links>
         </configuration>
       </plugin>
@@ -267,8 +267,8 @@
                     javax.servlet.http;version="3.0.1",
                     javax.servlet.resources;version="3.0.1", 
                     javax.xml.parsers,
-                    org.apache.tomcat.util.descriptor;version="8.0.33";resolution:=optional,
-                    org.apache.tomcat.util.descriptor.tagplugin;version="8.0.33";resolution:=optional,
+                    org.apache.tomcat.util.descriptor;version="8.5.4";resolution:=optional,
+                    org.apache.tomcat.util.descriptor.tagplugin;version="8.5.4";resolution:=optional,
                     org.eclipse.jdt.core.compiler,
                     org.eclipse.jdt.internal.compiler,
                     org.eclipse.jdt.internal.compiler.classfmt,
@@ -293,7 +293,7 @@
       <dependency>
          <groupId>org.eclipse.jetty.toolchain</groupId>
          <artifactId>jetty-schemas</artifactId>
-         <version>3.1.M0</version>
+         <version>3.1</version>
       </dependency>
       <dependency>
          <groupId>org.mortbay.jasper</groupId>
