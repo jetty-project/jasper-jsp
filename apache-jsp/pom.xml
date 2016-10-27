@@ -279,7 +279,7 @@
                     org.xml.sax.ext,
                     org.xml.sax.helpers
                 </Import-Package>
-
+                <Require-Capability>osgi.serviceloader; filter:="(osgi.serviceloader=org.apache.juli.logging.Log)";resolution:=optional;cardinality:=multiple, osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)"</Require-Capability>
                 <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
                 <_nouses>true</_nouses>
               </instructions>
