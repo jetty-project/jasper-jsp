@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mortbay.jasper</groupId>
     <artifactId>jasper-jsp</artifactId>
-    <version>8.5.6-SNAPSHOT</version>
+    <version>8.5.9-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Jetty :: Jasper :: Project</name>
 
@@ -39,7 +39,7 @@
     </scm>
 
     <properties>
-       <tomcat.version>8.5.5</tomcat.version>
+       <tomcat.version>8.5.9</tomcat.version>
     </properties>
 
     <repositories>
