@@ -166,6 +166,7 @@
                   <artifact>org.apache.tomcat:tomcat-util</artifact>
                   <includes>
                     <include>org/apache/tomcat/util/*</include>
+                    <include>org/apache/tomcat/util/file/**</include>
                     <include>org/apache/tomcat/util/buf/**</include>
                     <include>org/apache/tomcat/util/res/**</include>
                     <include>org/apache/tomcat/util/security/**</include>
