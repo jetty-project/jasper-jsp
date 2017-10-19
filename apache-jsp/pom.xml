@@ -3,7 +3,7 @@
     <parent>
       <groupId>org.mortbay.jasper</groupId>
       <artifactId>jasper-jsp</artifactId>
-      <version>8.5.21-SNAPSHOT</version>
+      <version>8.5.23-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -42,9 +42,9 @@
                  <version>1.8.4</version>
                </additionalDependency>
                <additionalDependency>
-                 <groupId>org.eclipse.jetty.orbit</groupId>
-                 <artifactId>org.eclipse.jdt.core</artifactId>
-                 <version>3.8.2.v20130121</version>
+                 <groupId>org.eclipse.jdt</groupId>
+                 <artifactId>ecj</artifactId>
+                 <version>${ecj.version}</version>
                </additionalDependency>
                <additionalDependency>
                  <groupId>org.apache.tomcat</groupId>
@@ -135,6 +135,7 @@
                  <exclude>org.apache.tomcat:tomcat-el-api</exclude>
                  <exclude>org.apache.tomcat:tomcat-jasper-el</exclude>
                  <exclude>org.mortbay.jasper:apache-el</exclude>
+                 <exclude>org.eclipse.jdt:ecj</exclude>
                 </excludes>
               </artifactSet>
               <filters>
@@ -312,10 +313,15 @@
              <artifactId>tomcat-servlet-api</artifactId>
           </exclusion>
           <exclusion>
-             <groupId>org.eclipse.jdt.core.compiler</groupId>
+             <groupId>org.eclipse.jdt</groupId>
              <artifactId>ecj</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>org.eclipse.jdt</groupId>
+         <artifactId>ecj</artifactId>
+         <version>${ecj.version}</version>
       </dependency>
     </dependencies>
 
