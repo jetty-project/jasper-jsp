@@ -3,7 +3,7 @@
     <parent>
       <groupId>org.mortbay.jasper</groupId>
       <artifactId>jasper-jsp</artifactId>
-      <version>8.5.23-SNAPSHOT</version>
+      <version>8.5.24-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -153,7 +153,7 @@
                 </filter>
                 <filter>
                   <artifact>org.apache.tomcat:tomcat-util-scan</artifact>
-                  <includes>
+                   <includes>
                     <include>org/apache/tomcat/util/scan/**</include>
                     <include>org/apache/tomcat/util/file/**</include>
                     <include>org/apache/tomcat/util/digester/**</include>
@@ -167,6 +167,7 @@
                   <artifact>org.apache.tomcat:tomcat-util</artifact>
                   <includes>
                     <include>org/apache/tomcat/util/*</include>
+                    <include>org/apache/tomcat/util/compat/*</include>
                     <include>org/apache/tomcat/util/file/**</include>
                     <include>org/apache/tomcat/util/buf/**</include>
                     <include>org/apache/tomcat/util/res/**</include>
@@ -233,6 +234,7 @@
                 <Export-Package>!org.mortbay.*,
                     org.apache.juli.logging;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
                     org.apache.tomcat;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                    org.apache.tomcat.util.compat;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
                     org.apache.tomcat.util.scan;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
                     org.apache.tomcat.util.file;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
                     org.apache.tomcat.util.digester;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
