@@ -3,7 +3,7 @@
     <parent>
       <groupId>org.mortbay.jasper</groupId>
       <artifactId>jasper-jsp</artifactId>
-      <version>8.5.25-SNAPSHOT</version>
+      <version>8.5.24-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -225,6 +225,7 @@
           </executions>
           <configuration>
               <instructions>
+                <Automatic-Module-Name>org.mortbay.apache.jasper</Automatic-Module-Name>
                 <Bundle-Name>Mortbay Jasper</Bundle-Name>
                 <Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
                 <Bundle-Classpath>.</Bundle-Classpath>
