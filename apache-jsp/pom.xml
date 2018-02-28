@@ -266,6 +266,7 @@
                 <Import-Package>!org.apache.tools.ant.*,
                     javax.el;version="3.0",
                     javax.naming,
+                    javax.net.ssl,
                     javax.servlet;version="3.0.1",
                     javax.servlet.annotation;version="3.0.1",
                     javax.servlet.descriptor;version="3.0.1",
