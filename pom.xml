@@ -13,6 +13,8 @@
     so that the JSP engine can be used by the Eclipse Jetty project.
   </description>
 
+  <url>https://github.com/jetty-project/jasper-jsp</url>
+
   <inceptionYear>2014</inceptionYear>
 
   <issueManagement>
@@ -33,6 +35,26 @@
     <url>https://github.com/jetty-project/jasper-jsp</url>
     <tag>HEAD</tag>
   </scm>
+
+  <developers>
+      <developer>
+      <id>janb</id>
+      <name>Jan Bartel</name>
+      <email>janb@webtide.com</email>
+      <organization>Webtide, LLC</organization>
+      <organizationUrl>https://webtide.com</organizationUrl>
+      <timezone>10</timezone>
+    </developer>
+    <developer>
+      <id>olamy</id>
+      <name>Olivier Lamy</name>
+      <email>oliver.lamy@gmail.com</email>
+      <organization>Webtide, LLC</organization>
+      <organizationUrl>https://webtide.com</organizationUrl>
+      <timezone>Australia/Brisbane</timezone>
+    </developer>
+  </developers>
+
 
   <properties>
     <!-- must update both versions together -->
