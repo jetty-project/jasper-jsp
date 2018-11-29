@@ -40,10 +40,11 @@
               <version>${tomcat.version}</version>
             </additionalDependency>
           </additionalDependencies>
-          <excludePackageNames>org.apache.catalina.*:org.apache.tools.*:org.eclipse.*</excludePackageNames>
+          <excludePackageNames>org.apache.tomcat.util.*:org.apache.catalina.*:org.apache.tools.*:org.eclipse.*</excludePackageNames>
           <docfilessubdirs>true</docfilessubdirs>
           <detectLinks>false</detectLinks>
           <detectJavaApiLink>true</detectJavaApiLink>
+          <doclint>none</doclint>
           <verbose>true</verbose>
           <links>
             <link>http://docs.oracle.com/javase/7/docs/api/</link>
