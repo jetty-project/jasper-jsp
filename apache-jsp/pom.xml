@@ -71,6 +71,7 @@
               <classifier>sources</classifier>
               <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
               <outputDirectory>${project.build.directory}/sources</outputDirectory>
+              <excludeArtifactIds>ecj</excludeArtifactIds>
             </configuration>
           </execution>
         </executions>
@@ -305,7 +306,6 @@
               <useDefaultManifestFile>false</useDefaultManifestFile>
               <excludes>
                 <exclude>*.java</exclude>
-                <exclude />
               </excludes>
               <archive>
                 <manifestEntries>

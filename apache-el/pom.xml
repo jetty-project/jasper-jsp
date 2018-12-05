@@ -158,7 +158,6 @@
               <useDefaultManifestFile>false</useDefaultManifestFile>
               <excludes>
                 <exclude>*.java</exclude>
-                <exclude />
               </excludes>
               <archive>
                 <manifestEntries>
