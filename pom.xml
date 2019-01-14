@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.mortbay.jasper</groupId>
   <artifactId>jasper-jsp</artifactId>
-  <version>8.5.35-SNAPSHOT</version>
+  <version>9.0.14-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Jetty :: Jasper :: Project</name>
 
@@ -33,7 +33,7 @@
     <connection>scm:git:git://github.com/jetty-project/jasper-jsp.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/jetty-project/jasper-jsp.git</developerConnection>
     <url>https://github.com/jetty-project/jasper-jsp</url>
-    <tag>HEAD</tag>
+    <tag>apache-9</tag>
   </scm>
 
   <developers>
@@ -58,7 +58,7 @@
 
   <properties>
     <!-- must update both versions together -->
-    <tomcat.version>8.5.35</tomcat.version>
+    <tomcat.version>9.0.14</tomcat.version>
     <ecj.version>3.14.0</ecj.version>
   </properties>
 
@@ -86,14 +86,14 @@
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
           <execution>
-            <id>require-jdk7</id>
+            <id>require-jdk8</id>
             <goals>
               <goal>enforce</goal>
             </goals>
             <configuration>
               <rules>
                 <requireJavaVersion>
-                  <version>[1.7,)</version>
+                  <version>[1.8,)</version>
                 </requireJavaVersion>
               </rules>
             </configuration>
@@ -108,8 +108,8 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.8.0</version>
           <configuration>
-            <source>1.7</source>
-            <target>1.7</target>
+            <source>1.8</source>
+            <target>1.8</target>
             <skipMain>true</skipMain>
             <skip>true</skip>
           </configuration>
