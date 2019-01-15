@@ -2,6 +2,12 @@
 
 pipeline {
   agent any
+  options {
+    disableConcurrentBuilds()
+    durabilityHint('PERFORMANCE_OPTIMIZED')
+    buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '5'))
+    timeout(time: 120, unit: 'MINUTES')
+  }
   stages {
     stage( "Parallel Stage" ) {
       parallel {
@@ -64,4 +70,5 @@ def mavenBuild(jdk, cmdline) {
     sh "mvn -V -B -DfailIfNoTests=false -Dmaven.test.failure.ignore=true -T3 -Djetty.testtracker.log=true -e $cmdline"
   }
 }
+
 // vim: et:ts=2:sw=2:ft=groovy
