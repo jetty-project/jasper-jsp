@@ -70,5 +70,4 @@ def mavenBuild(jdk, cmdline) {
     sh "mvn -V -B -DfailIfNoTests=false -Dmaven.test.failure.ignore=true -T3 -Djetty.testtracker.log=true -e $cmdline"
   }
 }
-
 // vim: et:ts=2:sw=2:ft=groovy
