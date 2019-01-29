@@ -119,7 +119,7 @@
               ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
             </Bundle-Version>
             <Specification-Version>3.0</Specification-Version>
-            <Implementation-Version>8.5.24</Implementation-Version>
+            <Implementation-Version>${tomcat.version}</Implementation-Version>
             <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
             <Export-Package>!javax.servlet.*,
               javax.el;version="3.0",

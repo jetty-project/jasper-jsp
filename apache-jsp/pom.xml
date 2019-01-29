@@ -211,7 +211,7 @@
               ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
             </Bundle-Version>
             <Specification-Version>2.3</Specification-Version>
-            <Implementation-Version>2.3</Implementation-Version>
+            <Implementation-Version>${tomcat.version}</Implementation-Version>
             <Require-Capability>osgi.serviceloader;
               filter:="(osgi.serviceloader=org.apache.juli.logging.Log)";resolution:=optional;cardinality:=multiple,
               osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)"
@@ -266,11 +266,11 @@
                   javax.el;version="3.0",
                   javax.naming,
                   javax.net.ssl,
-                  javax.servlet;version="4.0.1",
-                  javax.servlet.annotation;version="4.0.1",
-                  javax.servlet.descriptor;version="4.0.1",
-                  javax.servlet.http;version="4.0.1",
-                  javax.servlet.resources;version="4.0.1",
+                  javax.servlet;version="4.0.0",
+                  javax.servlet.annotation;version="4.0.0",
+                  javax.servlet.descriptor;version="4.0.0",
+                  javax.servlet.http;version="4.0.0",
+                  javax.servlet.resources;version="4.0.0",
                   javax.xml.parsers,
                   org.apache.tomcat.util.descriptor;version="9.0.14";resolution:=optional,
                   org.apache.tomcat.util.descriptor.tagplugin;version="9.0.14";resolution:=optional,
