@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.mortbay.jasper</groupId>
     <artifactId>jasper-jsp</artifactId>
-    <version>8.5.35-SNAPSHOT</version>
+    <version>8.5.40-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -119,7 +119,7 @@
               ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
             </Bundle-Version>
             <Specification-Version>3.0</Specification-Version>
-            <Implementation-Version>8.5.24</Implementation-Version>
+            <Implementation-Version>${tomcat.version}</Implementation-Version>
             <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
             <Export-Package>!javax.servlet.*,
               javax.el;version="3.0",
