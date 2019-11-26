@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.mortbay.jasper</groupId>
   <artifactId>jasper-jsp</artifactId>
-  <version>8.5.40-SNAPSHOT</version>
+  <version>8.5.49-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Jetty :: Jasper :: Project</name>
 
@@ -58,7 +58,7 @@
 
   <properties>
     <!-- must update both versions together -->
-    <tomcat.version>8.5.40</tomcat.version>
+    <tomcat.version>8.5.49</tomcat.version>
     <ecj.version>3.17.0</ecj.version>
   </properties>
 
