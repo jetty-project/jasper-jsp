@@ -3,11 +3,10 @@
   <parent>
     <groupId>org.mortbay.jasper</groupId>
     <artifactId>jasper-jsp</artifactId>
-    <version>8.5.49-SNAPSHOT</version>
+    <version>10.0.0-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.mortbay.jasper</groupId>
   <artifactId>apache-el</artifactId>
   <packaging>jar</packaging>
   <name>MortBay :: Apache EL :: API and Implementation</name>
@@ -25,7 +24,7 @@
               <goal>unpack-dependencies</goal>
             </goals>
             <configuration>
-              <excludeArtifactIds>javax.servlet-api</excludeArtifactIds>
+              <excludeArtifactIds>jakarta.servlet-api</excludeArtifactIds>
               <classifier>sources</classifier>
               <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
               <outputDirectory>${project.build.directory}/sources</outputDirectory>
@@ -78,7 +77,7 @@
                 <filter>
                   <artifact>*:*</artifact>
                   <includes>
-                    <include>javax/el/**</include>
+                    <include>jakarta/el/**</include>
                     <include>org/apache/el/**</include>
                     <include>META-INF/NOTICE</include>
                     <include>META-INF/LICENSE</include>
@@ -121,8 +120,8 @@
             <Specification-Version>3.0</Specification-Version>
             <Implementation-Version>${tomcat.version}</Implementation-Version>
             <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
-            <Export-Package>!javax.servlet.*,
-              javax.el;version="3.0",
+            <Export-Package>!jakarta.servlet.*,
+              jakarta.el;version="3.0",
               org.apache.el;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
               org.apache.el.lang;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
               org.apache.el.stream;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
@@ -130,7 +129,7 @@
               org.apache.el.util;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"
             </Export-Package>
             <Import-Package>
-              javax.el;version="3.0",
+              jakarta.el;version="3.0",
               org.apache.el;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
               org.apache.el.lang;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
               org.apache.el.stream;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
@@ -175,9 +174,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>${servlet.api.version}</version>
       <optional>true</optional>
     </dependency>
     <dependency>

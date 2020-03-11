@@ -3,14 +3,13 @@
   <parent>
     <groupId>org.mortbay.jasper</groupId>
     <artifactId>jasper-jsp</artifactId>
-    <version>8.5.49-SNAPSHOT</version>
+    <version>10.0.0-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>apache-jsp</artifactId>
   <packaging>jar</packaging>
   <name>MortBay :: Apache Jasper :: JSP Implementation</name>
-
 
   <build>
     <plugins>
@@ -20,9 +19,9 @@
         <configuration>
           <additionalDependencies>
             <additionalDependency>
-              <groupId>javax.servlet</groupId>
-              <artifactId>javax.servlet-api</artifactId>
-              <version>3.1.0</version>
+              <groupId>jakarta.servlet</groupId>
+              <artifactId>jakarta.servlet-api</artifactId>
+              <version>${servlet.api.version}</version>
             </additionalDependency>
             <additionalDependency>
               <groupId>org.apache.ant</groupId>
@@ -160,13 +159,13 @@
             <filter>
               <artifact>org.apache.tomcat:tomcat-jsp-api</artifact>
               <excludes>
-                <exclude>javax/servlet/jsp/resources/*</exclude>
+                <exclude>jakarta/servlet/jsp/resources/*</exclude>
               </excludes>
             </filter>
             <filter>
               <artifact>org.eclipse.jetty.toolchain:jetty-schemas</artifact>
               <includes>
-                <include>javax/servlet/jsp/resources/*</include>
+                <include>jakarta/servlet/jsp/resources/*</include>
               </includes>
             </filter>
             <filter>
@@ -245,10 +244,10 @@
                   org.apache.tomcat.util.buf;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
                   org.apache.tomcat.util.res;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
                   org.apache.tomcat.util.security;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  javax.servlet.jsp;version="2.3",
-                  javax.servlet.jsp.el;version="2.3",
-                  javax.servlet.jsp.tagext;version="2.3",
-                  javax.servlet.jsp.resources;version="2.3",
+                  jakarta.servlet.jsp;version="3.0",
+                  jakarta.servlet.jsp.el;version="3.0",
+                  jakarta.servlet.jsp.tagext;version="3.0",
+                  jakarta.servlet.jsp.resources;version="3.0",
                   org.apache.jasper;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
                   org.apache.jasper.compiler;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
                   org.apache.jasper.compiler.tagplugin;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
@@ -263,15 +262,15 @@
                   org.apache.jasper.xmlparser;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
                 </Export-Package>
                 <Import-Package>!org.apache.tools.ant.*,
-                  javax.el;version="3.0",
-                  javax.naming,
-                  javax.net.ssl,
-                  javax.servlet;version="3.0.1",
-                  javax.servlet.annotation;version="3.0.1",
-                  javax.servlet.descriptor;version="3.0.1",
-                  javax.servlet.http;version="3.0.1",
-                  javax.servlet.resources;version="3.0.1",
-                  javax.xml.parsers,
+                  jakarta.el;version="3.0",
+                  jakarta.naming,
+                  jakarta.net.ssl,
+                  jakarta.servlet;version="3.0.1",
+                  jakarta.servlet.annotation;version="3.0.1",
+                  jakarta.servlet.descriptor;version="3.0.1",
+                  jakarta.servlet.http;version="3.0.1",
+                  jakarta.servlet.resources;version="3.0.1",
+                  jakarta.xml.parsers,
                   org.apache.tomcat.util.descriptor;version="8.5.4";resolution:=optional,
                   org.apache.tomcat.util.descriptor.tagplugin;version="8.5.4";resolution:=optional,
                   org.eclipse.jdt.core.compiler,
