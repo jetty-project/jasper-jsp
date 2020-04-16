@@ -49,8 +49,90 @@
               </sources>
             </configuration>
           </execution>
+          <execution>
+            <id>set-osgi-version</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>parse-version</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
+            <Bundle-Description>A rebundling of the Apache Standard Taglibs for Jakarta Naming</Bundle-Description>
+            <Bundle-Classpath>.</Bundle-Classpath>
+            <Bundle-Vendor>Mort Bay Consulting</Bundle-Vendor>
+            <Bundle-Version>
+              ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+            </Bundle-Version>
+            <Specification-Version>1.2.5</Specification-Version>
+            <Implementation-Version>${tomcat.version}</Implementation-Version>
+            <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
+            <_nouses>true</_nouses>
+          </instructions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+            <configuration>
+              <instructions>
+                <Bundle-Name>Mort Bay JSTL</Bundle-Name>
+                <Export-Package> 
+                    org.apache.taglibs.standard.tlv;version="1.2",
+                    org.apache.taglibs.standard.tag.common.core;version="1.2",
+                    org.apache.taglibs.standard;version="1.2",
+                    org.apache.taglibs.standard.tag.common.xml;version="1.2",
+                    org.apache.taglibs.standard.tei;version="1.2",
+                    org.apache.taglibs.standard.tag.common.sql;version="1.2",
+                    org.apache.taglibs.standard.functions;version="1.2",
+                    org.apache.taglibs.standard.resources;version="1.2",
+                    org.apache.taglibs.standard.tag.rt.xml;version="1.2",
+                    org.apache.taglibs.standard.tag.common.fmt;version="1.2",
+                    org.apache.taglibs.standard.tag.rt.fmt;version="1.2",
+                    org.apache.taglibs.standard.tag.rt.sql;version="1.2",
+                    org.apache.taglibs.standard.tag.rt.core;version="1.2",
+                    org.apache.taglibs.standard.util;version="1.2"
+                </Export-Package> 
+                <Import-Package>
+                    javax.el,
+                    javax.naming,
+                    jakarta.servlet,
+                    jakarta.servlet.http,
+                    jakarta.servlet.jsp,
+                    jakarta.servlet.jsp.jstl.core,
+                    jakarta.servlet.jsp.jstl.fmt,
+                    jakarta.servlet.jsp.jstl.sql,
+                    jakarta.servlet.jsp.tagext,
+                    javax.sql,
+                    javax.xml.parsers,
+                    javax.xml.transform,
+                    javax.xml.transform.dom,
+                    javax.xml.transform.sax,
+                    javax.xml.transform.stream,
+                    org.apache.xml.dtm,
+                    org.apache.xml.utils,
+                    org.apache.xpath,
+                    org.apache.xpath.objects,
+                    org.w3c.dom,
+                    org.xml.sax,
+                    org.xml.sax.helpers
+                </Import-Package>
+             </instructions>
+           </configuration>
+        </execution>
+       </executions>
+     </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -73,6 +155,24 @@
                   <shadedPattern>jakarta.el</shadedPattern>
                 </relocation>
               </relocations>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/services/**</exclude>
+                    <exclude>META-INF/web-fragment.xml</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                    <exclude>META-INF/MANIFEST.MF</exclude>
+                  </excludes>
+                </filter>
+             </filters>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                  <resource>META-INF/MANIFEST.MF</resource>
+                  <file>target/classes/META-INF/MANIFEST.MF</file>
+                </transformer>
+              </transformers>
             </configuration>
           </execution>
         </executions>
