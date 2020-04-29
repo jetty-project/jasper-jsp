@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.mortbay.jasper</groupId>
     <artifactId>jasper-jsp</artifactId>
-    <version>8.5.49-SNAPSHOT</version>
+    <version>8.5.54-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -137,6 +137,7 @@
               org.apache.el.parser;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
               org.apache.el.util;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"
             </Import-Package>
+            <Require-Capability>osgi.serviceloader; filter:="(osgi.serviceloader=javax.el.ExpressionFactory)";resolution:=optional;cardinality:=multiple, osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)";resolution:=optional</Require-Capability>
             <_nouses>true</_nouses>
           </instructions>
         </configuration>
