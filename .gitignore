@@ -40,3 +40,4 @@ bin/
 #maven
 *.versionsBackup
 *.releaseBackup
+dependency-reduced-pom.xml
