@@ -77,7 +77,8 @@
                 <filter>
                   <artifact>*:*</artifact>
                   <excludes>
-                      <exclude>META-INF/services/jakarta.servlet.ServletContainerInitializer</exclude>
+                    <exclude>META-INF/services/jakarta.servlet.ServletContainerInitializer</exclude>
+                    <exclude>META-INF/services/javax.tools.JavaCompiler</exclude>
                   </excludes>
                   <includes>
                     <include>jakarta/el/**</include>
