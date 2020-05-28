@@ -15,7 +15,7 @@ pipeline {
           agent { node { label 'linux' } }
           options { timeout( time: 120, unit: 'MINUTES' ) }
           steps {
-            mavenBuild( "jdk11", "clean install javadoc:javadoc" )
+            mavenBuild( "jdk11", "clean install javadoc:jar" )
             // Collect up the jacoco execution results
             jacoco inclusionPattern: '**/org/eclipse/jetty/**/*.class',
                    exclusionPattern: '',
