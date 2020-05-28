@@ -153,7 +153,68 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.1.1</version>
+          <version>3.2.0</version>
+          <configuration>
+            <additionalDependencies>
+              <additionalDependency>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>${servlet.api.version}</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant</artifactId>
+                <version>1.8.4</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>org.eclipse.jdt</groupId>
+                <artifactId>ecj</artifactId>
+                <version>${ecj.version}</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>tomcat-catalina</artifactId>
+                <version>${tomcat.version}</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>xalan</groupId>
+                <artifactId>xalan</artifactId>
+                <version>2.4.1</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>jakarta.servlet.jsp.jstl</groupId>
+                <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+                <version>1.2.7</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>jakarta.servlet.jsp</groupId>
+                <artifactId>jakarta.servlet.jsp-api</artifactId>
+                <version>2.3.6</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>4.0.3</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>jakarta.el</groupId>
+                <artifactId>jakarta.el-api</artifactId>
+                <version>3.0.3</version>
+              </additionalDependency>
+            </additionalDependencies>
+            <excludePackageNames>org.apache.tomcat.util.*:org.apache.catalina.*:org.apache.tools.*:org.eclipse.*</excludePackageNames>
+            <docfilessubdirs>true</docfilessubdirs>
+            <detectLinks>false</detectLinks>
+            <detectJavaApiLink>true</detectJavaApiLink>
+            <doclint>none</doclint>
+            <verbose>true</verbose>
+            <links>
+              <link>http://tomcat.apache.org/tomcat-10.0-doc/jspapi/</link>
+              <link>http://tomcat.apache.org/tomcat-10.0-doc/elapi/</link>
+              <link>http://tomcat.apache.org/tomcat-10.0-doc/api/</link>
+            </links>
+            <failOnWarnings>false</failOnWarnings>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -166,12 +227,12 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
-          <version>3.1.1</version>
+          <version>3.2.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
-          <version>3.0.1</version>
+          <version>3.2.1</version>
           <executions>
             <execution>
               <id>attach-sources</id>
