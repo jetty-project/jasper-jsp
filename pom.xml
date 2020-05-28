@@ -224,6 +224,7 @@
           <version>2.5.3</version>
           <configuration>
             <autoVersionSubmodules>true</autoVersionSubmodules>
+            <releaseProfiles>eclipse-release</releaseProfiles>
           </configuration>
         </plugin>
         <plugin>

@@ -25,7 +25,7 @@ pipeline {
             warnings consoleParsers: [[parserName: 'Maven'], [parserName: 'Java']]
             script {
               if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'apache-9' || env.BRANCH_NAME =='apache-8') {
-                mavenBuild( "jdk11", "deploy" )
+                mavenBuild( "jdk8", "deploy" )
               }
             }
 
