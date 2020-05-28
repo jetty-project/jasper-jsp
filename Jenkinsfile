@@ -60,7 +60,7 @@ def mavenBuild(jdk, cmdline) {
           mavenOpts: mavenOpts,
           mavenLocalRepo: localRepo) {
     // Some common Maven command line + provided command line
-    sh "mvn -V -B -DfailIfNoTests=false -Dmaven.test.failure.ignore=true -T3 -Djetty.testtracker.log=true -e $cmdline"
+    sh "mvn -V -B -DfailIfNoTests=false -Dmaven.test.failure.ignore=true -T2 -Djetty.testtracker.log=true -e $cmdline"
   }
 }
 

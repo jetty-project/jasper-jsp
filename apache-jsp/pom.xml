@@ -320,7 +320,6 @@
   </build>
 
   <dependencies>
-
     <dependency>
       <groupId>org.eclipse.jetty.toolchain</groupId>
       <artifactId>jetty-schemas</artifactId>
