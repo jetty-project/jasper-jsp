@@ -97,14 +97,14 @@
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
           <execution>
-            <id>require-jdk11</id>
+            <id>require-jdk8</id>
             <goals>
               <goal>enforce</goal>
             </goals>
             <configuration>
               <rules>
                 <requireJavaVersion>
-                  <version>[11,)</version>
+                  <version>[1.8,)</version>
                 </requireJavaVersion>
               </rules>
             </configuration>
@@ -119,8 +119,8 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.8.1</version>
           <configuration>
-            <source>11</source>
-            <target>11</target>
+            <source>8</source>
+            <target>8</target>
             <skipMain>true</skipMain>
             <skip>true</skip>
           </configuration>
@@ -204,7 +204,7 @@
                 <version>3.0.3</version>
               </additionalDependency>
             </additionalDependencies>
-            <excludePackageNames>org.apache.tomcat.util.*:org.apache.catalina.*:org.apache.tools.*:org.eclipse.*</excludePackageNames>
+            <excludePackageNames>org.apache.tomcat.*,org.apache.tomcat.util,org.apache.tools,org.apache.juli,org.apache.juli.logging</excludePackageNames>
             <docfilessubdirs>true</docfilessubdirs>
             <detectLinks>false</detectLinks>
             <detectJavaApiLink>true</detectJavaApiLink>

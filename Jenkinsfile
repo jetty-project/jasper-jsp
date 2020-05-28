@@ -11,11 +11,11 @@ pipeline {
   stages {
     stage( "Parallel Stage" ) {
       parallel {
-        stage( "Build / Test - JDK11" ) {
+        stage( "Build / Test - JDK8" ) {
           agent { node { label 'linux' } }
           options { timeout( time: 120, unit: 'MINUTES' ) }
           steps {
-            mavenBuild( "jdk11", "clean install javadoc:jar" )
+            mavenBuild( "jdk8", "clean install javadoc:jar" )
             // Collect up the jacoco execution results
             jacoco inclusionPattern: '**/org/eclipse/jetty/**/*.class',
                    exclusionPattern: '',
