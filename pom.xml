@@ -155,6 +155,10 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>3.2.0</version>
           <configuration>
+<!--            <includeDependencySources>true</includeDependencySources>-->
+<!--            <dependencySourceIncludes>-->
+<!--              <dependencySourceInclude>org.apache.tomcat:*</dependencySourceInclude>-->
+<!--            </dependencySourceIncludes>-->
             <additionalDependencies>
               <additionalDependency>
                 <groupId>jakarta.servlet</groupId>
@@ -174,6 +178,21 @@
               <additionalDependency>
                 <groupId>org.apache.tomcat</groupId>
                 <artifactId>tomcat-catalina</artifactId>
+                <version>${tomcat.version}</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>tomcat-juli</artifactId>
+                <version>${tomcat.version}</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>tomcat-util</artifactId>
+                <version>${tomcat.version}</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>tomcat-util-scan</artifactId>
                 <version>${tomcat.version}</version>
               </additionalDependency>
               <additionalDependency>
@@ -204,10 +223,10 @@
                 <version>3.0.3</version>
               </additionalDependency>
             </additionalDependencies>
-            <excludePackageNames>org.apache.tomcat.*,org.apache.tomcat.util,org.apache.tools,org.apache.juli,org.apache.juli.logging</excludePackageNames>
+            <excludePackageNames>org.apache.tomcat:org.apache.tomcat.util:org.apache.tools:org.apache.juli:org.apache.juli.logging:org.apache.juli:org.apache.tomcat.util.*:org.apache.jasper:org.apache.jasper.*:jakarta.servlet:jakarta.servlet.*:org.apache.el:org.apache.el.*:jakarta.el</excludePackageNames>
             <docfilessubdirs>true</docfilessubdirs>
             <detectLinks>false</detectLinks>
-            <detectJavaApiLink>true</detectJavaApiLink>
+            <detectJavaApiLink>false</detectJavaApiLink>
             <doclint>none</doclint>
             <verbose>true</verbose>
             <links>
