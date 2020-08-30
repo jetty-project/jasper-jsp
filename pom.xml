@@ -58,7 +58,7 @@
   <properties>
     <servlet.api.version>5.0.0-M1</servlet.api.version>
     <!-- must update both versions together -->
-    <tomcat.version>10.0.0-M5</tomcat.version>
+    <tomcat.version>10.0.0-M7</tomcat.version>
     <ecj.version>3.21.0</ecj.version>
   </properties>
 
@@ -116,6 +116,11 @@
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.8.1</version>
           <configuration>
@@ -147,6 +152,16 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.2.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.0.0-M5</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.1.2</version>
         </plugin>
@@ -155,6 +170,10 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>3.2.0</version>
           <configuration>
+<!--            <includeDependencySources>true</includeDependencySources>-->
+<!--            <dependencySourceIncludes>-->
+<!--              <dependencySourceInclude>org.apache.tomcat:*</dependencySourceInclude>-->
+<!--            </dependencySourceIncludes>-->
             <additionalDependencies>
               <additionalDependency>
                 <groupId>jakarta.servlet</groupId>
@@ -174,6 +193,21 @@
               <additionalDependency>
                 <groupId>org.apache.tomcat</groupId>
                 <artifactId>tomcat-catalina</artifactId>
+                <version>${tomcat.version}</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>tomcat-juli</artifactId>
+                <version>${tomcat.version}</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>tomcat-util</artifactId>
+                <version>${tomcat.version}</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>tomcat-util-scan</artifactId>
                 <version>${tomcat.version}</version>
               </additionalDependency>
               <additionalDependency>
@@ -204,10 +238,10 @@
                 <version>3.0.3</version>
               </additionalDependency>
             </additionalDependencies>
-            <excludePackageNames>org.apache.tomcat.*,org.apache.tomcat.util,org.apache.tools,org.apache.juli,org.apache.juli.logging</excludePackageNames>
+            <excludePackageNames>org.apache.tomcat:org.apache.tomcat.util:org.apache.tools:org.apache.juli:org.apache.juli.logging:org.apache.juli:org.apache.tomcat.util.*:org.apache.jasper:org.apache.jasper.*:jakarta.servlet:jakarta.servlet.*:org.apache.el:org.apache.el.*:jakarta.el</excludePackageNames>
             <docfilessubdirs>true</docfilessubdirs>
             <detectLinks>false</detectLinks>
-            <detectJavaApiLink>true</detectJavaApiLink>
+            <detectJavaApiLink>false</detectJavaApiLink>
             <doclint>none</doclint>
             <verbose>true</verbose>
             <links>
@@ -258,7 +292,14 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <version>4.0.0</version>
+          <version>4.2.1</version>
+          <dependencies>
+            <dependency>
+              <groupId>biz.aQute.bnd</groupId>
+              <artifactId>biz.aQute.bndlib</artifactId>
+              <version>5.1.2</version>
+            </dependency>
+          </dependencies>
         </plugin>
       </plugins>
     </pluginManagement>

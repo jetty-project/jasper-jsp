@@ -12,6 +12,7 @@
   <name>MortBay :: Apache Jasper :: JSP Implementation</name>
 
   <build>
+    <sourceDirectory>${project.build.directory}/sources</sourceDirectory>
     <plugins>
 
       <plugin>
