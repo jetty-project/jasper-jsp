@@ -126,7 +126,7 @@
             <Implementation-Version>${tomcat.version}</Implementation-Version>
             <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
             <Export-Package>!jakarta.servlet.*,
-              jakarta.el;version="4.0.0",
+              jakarta.el;version="4.0.0.SNAPSHOT",
               org.apache.el;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
               org.apache.el.lang;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
               org.apache.el.stream;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",

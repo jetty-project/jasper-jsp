@@ -104,7 +104,7 @@
             <configuration>
               <rules>
                 <requireJavaVersion>
-                  <version>[1.8,)</version>
+                  <version>1.8</version>
                 </requireJavaVersion>
               </rules>
             </configuration>
@@ -243,7 +243,7 @@
                 <version>3.0.3</version>
               </additionalDependency>
             </additionalDependencies>
-            <excludePackageNames>org.apache.tomcat:org.apache.tomcat.util:org.apache.tools:org.apache.juli:org.apache.juli.logging:org.apache.juli:org.apache.tomcat.util.*:org.apache.jasper:org.apache.jasper.*:</excludePackageNames>
+            <excludePackageNames>org.apache.tomcat.*,org.apache.tomcat.util,org.apache.tools,org.apache.juli,org.apache.juli.logging</excludePackageNames>
             <docfilessubdirs>true</docfilessubdirs>
             <detectLinks>false</detectLinks>
             <detectJavaApiLink>false</detectJavaApiLink>
@@ -297,14 +297,8 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <version>4.2.1</version>
-          <dependencies>
-            <dependency>
-              <groupId>biz.aQute.bnd</groupId>
-              <artifactId>biz.aQute.bndlib</artifactId>
-              <version>5.1.2</version>
-            </dependency>
-          </dependencies>
+          <!-- keep this version as upgrade break manifest -->
+          <version>4.0.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
