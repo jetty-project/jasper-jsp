@@ -299,13 +299,6 @@
           <artifactId>maven-bundle-plugin</artifactId>
           <!-- keep this version as upgrade break manifest -->
           <version>4.0.0</version>
-          <dependencies>
-            <dependency>
-              <groupId>biz.aQute.bnd</groupId>
-              <artifactId>biz.aQute.bndlib</artifactId>
-              <version>5.1.2</version>
-            </dependency>
-          </dependencies>
         </plugin>
       </plugins>
     </pluginManagement>
