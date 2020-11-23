@@ -204,10 +204,10 @@
                   org.apache.tomcat.util.buf;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
                   org.apache.tomcat.util.res;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
                   org.apache.tomcat.util.security;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  jakarta.servlet.jsp;version="5.0",
-                  jakarta.servlet.jsp.el;version="5.0",
-                  jakarta.servlet.jsp.tagext;version="5.0",
-                  jakarta.servlet.jsp.resources;version="5.0",
+                  jakarta.servlet.jsp;version="3.0",
+                  jakarta.servlet.jsp.el;version="3.0",
+                  jakarta.servlet.jsp.tagext;version="3.0",
+                  jakarta.servlet.jsp.resources;version="3.0",
                   org.apache.jasper;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
                   org.apache.jasper.compiler;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
                   org.apache.jasper.compiler.tagplugin;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
@@ -246,8 +246,7 @@
               </instructions>
             </configuration>
           </execution>
-        </executions>
-      </plugin>
+        </executions> </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
