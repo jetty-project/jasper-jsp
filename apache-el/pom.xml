@@ -170,6 +170,19 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <additionalDependencies>
+            <additionalDependency>
+              <groupId>biz.aQute.bnd</groupId>
+              <artifactId>biz.aQute.bnd</artifactId>
+              <version>5.2.0</version>
+            </additionalDependency>
+          </additionalDependencies>
+        </configuration>
+      </plugin>
 
     </plugins>
   </build>
