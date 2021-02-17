@@ -86,7 +86,6 @@
   <modules>
     <module>apache-el</module>
     <module>apache-jsp</module>
-    <module>taglibs-standard</module>
   </modules>
 
   <build>
