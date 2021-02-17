@@ -8,7 +8,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>taglibs-standard</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <name>MortBay :: Apache Taglibs Standard :: API and Implementation</name>
 
   <build>

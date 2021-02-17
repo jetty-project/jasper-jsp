@@ -8,7 +8,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>apache-el</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <name>MortBay :: Apache EL :: API and Implementation</name>
 
   <build>
