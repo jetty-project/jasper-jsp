@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.mortbay.jasper</groupId>
   <artifactId>jasper-jsp</artifactId>
-  <version>10.0.10-SNAPSHOT</version>
+  <version>10.0.10</version>
   <packaging>pom</packaging>
   <name>Jetty :: Jasper :: Project</name>
 
@@ -33,7 +33,7 @@
     <connection>scm:git:git://github.com/jetty-project/jasper-jsp.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/jetty-project/jasper-jsp.git</developerConnection>
     <url>https://github.com/jetty-project/jasper-jsp</url>
-    <tag>HEAD</tag>
+    <tag>jasper-jsp-10.0.10</tag>
   </scm>
 
   <developers>
