@@ -11,24 +11,24 @@ pipeline {
   stages {
     stage( "Parallel Stage" ) {
       parallel {
-        stage( "Build / Test - JDK8" ) {
+        stage( "Build / Test - JDK11" ) {
           agent { node { label 'linux' } }
           options { timeout( time: 120, unit: 'MINUTES' ) }
           steps {
-            mavenBuild( "jdk8", "clean install javadoc:jar" )
-            // Collect up the jacoco execution results
-            jacoco inclusionPattern: '**/org/eclipse/jetty/**/*.class',
-                   exclusionPattern: '',
-                   execPattern: '**/target/jacoco.exec',
-                   classPattern: '**/target/classes',
-                   sourcePattern: '**/src/main/java'
+            mavenBuild( "jdk11", "clean install javadoc:jar" )
             warnings consoleParsers: [[parserName: 'Maven'], [parserName: 'Java']]
             script {
               if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'apache-9' || env.BRANCH_NAME == 'apache-8') {
-                mavenBuild( "jdk8", "deploy" )
+                mavenBuild( "jdk11", "deploy" )
               }
             }
-
+          }
+        }
+        stage( "Build / Test - JDK17" ) {
+          agent { node { label 'linux' } }
+          options { timeout( time: 120, unit: 'MINUTES' ) }
+          steps {
+            mavenBuild( "jdk17", "clean install javadoc:jar" )
           }
         }
       }
@@ -46,7 +46,7 @@ pipeline {
  * @return the Jenkinsfile step representing a maven build
  */
 def mavenBuild(jdk, cmdline) {
-  def mvnName = 'maven3.5'
+  def mvnName = 'maven3'
   def localRepo = "${env.JENKINS_HOME}/${env.EXECUTOR_NUMBER}" // ".repository" //
   def settingsName = 'oss-settings.xml'
   def mavenOpts = '-Xms2g -Xmx2g -Djava.awt.headless=true'

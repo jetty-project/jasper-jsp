@@ -25,7 +25,7 @@
               <goal>unpack-dependencies</goal>
             </goals>
             <configuration>
-              <excludeArtifactIds>jakarta.servlet-api,ecj,ant,ant-launcher</excludeArtifactIds>
+              <excludeArtifactIds>jakarta.servlet-api,ecj,ant,ant-launcher,tomcat-servlet-api,tomcat-el-api</excludeArtifactIds>
               <classifier>sources</classifier>
               <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
               <outputDirectory>${project.build.directory}/sources</outputDirectory>
@@ -192,7 +192,11 @@
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
-      <version>${servlet.api.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.el</groupId>
+      <artifactId>jakarta.el-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -200,6 +204,16 @@
       <artifactId>tomcat-jasper</artifactId>
       <version>${tomcat.version}</version>
       <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-el-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>

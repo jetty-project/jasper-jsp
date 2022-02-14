@@ -88,6 +88,23 @@
     <module>apache-jsp</module>
   </modules>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>${servlet.api.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.el</groupId>
+        <artifactId>jakarta.el-api</artifactId>
+        <version>4.0.0</version>
+        <scope>provided</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <build>
     <defaultGoal>install</defaultGoal>
     <plugins>
@@ -174,74 +191,6 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>3.3.2</version>
           <configuration>
-<!--            <includeDependencySources>true</includeDependencySources>-->
-<!--            <dependencySourceIncludes>-->
-<!--              <dependencySourceInclude>org.apache.tomcat:*</dependencySourceInclude>-->
-<!--            </dependencySourceIncludes>-->
-            <additionalDependencies>
-              <additionalDependency>
-                <groupId>jakarta.servlet</groupId>
-                <artifactId>jakarta.servlet-api</artifactId>
-                <version>${servlet.api.version}</version>
-              </additionalDependency>
-              <additionalDependency>
-                <groupId>org.apache.ant</groupId>
-                <artifactId>ant</artifactId>
-                <version>1.8.4</version>
-              </additionalDependency>
-              <additionalDependency>
-                <groupId>org.eclipse.jdt</groupId>
-                <artifactId>ecj</artifactId>
-                <version>${ecj.version}</version>
-              </additionalDependency>
-              <additionalDependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>tomcat-catalina</artifactId>
-                <version>${tomcat.version}</version>
-              </additionalDependency>
-              <additionalDependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>tomcat-juli</artifactId>
-                <version>${tomcat.version}</version>
-              </additionalDependency>
-              <additionalDependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>tomcat-util</artifactId>
-                <version>${tomcat.version}</version>
-              </additionalDependency>
-              <additionalDependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>tomcat-util-scan</artifactId>
-                <version>${tomcat.version}</version>
-              </additionalDependency>
-              <additionalDependency>
-                <groupId>xalan</groupId>
-                <artifactId>xalan</artifactId>
-                <version>2.4.1</version>
-              </additionalDependency>
-              <!-- needed as long as we use the shaded of taglib-standard
-              to remove when we will use the jakarta namespace -->
-              <additionalDependency>
-                <groupId>jakarta.servlet.jsp.jstl</groupId>
-                <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
-                <version>1.2.7</version>
-              </additionalDependency>
-              <additionalDependency>
-                <groupId>jakarta.servlet.jsp</groupId>
-                <artifactId>jakarta.servlet.jsp-api</artifactId>
-                <version>2.3.6</version>
-              </additionalDependency>
-              <additionalDependency>
-                <groupId>jakarta.servlet</groupId>
-                <artifactId>jakarta.servlet-api</artifactId>
-                <version>4.0.3</version>
-              </additionalDependency>
-              <additionalDependency>
-                <groupId>jakarta.el</groupId>
-                <artifactId>jakarta.el-api</artifactId>
-                <version>3.0.3</version>
-              </additionalDependency>
-            </additionalDependencies>
             <excludePackageNames>org.apache.tomcat.*,org.apache.tomcat.util,org.apache.tools,org.apache.juli,org.apache.juli.logging</excludePackageNames>
             <docfilessubdirs>true</docfilessubdirs>
             <detectLinks>false</detectLinks>
@@ -296,8 +245,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <!-- keep this version as upgrade break manifest -->
-          <version>4.0.0</version>
+          <version>5.1.4</version>
         </plugin>
       </plugins>
     </pluginManagement>

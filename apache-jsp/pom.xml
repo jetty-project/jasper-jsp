@@ -302,6 +302,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.jetty.toolchain</groupId>
       <artifactId>jetty-schemas</artifactId>
       <version>5.2</version>
