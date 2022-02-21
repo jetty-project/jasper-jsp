@@ -272,6 +272,7 @@
                   javax.servlet.http;version="3.0.1",
                   javax.servlet.resources;version="3.0.1",
                   javax.xml.parsers,
+                  org.apache.el.util,
                   org.apache.tomcat.util.descriptor;version="8.5.4";resolution:=optional,
                   org.apache.tomcat.util.descriptor.tagplugin;version="8.5.4";resolution:=optional,
                   org.eclipse.jdt.core.compiler,
