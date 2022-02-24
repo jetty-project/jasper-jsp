@@ -175,6 +175,10 @@
               filter:="(osgi.serviceloader=org.apache.juli.logging.Log)";resolution:=optional;cardinality:=multiple,
               osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)"
             </Require-Capability>
+            <Provide-Capability>osgi.contract;
+              osgi.contract=JavaJSP;
+              version:Version="3.0"
+            </Provide-Capability>
             <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
             <_nouses>true</_nouses>
           </instructions>
