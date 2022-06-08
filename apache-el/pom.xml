@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.mortbay.jasper</groupId>
     <artifactId>jasper-jsp</artifactId>
-    <version>10.0.14-SNAPSHOT</version>
+    <version>10.1.0-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -122,11 +122,11 @@
             <Bundle-Version>
               ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
             </Bundle-Version>
-            <Specification-Version>3.0</Specification-Version>
+            <Specification-Version>5.0</Specification-Version>
             <Implementation-Version>${tomcat.version}</Implementation-Version>
             <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
             <Export-Package>!jakarta.servlet.*,
-              jakarta.el;version="4.0.0.SNAPSHOT",
+              jakarta.el;version="5.0.0",
               org.apache.el;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
               org.apache.el.lang;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
               org.apache.el.stream;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
@@ -134,9 +134,9 @@
               org.apache.el.util;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"
             </Export-Package>
             <Import-Package>
-                jakarta.servlet.jsp;version="3.0",
-                jakarta.servlet.jsp.el;version="3.0",
-                jakarta.servlet.jsp.tagext;version="3.0"
+                jakarta.servlet.jsp;version="5.0",
+                jakarta.servlet.jsp.el;version="5.0",
+                jakarta.servlet.jsp.tagext;version="5.0"
             </Import-Package>
             <_nouses>true</_nouses>
           </instructions>

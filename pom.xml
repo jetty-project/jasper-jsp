@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.mortbay.jasper</groupId>
   <artifactId>jasper-jsp</artifactId>
-  <version>10.0.14-SNAPSHOT</version>
+  <version>10.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Jetty :: Jasper :: Project</name>
 
@@ -56,9 +56,9 @@
   </developers>
 
   <properties>
-    <servlet.api.version>5.0.0</servlet.api.version>
+    <servlet.api.version>6.0.0</servlet.api.version>
     <!-- must update both versions together -->
-    <tomcat.version>10.0.21</tomcat.version>
+    <tomcat.version>10.1.0-M15</tomcat.version>
     <ecj.version>3.27.0</ecj.version>
   </properties>
 
@@ -224,22 +224,22 @@
               <additionalDependency>
                 <groupId>jakarta.servlet.jsp.jstl</groupId>
                 <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
-                <version>1.2.7</version>
+                <version>3.0.0</version>
               </additionalDependency>
               <additionalDependency>
                 <groupId>jakarta.servlet.jsp</groupId>
                 <artifactId>jakarta.servlet.jsp-api</artifactId>
-                <version>2.3.6</version>
+                <version>5.0.0</version>
               </additionalDependency>
               <additionalDependency>
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
-                <version>4.0.3</version>
+                <version>6.0.0</version>
               </additionalDependency>
               <additionalDependency>
                 <groupId>jakarta.el</groupId>
                 <artifactId>jakarta.el-api</artifactId>
-                <version>3.0.3</version>
+                <version>5.0.0</version>
               </additionalDependency>
             </additionalDependencies>
             <excludePackageNames>org.apache.tomcat.*,org.apache.tomcat.util,org.apache.tools,org.apache.juli,org.apache.juli.logging</excludePackageNames>
@@ -249,9 +249,9 @@
             <doclint>none</doclint>
             <verbose>true</verbose>
             <links>
-              <link>http://tomcat.apache.org/tomcat-10.0-doc/jspapi/</link>
-              <link>http://tomcat.apache.org/tomcat-10.0-doc/elapi/</link>
-              <link>http://tomcat.apache.org/tomcat-10.0-doc/api/</link>
+              <link>http://tomcat.apache.org/tomcat-10.1-doc/jspapi/</link>
+              <link>http://tomcat.apache.org/tomcat-10.1-doc/elapi/</link>
+              <link>http://tomcat.apache.org/tomcat-10.1-doc/api/</link>
             </links>
             <failOnWarnings>false</failOnWarnings>
           </configuration>
