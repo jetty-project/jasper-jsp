@@ -15,7 +15,7 @@ pipeline {
           agent { node { label 'linux' } }
           options { timeout( time: 120, unit: 'MINUTES' ) }
           steps {
-            mavenBuild( "jdk8", "clean install javadoc:jar" )
+            mavenBuild( "jdk11", "clean install javadoc:jar" )
             // Collect up the jacoco execution results
             jacoco inclusionPattern: '**/org/eclipse/jetty/**/*.class',
                    exclusionPattern: '',
@@ -25,7 +25,7 @@ pipeline {
             warnings consoleParsers: [[parserName: 'Maven'], [parserName: 'Java']]
             script {
               if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'apache-9' || env.BRANCH_NAME == 'apache-8') {
-                mavenBuild( "jdk8", "deploy" )
+                mavenBuild( "jdk11", "deploy" )
               }
             }
 
