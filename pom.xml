@@ -173,13 +173,23 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.4.0</version>
+          <version>3.4.1</version>
           <configuration>
             <additionalDependencies>
               <additionalDependency>
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
                 <version>${jakarta.servlet.api.version}</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>jakarta.servlet.jsp</groupId>
+                <artifactId>jakarta.servlet.jsp-api</artifactId>
+                <version>${jakarta.servlet.jsp.api.version}</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>jakarta.el</groupId>
+                <artifactId>jakarta.el-api</artifactId>
+                <version>${jakarta.el.api.version}</version>
               </additionalDependency>
               <additionalDependency>
                 <groupId>org.apache.ant</groupId>
@@ -216,18 +226,8 @@
                 <artifactId>xalan</artifactId>
                 <version>2.4.1</version>
               </additionalDependency>
-              <additionalDependency>
-                <groupId>jakarta.servlet.jsp</groupId>
-                <artifactId>jakarta.servlet.jsp-api</artifactId>
-                <version>${jakarta.servlet.jsp.api.version}</version>
-              </additionalDependency>
-              <additionalDependency>
-                <groupId>jakarta.el</groupId>
-                <artifactId>jakarta.el-api</artifactId>
-                <version>${jakarta.el.api.version}</version>
-              </additionalDependency>
             </additionalDependencies>
-            <excludePackageNames>org.apache.tomcat.*,org.apache.tomcat.util,org.apache.tools,org.apache.juli,org.apache.juli.logging</excludePackageNames>
+            <excludePackageNames>jakarta.servlet,org.apache.tomcat.*,org.apache.tomcat.util,org.apache.tools,org.apache.juli,org.apache.juli.logging</excludePackageNames>
             <docfilessubdirs>true</docfilessubdirs>
             <detectLinks>false</detectLinks>
             <detectJavaApiLink>false</detectJavaApiLink>

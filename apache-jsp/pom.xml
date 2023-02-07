@@ -299,6 +299,11 @@
           <source>8</source>
           <additionalDependencies>
             <additionalDependency>
+              <groupId>jakarta.servlet</groupId>
+              <artifactId>jakarta.servlet-api</artifactId>
+              <version>${jakarta.servlet.api.version}</version>
+            </additionalDependency>
+            <additionalDependency>
               <groupId>biz.aQute.bnd</groupId>
               <artifactId>biz.aQute.bnd</artifactId>
               <version>5.2.0</version>
