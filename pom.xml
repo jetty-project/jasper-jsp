@@ -56,9 +56,10 @@
   </developers>
 
   <properties>
-    <servlet.api.version>6.0.0</servlet.api.version>
-    <!-- must update both versions together -->
-    <tomcat.version>10.1.1</tomcat.version>
+    <jakarta.servlet.api.version>6.0.0</jakarta.servlet.api.version>
+    <tomcat.version>10.1.5</tomcat.version>
+    <jakarta.el.api.version>5.0.1</jakarta.el.api.version>
+    <jakarta.servlet.jsp.api.version>3.1.0</jakarta.servlet.jsp.api.version>
     <ecj.version>3.31.0</ecj.version>
   </properties>
 
@@ -174,15 +175,11 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>3.4.0</version>
           <configuration>
-<!--            <includeDependencySources>true</includeDependencySources>-->
-<!--            <dependencySourceIncludes>-->
-<!--              <dependencySourceInclude>org.apache.tomcat:*</dependencySourceInclude>-->
-<!--            </dependencySourceIncludes>-->
             <additionalDependencies>
               <additionalDependency>
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
-                <version>${servlet.api.version}</version>
+                <version>${jakarta.servlet.api.version}</version>
               </additionalDependency>
               <additionalDependency>
                 <groupId>org.apache.ant</groupId>
@@ -219,27 +216,15 @@
                 <artifactId>xalan</artifactId>
                 <version>2.4.1</version>
               </additionalDependency>
-              <!-- needed as long as we use the shaded of taglib-standard
-              to remove when we will use the jakarta namespace -->
-              <additionalDependency>
-                <groupId>jakarta.servlet.jsp.jstl</groupId>
-                <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
-                <version>3.0.0</version>
-              </additionalDependency>
               <additionalDependency>
                 <groupId>jakarta.servlet.jsp</groupId>
                 <artifactId>jakarta.servlet.jsp-api</artifactId>
-                <version>5.0.0</version>
-              </additionalDependency>
-              <additionalDependency>
-                <groupId>jakarta.servlet</groupId>
-                <artifactId>jakarta.servlet-api</artifactId>
-                <version>6.0.0</version>
+                <version>${jakarta.servlet.jsp.api.version}</version>
               </additionalDependency>
               <additionalDependency>
                 <groupId>jakarta.el</groupId>
                 <artifactId>jakarta.el-api</artifactId>
-                <version>5.0.0</version>
+                <version>${jakarta.el.api.version}</version>
               </additionalDependency>
             </additionalDependencies>
             <excludePackageNames>org.apache.tomcat.*,org.apache.tomcat.util,org.apache.tools,org.apache.juli,org.apache.juli.logging</excludePackageNames>
@@ -297,7 +282,7 @@
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
           <!-- keep this version as upgrade break manifest -->
-          <version>4.0.0</version>
+          <version>5.1.8</version>
         </plugin>
       </plugins>
     </pluginManagement>

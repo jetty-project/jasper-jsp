@@ -25,7 +25,7 @@
               <goal>unpack-dependencies</goal>
             </goals>
             <configuration>
-              <excludeArtifactIds>jakarta.servlet-api,ecj,ant,ant-launcher</excludeArtifactIds>
+              <excludeArtifactIds>jakarta.servlet-api,jakarta.el-api,ecj,ant,ant-launcher</excludeArtifactIds>
               <classifier>sources</classifier>
               <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
               <outputDirectory>${project.build.directory}/sources</outputDirectory>
@@ -57,9 +57,19 @@
               <goal>parse-version</goal>
             </goals>
           </execution>
+          <execution>
+            <id>set-tomcat-osgi-version</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>parse-version</goal>
+            </goals>
+            <configuration>
+              <versionString>${tomcat.version}</versionString>
+              <propertyPrefix>tomcat</propertyPrefix>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -79,9 +89,9 @@
                   <excludes>
                     <exclude>META-INF/services/jakarta.servlet.ServletContainerInitializer</exclude>
                     <exclude>META-INF/services/javax.tools.JavaCompiler</exclude>
+                    <exclude>jakarta/el/**</exclude>
                   </excludes>
                   <includes>
-                    <include>jakarta/el/**</include>
                     <include>org/apache/el/**</include>
                     <include>META-INF/NOTICE</include>
                     <include>META-INF/LICENSE</include>
@@ -126,18 +136,21 @@
             <Implementation-Version>${tomcat.version}</Implementation-Version>
             <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
             <Export-Package>!jakarta.servlet.*,
-              jakarta.el;version="5.0.0",
-              org.apache.el;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.lang;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.stream;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.parser;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.util;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"
+              !jakarta.el.*,
+              org.apache.el;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+              org.apache.el.lang;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+              org.apache.el.stream;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+              org.apache.el.parser;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+              org.apache.el.util;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}"
             </Export-Package>
             <Import-Package>
-                jakarta.servlet.jsp;version="5.0",
-                jakarta.servlet.jsp.el;version="5.0",
-                jakarta.servlet.jsp.tagext;version="5.0"
+                jakarta.el;version="${jakarta.el.api.version}",
+                jakarta.servlet.jsp;version="3.1.0",
+                jakarta.servlet.jsp.el;version="3.1.0",
+                jakarta.servlet.jsp.tagext;version="3.1.0"
             </Import-Package>
+            <Provide-Capability>osgi.serviceloader;osgi.serviceloader="jakarta.el.ExpressionFactory";register:="org.apache.el.ExpressionFactoryImpl"</Provide-Capability>
+            <Require-Capability>osgi.extender;filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
             <_nouses>true</_nouses>
           </instructions>
         </configuration>
@@ -192,14 +205,33 @@
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
-      <version>${servlet.api.version}</version>
+      <version>${jakarta.servlet.api.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-jasper</artifactId>
+      <artifactId>tomcat-jasper-el</artifactId>
       <version>${tomcat.version}</version>
       <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-servlet-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-jsp-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-el-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.el</groupId>
+      <artifactId>jakarta.el-api</artifactId>
+      <version>${jakarta.el.api.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>

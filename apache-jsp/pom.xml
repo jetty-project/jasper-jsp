@@ -29,7 +29,7 @@
               <classifier>sources</classifier>
               <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
               <outputDirectory>${project.build.directory}/sources</outputDirectory>
-              <excludeArtifactIds>ecj,jakarta-servlet.api</excludeArtifactIds>
+              <excludeArtifactIds>ecj,apache-el,jakarta.el-api,jakarta.servlet-api,jakarta.servlet.jsp-api</excludeArtifactIds>
               <excludes>META-INF/maven/</excludes>
             </configuration>
           </execution>
@@ -59,9 +59,19 @@
               <goal>parse-version</goal>
             </goals>
           </execution>
+          <execution>
+            <id>set-tomcat-version</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>parse-version</goal>
+            </goals>
+            <configuration>
+              <versionString>${tomcat.version}</versionString>
+              <propertyPrefix>tomcat</propertyPrefix>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
-
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -76,6 +86,8 @@
               <exclude>org.apache.tomcat:tomcat-jasper-el</exclude>
               <exclude>org.mortbay.jasper:apache-el</exclude>
               <exclude>org.eclipse.jdt:ecj</exclude>
+              <exclude>jakarta.el:jakarta.el-api</exclude>
+              <exclude>jakarta.servlet.jsp:jakarta.servlet.jsp-api</exclude>
             </excludes>
           </artifactSet>
           <filters>
@@ -115,6 +127,19 @@
                 <include>META-INF/NOTICE</include>
                 <include>META-INF/LICENSE</include>
               </includes>
+            </filter>
+            <filter>
+              <artifact>org.apache.tomcat:tomcat-jsp-api</artifact>
+              <includes>
+                <include>jakarta/servlet/jsp/resources/*</include>
+              </includes>
+              <excludes>
+                <exclude>META-INF/services/**</exclude>
+                <exclude>META-INF/web-fragment.xml</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+                <exclude>META-INF/MANIFEST.MF</exclude>
+              </excludes>
             </filter>
             <filter>
               <artifact>jakarta.servlet:jakarta.servlet-api</artifact>
@@ -160,7 +185,7 @@
             <Bundle-Version>
               ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
             </Bundle-Version>
-            <Specification-Version>2.3</Specification-Version>
+            <Specification-Version>3.1.0</Specification-Version>
             <Implementation-Version>${tomcat.version}</Implementation-Version>
             <Require-Capability>osgi.serviceloader;
               filter:="(osgi.serviceloader=org.apache.juli.logging.Log)";resolution:=optional;cardinality:=multiple,
@@ -168,6 +193,7 @@
             </Require-Capability>
             <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
             <_nouses>true</_nouses>
+            <_contract>!JavaJSP,*</_contract>
           </instructions>
         </configuration>
         <executions>
@@ -181,39 +207,36 @@
               <instructions>
                 <Automatic-Module-Name>org.mortbay.apache.jasper</Automatic-Module-Name>
                 <Bundle-Name>Mortbay Jasper</Bundle-Name>
-                <Export-Package>!org.mortbay.*,
-                  org.apache.juli.logging;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.tomcat;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.tomcat.util.compat;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.tomcat.util.scan;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.tomcat.util.file;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.tomcat.util.digester;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.tomcat.util.descriptor.tagplugin;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.tomcat.util.descriptor.tld;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.tomcat.util.descriptor.web;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.tomcat.util;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.tomcat.util.buf;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.tomcat.util.res;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.tomcat.util.security;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  jakarta.servlet.jsp;version="3.1.0",
-                  jakarta.servlet.jsp.el;version="3.1.0",
-                  jakarta.servlet.jsp.tagext;version="3.1.0",
-                  jakarta.servlet.jsp.resources;version="3.1.0",
-                  org.apache.jasper;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.jasper.compiler;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.jasper.compiler.tagplugin;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.jasper.el;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.jasper.resources;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.jasper.runtime;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.jasper.security;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.jasper.servlet;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.jasper.tagplugins.jstl;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.jasper.tagplugins.jstl.core;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.jasper.util;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-                  org.apache.jasper.xmlparser;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+                <Export-Package>
+                  jakarta.servlet.jsp.resources,
+                  org.apache.juli.logging;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.compat;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.scan;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.file;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.digester;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.descriptor.tagplugin;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.descriptor.tld;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.descriptor.web;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.buf;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.res;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.security;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.compiler;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.compiler.tagplugin;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.el;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.resources;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.runtime;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.security;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.servlet;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.tagplugins.jstl;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.tagplugins.jstl.core;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.util;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.xmlparser;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
                 </Export-Package>
                 <Import-Package>!org.apache.tools.ant.*,
-                  jakarta.el;version="4.0",
+                  jakarta.el;version="5.0",
                   javax.naming,
                   javax.net.ssl,
                   jakarta.servlet;version="6.0",
@@ -221,10 +244,11 @@
                   jakarta.servlet.descriptor;version="6.0",
                   jakarta.servlet.http;version="6.0",
                   jakarta.servlet.resources;version="6.0",
+                  jakarta.servlet.jsp;version="3.1",
+                  jakarta.servlet.jsp.el;version="3.1",
+                  jakarta.servlet.jsp.tagext;version="3.1",
                   javax.xml.parsers,
                   org.apache.el.util,
-                  org.apache.tomcat.util.descriptor;version="10.1.0";resolution:=optional,
-                  org.apache.tomcat.util.descriptor.tagplugin;version="10.1.0";resolution:=optional,
                   org.eclipse.jdt.core.compiler,
                   org.eclipse.jdt.internal.compiler,
                   org.eclipse.jdt.internal.compiler.classfmt,
@@ -292,11 +316,6 @@
   </build>
 
   <dependencies>
-    <!-- dependency>
-      <groupId>jakarta.servlet</groupId>
-      <artifactId>jakarta.servlet-api</artifactId>
-      <version>6.0.0</version>
-    </dependency -->
     <dependency>
       <groupId>org.mortbay.jasper</groupId>
       <artifactId>apache-el</artifactId>
@@ -313,6 +332,8 @@
           <artifactId>tomcat-servlet-api</artifactId>
         </exclusion>
         <exclusion>
+        </exclusion>
+        <exclusion>
           <groupId>org.eclipse.jdt</groupId>
           <artifactId>ecj</artifactId>
         </exclusion>
@@ -325,6 +346,11 @@
           <artifactId>tomcat-jasper-el</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet.jsp</groupId>
+      <artifactId>jakarta.servlet.jsp-api</artifactId>
+      <version>${jakarta.servlet.jsp.api.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jdt</groupId>
