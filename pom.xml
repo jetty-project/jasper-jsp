@@ -59,7 +59,7 @@
     <servlet.api.version>5.0.0</servlet.api.version>
     <!-- must update both versions together -->
     <tomcat.version>10.1.6</tomcat.version>
-    <ecj.version>3.32.0</ecj.version>
+    <ecj.version>3.33.0</ecj.version>
   </properties>
 
   <repositories>
