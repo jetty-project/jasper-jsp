@@ -11,7 +11,7 @@ pipeline {
   stages {
     stage( "Parallel Stage" ) {
       parallel {
-        stage( "Build / Test - JDK8" ) {
+        stage( "Build / Test - JDK11" ) {
           agent { node { label 'linux' } }
           options { timeout( time: 120, unit: 'MINUTES' ) }
           steps {
@@ -24,7 +24,12 @@ pipeline {
                    sourcePattern: '**/src/main/java'
             warnings consoleParsers: [[parserName: 'Maven'], [parserName: 'Java']]
             script {
-              if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'apache-9' || env.BRANCH_NAME == 'apache-8') {
+              if (env.BRANCH_NAME == 'master' ||
+                  env.BRANCH_NAME == 'apache-10.0.x' ||
+                  env.BRANCH_NAME == 'apache-10.1.x' ||
+                  env.BRANCH_NAME == 'apache-9' ||
+                  env.BRANCH_NAME == 'apache-8.5' ||
+                  env.BRANCH_NAME == 'apache-8') {
                 mavenBuild( "jdk11", "deploy" )
               }
             }
@@ -46,7 +51,7 @@ pipeline {
  * @return the Jenkinsfile step representing a maven build
  */
 def mavenBuild(jdk, cmdline) {
-  def mvnName = 'maven3.5'
+  def mvnName = 'maven3'
   def localRepo = "${env.JENKINS_HOME}/${env.EXECUTOR_NUMBER}" // ".repository" //
   def settingsName = 'oss-settings.xml'
   def mavenOpts = '-Xms2g -Xmx2g -Djava.awt.headless=true'
