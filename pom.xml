@@ -296,7 +296,8 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <!-- keep this version as upgrade break manifest -->
+          <!-- keep this version at 4.0.0, as upgrade breaks manifest generation.
+               version 4.0.0 is also incompatible with JDK 17+ -->
           <version>4.0.0</version>
         </plugin>
       </plugins>
