@@ -7,20 +7,24 @@ updates:
   - package-ecosystem: "maven"
     directory: "/"
     target-branch: apache-11.0.x
+    milestone: 1
     schedule:
       interval: "weekly"
   - package-ecosystem: "maven"
     directory: "/"
-    target-branch: apache-11.1.x
+    target-branch: apache-10.1.x
+    milestone: 2
     schedule:
       interval: "weekly"
   - package-ecosystem: "maven"
     directory: "/"
     target-branch: apache-10.0.x
+    milestone: 3
     schedule:
       interval: "weekly"
   - package-ecosystem: "maven"
     directory: "/"
     target-branch: apache-9
+    milestone: 4
     schedule:
       interval: "weekly"
