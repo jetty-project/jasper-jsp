@@ -24,16 +24,27 @@ pipeline {
                    sourcePattern: '**/src/main/java'
             warnings consoleParsers: [[parserName: 'Maven'], [parserName: 'Java']]
             script {
-              if (env.BRANCH_NAME == 'master' ||
+              if (env.BRANCH_NAME == 'apache-11.0.x' ||
                   env.BRANCH_NAME == 'apache-10.0.x' ||
                   env.BRANCH_NAME == 'apache-10.1.x' ||
-                  env.BRANCH_NAME == 'apache-9' ||
-                  env.BRANCH_NAME == 'apache-8.5' ||
-                  env.BRANCH_NAME == 'apache-8') {
+                  env.BRANCH_NAME == 'apache-9') {
                 mavenBuild( "jdk11", "deploy" )
               }
             }
-
+          }
+        }
+        stage( "Build / Test - JDK17" ) {
+          agent { node { label 'linux' } }
+          options { timeout( time: 120, unit: 'MINUTES' ) }
+          steps {
+            mavenBuild( "jdk17", "clean install" )
+          }
+        }
+        stage( "Build / Test - JDK21" ) {
+          agent { node { label 'linux' } }
+          options { timeout( time: 120, unit: 'MINUTES' ) }
+          steps {
+            mavenBuild( "jdk21", "clean install" )
           }
         }
       }
