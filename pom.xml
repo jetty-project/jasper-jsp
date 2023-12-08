@@ -281,8 +281,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <!-- keep this version as upgrade break manifest -->
-          <version>5.1.8</version>
+          <version>4.0.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
