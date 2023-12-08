@@ -28,7 +28,6 @@ pipeline {
                 mavenBuild( "jdk8", "deploy" )
               }
             }
-
           }
         }
         stage( "Build / Test - JDK11" ) {
@@ -36,6 +35,20 @@ pipeline {
           options { timeout( time: 120, unit: 'MINUTES' ) }
           steps {
             mavenBuild( "jdk11", "clean install" )
+          }
+        }
+        stage( "Build / Test - JDK17" ) {
+          agent { node { label 'linux' } }
+          options { timeout( time: 120, unit: 'MINUTES' ) }
+          steps {
+            mavenBuild( "jdk17", "clean install" )
+          }
+        }
+        stage( "Build / Test - JDK21" ) {
+          agent { node { label 'linux' } }
+          options { timeout( time: 120, unit: 'MINUTES' ) }
+          steps {
+            mavenBuild( "jdk21", "clean install" )
           }
         }
       }
@@ -53,7 +66,7 @@ pipeline {
  * @return the Jenkinsfile step representing a maven build
  */
 def mavenBuild(jdk, cmdline) {
-  def mvnName = 'maven3.5'
+  def mvnName = 'maven3'
   def localRepo = "${env.JENKINS_HOME}/${env.EXECUTOR_NUMBER}" // ".repository" //
   def settingsName = 'oss-settings.xml'
   def mavenOpts = '-Xms2g -Xmx2g -Djava.awt.headless=true'
