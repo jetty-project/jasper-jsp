@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.mortbay.jasper</groupId>
     <artifactId>jasper-jsp</artifactId>
-    <version>10.1-SNAPSHOT</version>
+    <version>10.1.16-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -193,7 +193,7 @@
             </Require-Capability>
             <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
             <_nouses>true</_nouses>
-            <_contract>!JavaJSP,*</_contract>
+            <_contract>!JavaJSP,!JakartaServerPages</_contract>
           </instructions>
         </configuration>
         <executions>
