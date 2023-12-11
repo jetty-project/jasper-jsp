@@ -138,6 +138,7 @@
               org.apache.el.util;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"
             </Import-Package>
             <_nouses>true</_nouses>
+            <_contract>!JavaEL</_contract>
           </instructions>
         </configuration>
       </plugin>

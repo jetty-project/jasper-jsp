@@ -218,6 +218,7 @@
             </Require-Capability>
             <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
             <_nouses>true</_nouses>
+            <_contract>!JavaJSP</_contract>
           </instructions>
         </configuration>
         <executions>
