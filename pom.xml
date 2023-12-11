@@ -60,7 +60,7 @@
     <tomcat.version>10.1.16</tomcat.version>
     <jakarta.el.api.version>5.0.1</jakarta.el.api.version>
     <jakarta.servlet.jsp.api.version>3.1.1</jakarta.servlet.jsp.api.version>
-    <ecj.version>3.33.0</ecj.version>
+    <ecj.version>3.35.0</ecj.version>
   </properties>
 
   <repositories>
