@@ -16,15 +16,26 @@ updates:
     milestone: 2
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "org.apache.tomcat:*"
+        versions: [ ">= 11.0.0" ]
   - package-ecosystem: "maven"
     directory: "/"
     target-branch: apache-10.0.x
     milestone: 3
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "org.apache.tomcat:*"
+        versions: [ ">= 10.1.0" ]
   - package-ecosystem: "maven"
     directory: "/"
     target-branch: apache-9
     milestone: 4
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "org.apache.tomcat:*"
+        versions: [ ">= 10.0.0" ]
+
+
