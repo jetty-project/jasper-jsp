@@ -4,12 +4,14 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+  # EE11 - Tomcat 11.0 - Servlet 6.1
   - package-ecosystem: "maven"
     directory: "/"
     target-branch: apache-11.0.x
     milestone: 1
     schedule:
       interval: "weekly"
+  # EE10 - Tomcat 10.1 - Servlet 6.0
   - package-ecosystem: "maven"
     directory: "/"
     target-branch: apache-10.1.x
@@ -19,9 +21,16 @@ updates:
     ignore:
       - dependency-name: "org.apache.tomcat:*"
         versions: [ ">= 11.0.0" ]
+      - dependency-name: "jakarta.servlet:*"
+        versions: [ ">=6.1.0" ]
+      - dependency-name: "jakarta.servlet.jsp:*"
+        versions: [ ">=4.0.0" ]
+      - dependency-name: "jakarta.servlet.jsp.jstl:*"
+        versions: [ ">=3.1.0" ]
       # ECJ minimum JDK is JDK17 now
       - dependency-name: "org.eclipse.jdt:ecj"
         versions: [ ">= 3.36.0" ]
+  # EE9 - Tomcat 10.0 - Servlet 5.0
   - package-ecosystem: "maven"
     directory: "/"
     target-branch: apache-10.0.x
@@ -31,9 +40,16 @@ updates:
     ignore:
       - dependency-name: "org.apache.tomcat:*"
         versions: [ ">= 10.1.0" ]
+      - dependency-name: "jakarta.servlet:*"
+        versions: [ ">=6.0.0" ]
+      - dependency-name: "jakarta.servlet.jsp:*"
+        versions: [ ">=4.0.0" ]
+      - dependency-name: "jakarta.servlet.jsp.jstl:*"
+        versions: [ ">=3.0.0" ]
       # ECJ minimum JDK is JDK17 now
       - dependency-name: "org.eclipse.jdt:ecj"
         versions: [ ">= 3.36.0" ]
+  # EE8 - Tomcat 9 - Servlet 4.0
   - package-ecosystem: "maven"
     directory: "/"
     target-branch: apache-9
@@ -43,6 +59,12 @@ updates:
     ignore:
       - dependency-name: "org.apache.tomcat:*"
         versions: [ ">= 10.0.0" ]
+      - dependency-name: "jakarta.servlet:*"
+        versions: [ ">=5.0.0" ]
+      - dependency-name: "jakarta.servlet.jsp:*"
+        versions: [ ">=2.4.0" ]
+      - dependency-name: "jakarta.servlet.jsp.jstl:*"
+        versions: [ ">=2.0.0" ]
       # ECJ minimum JDK is JDK17 now
       - dependency-name: "org.eclipse.jdt:ecj"
         versions: [ ">= 3.36.0" ]
