@@ -150,6 +150,7 @@
           <version>3.0.1</version>
           <configuration>
             <autoVersionSubmodules>true</autoVersionSubmodules>
+            <releaseProfiles>eclipse-release</releaseProfiles>
           </configuration>
         </plugin>
         <plugin>
