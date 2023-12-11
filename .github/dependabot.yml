@@ -19,6 +19,9 @@ updates:
     ignore:
       - dependency-name: "org.apache.tomcat:*"
         versions: [ ">= 11.0.0" ]
+      # ECJ minimum JDK is JDK17 now
+      - dependency-name: "org.eclipse.jdt:ecj"
+        versions: [ ">= 3.36.0" ]
   - package-ecosystem: "maven"
     directory: "/"
     target-branch: apache-10.0.x
@@ -28,6 +31,9 @@ updates:
     ignore:
       - dependency-name: "org.apache.tomcat:*"
         versions: [ ">= 10.1.0" ]
+      # ECJ minimum JDK is JDK17 now
+      - dependency-name: "org.eclipse.jdt:ecj"
+        versions: [ ">= 3.36.0" ]
   - package-ecosystem: "maven"
     directory: "/"
     target-branch: apache-9
@@ -37,5 +43,8 @@ updates:
     ignore:
       - dependency-name: "org.apache.tomcat:*"
         versions: [ ">= 10.0.0" ]
+      # ECJ minimum JDK is JDK17 now
+      - dependency-name: "org.eclipse.jdt:ecj"
+        versions: [ ">= 3.36.0" ]
 
 
