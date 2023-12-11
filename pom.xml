@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.mortbay.jasper</groupId>
   <artifactId>jasper-jsp</artifactId>
-  <version>10.0.27-SNAPSHOT</version>
+  <version>11.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Jetty :: Jasper :: Project</name>
 
@@ -56,10 +56,9 @@
   </developers>
 
   <properties>
-    <servlet.api.version>5.0.0</servlet.api.version>
-    <!-- must update both versions together -->
-    <tomcat.version>10.1.16</tomcat.version>
-    <ecj.version>3.26.0</ecj.version>
+    <servlet.api.version>6.1.0-M1</servlet.api.version>
+    <tomcat.version>11.0.0-M14</tomcat.version>
+    <ecj.version>3.36.0</ecj.version>
   </properties>
 
   <repositories>
@@ -96,14 +95,14 @@
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
           <execution>
-            <id>require-jdk11</id>
+            <id>require-jdk17</id>
             <goals>
               <goal>enforce</goal>
             </goals>
             <configuration>
               <rules>
                 <requireJavaVersion>
-                  <version>11</version>
+                  <version>17</version>
                 </requireJavaVersion>
               </rules>
             </configuration>
@@ -123,8 +122,8 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.11.0</version>
           <configuration>
-            <source>11</source>
-            <target>11</target>
+            <source>17</source>
+            <target>17</target>
             <skipMain>true</skipMain>
             <skip>true</skip>
           </configuration>
@@ -174,10 +173,6 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>3.6.3</version>
           <configuration>
-<!--            <includeDependencySources>true</includeDependencySources>-->
-<!--            <dependencySourceIncludes>-->
-<!--              <dependencySourceInclude>org.apache.tomcat:*</dependencySourceInclude>-->
-<!--            </dependencySourceIncludes>-->
             <additionalDependencies>
               <additionalDependency>
                 <groupId>jakarta.servlet</groupId>
@@ -219,28 +214,6 @@
                 <artifactId>xalan</artifactId>
                 <version>2.4.1</version>
               </additionalDependency>
-              <!-- needed as long as we use the shaded of taglib-standard
-              to remove when we will use the jakarta namespace -->
-              <additionalDependency>
-                <groupId>jakarta.servlet.jsp.jstl</groupId>
-                <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
-                <version>1.2.7</version>
-              </additionalDependency>
-              <additionalDependency>
-                <groupId>jakarta.servlet.jsp</groupId>
-                <artifactId>jakarta.servlet.jsp-api</artifactId>
-                <version>2.3.6</version>
-              </additionalDependency>
-              <additionalDependency>
-                <groupId>jakarta.servlet</groupId>
-                <artifactId>jakarta.servlet-api</artifactId>
-                <version>4.0.3</version>
-              </additionalDependency>
-              <additionalDependency>
-                <groupId>jakarta.el</groupId>
-                <artifactId>jakarta.el-api</artifactId>
-                <version>3.0.3</version>
-              </additionalDependency>
             </additionalDependencies>
             <excludePackageNames>org.apache.tomcat.*,org.apache.tomcat.util,org.apache.tools,org.apache.juli,org.apache.juli.logging</excludePackageNames>
             <docfilessubdirs>true</docfilessubdirs>
@@ -249,9 +222,9 @@
             <doclint>none</doclint>
             <verbose>true</verbose>
             <links>
-              <link>http://tomcat.apache.org/tomcat-10.0-doc/jspapi/</link>
-              <link>http://tomcat.apache.org/tomcat-10.0-doc/elapi/</link>
-              <link>http://tomcat.apache.org/tomcat-10.0-doc/api/</link>
+              <link>http://tomcat.apache.org/tomcat-11.0-doc/jspapi/</link>
+              <link>http://tomcat.apache.org/tomcat-11.0-doc/elapi/</link>
+              <link>http://tomcat.apache.org/tomcat-11.0-doc/api/</link>
             </links>
             <failOnWarnings>false</failOnWarnings>
           </configuration>
@@ -296,9 +269,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <!-- keep this version at 4.0.0, as upgrade breaks manifest generation.
-               version 4.0.0 is also incompatible with JDK 17+ -->
-          <version>4.0.0</version>
+          <version>5.1.9</version>
         </plugin>
       </plugins>
     </pluginManagement>
