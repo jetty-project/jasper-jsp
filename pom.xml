@@ -59,7 +59,7 @@
   <properties>
     <!-- must update both versions together -->
     <tomcat.version>9.0.83</tomcat.version>
-    <ecj.version>3.26.0</ecj.version>
+    <ecj.version>3.33.0</ecj.version>
   </properties>
 
   <repositories>
