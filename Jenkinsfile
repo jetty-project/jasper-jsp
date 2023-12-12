@@ -11,46 +11,34 @@ pipeline {
   stages {
     stage( "Parallel Stage" ) {
       parallel {
-        stage( "Build / Test - JDK8" ) {
-          agent { node { label 'linux' } }
-          options { timeout( time: 120, unit: 'MINUTES' ) }
-          steps {
-            mavenBuild( "jdk8", "clean install" )
-            // Collect up the jacoco execution results
-            jacoco inclusionPattern: '**/org/eclipse/jetty/**/*.class',
-                   exclusionPattern: '',
-                   execPattern: '**/target/jacoco.exec',
-                   classPattern: '**/target/classes',
-                   sourcePattern: '**/src/main/java'
-            warnings consoleParsers: [[parserName: 'Maven'], [parserName: 'Java']]
-            script {
-              if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'apache-9') {
-                mavenBuild( "jdk8", "deploy" )
-              }
-            }
-          }
-        }
         stage( "Build / Test - JDK11" ) {
           agent { node { label 'linux' } }
           options { timeout( time: 120, unit: 'MINUTES' ) }
           steps {
-            mavenBuild( "jdk11", "clean install" )
+            mavenBuild( "jdk11", "clean install javadoc:jar" )
+            warnings consoleParsers: [[parserName: 'Maven'], [parserName: 'Java']]
+            script {
+              if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'apache-9') {
+                mavenBuild( "jdk11", "deploy" )
+              }
+            }
           }
         }
         stage( "Build / Test - JDK17" ) {
           agent { node { label 'linux' } }
           options { timeout( time: 120, unit: 'MINUTES' ) }
           steps {
-            mavenBuild( "jdk17", "clean install" )
+            mavenBuild( "jdk17", "clean install javadoc:jar" )
           }
         }
         stage( "Build / Test - JDK21" ) {
           agent { node { label 'linux' } }
           options { timeout( time: 120, unit: 'MINUTES' ) }
           steps {
-            mavenBuild( "jdk21", "clean install" )
+            mavenBuild( "jdk21", "clean install javadoc:jar" )
           }
         }
+
       }
     }
   }
