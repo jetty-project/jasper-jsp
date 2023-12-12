@@ -151,6 +151,7 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>3.6.3</version>
           <configuration>
+            <legacyMode>true</legacyMode>
             <additionalDependencies>
               <additionalDependency>
                 <groupId>biz.aQute.bnd</groupId>

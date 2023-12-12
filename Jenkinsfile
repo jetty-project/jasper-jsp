@@ -15,7 +15,7 @@ pipeline {
           agent { node { label 'linux' } }
           options { timeout( time: 120, unit: 'MINUTES' ) }
           steps {
-            mavenBuild( "jdk11", "clean install javadoc:jar" )
+            mavenBuild( "jdk11", "clean install -Peclipse-release -Dgpg.skip" )
             warnings consoleParsers: [[parserName: 'Maven'], [parserName: 'Java']]
             script {
               if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'apache-9') {
@@ -28,14 +28,14 @@ pipeline {
           agent { node { label 'linux' } }
           options { timeout( time: 120, unit: 'MINUTES' ) }
           steps {
-            mavenBuild( "jdk17", "clean install javadoc:jar" )
+            mavenBuild( "jdk17", "clean install -Peclipse-release -Dgpg.skip )
           }
         }
         stage( "Build / Test - JDK21" ) {
           agent { node { label 'linux' } }
           options { timeout( time: 120, unit: 'MINUTES' ) }
           steps {
-            mavenBuild( "jdk21", "clean install javadoc:jar" )
+            mavenBuild( "jdk21", "clean install -Peclipse-release -Dgpg.skip" )
           }
         }
 
