@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.mortbay.jasper</groupId>
     <artifactId>jasper-jsp</artifactId>
-    <version>9.0.83-SNAPSHOT</version>
+    <version>9.0.83</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
