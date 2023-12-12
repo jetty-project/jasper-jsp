@@ -28,7 +28,7 @@ pipeline {
           agent { node { label 'linux' } }
           options { timeout( time: 120, unit: 'MINUTES' ) }
           steps {
-            mavenBuild( "jdk17", "clean install -Peclipse-release -Dgpg.skip )
+            mavenBuild( "jdk17", "clean install -Peclipse-release -Dgpg.skip")
           }
         }
         stage( "Build / Test - JDK21" ) {
