@@ -15,13 +15,7 @@ pipeline {
                     agent { node { label 'linux' } }
                     options { timeout( time: 120, unit: 'MINUTES' ) }
                     steps {
-                        mavenBuild( "jdk11", "clean install javadoc:jar" )
-                        // Collect up the jacoco execution results
-                        jacoco inclusionPattern: '**/org/eclipse/jetty/**/*.class',
-                            exclusionPattern: '',
-                            execPattern: '**/target/jacoco.exec',
-                            classPattern: '**/target/classes',
-                            sourcePattern: '**/src/main/java'
+                        mavenBuild( "jdk11", "clean install -Peclipse-release -Dgpg.skip" )
                         warnings consoleParsers: [[parserName: 'Maven'], [parserName: 'Java']]
                         script {
                             if (env.BRANCH_NAME == 'apache-11.0.x' ||
@@ -37,14 +31,14 @@ pipeline {
                     agent { node { label 'linux' } }
                     options { timeout( time: 120, unit: 'MINUTES' ) }
                     steps {
-                        mavenBuild( "jdk17", "clean install" )
+                        mavenBuild( "jdk17", "clean install -Peclipse-release -Dgpg.skip" )
                     }
                 }
                 stage( "Build / Test - JDK21" ) {
                     agent { node { label 'linux' } }
                     options { timeout( time: 120, unit: 'MINUTES' ) }
                     steps {
-                        mavenBuild( "jdk21", "clean install" )
+                        mavenBuild( "jdk21", "clean install -Peclipse-release -Dgpg.skip" )
                     }
                 }
             }
