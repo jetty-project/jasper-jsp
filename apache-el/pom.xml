@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.mortbay.jasper</groupId>
     <artifactId>jasper-jsp</artifactId>
-    <version>10.1.16-SNAPSHOT</version>
+    <version>10.1.16</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -152,7 +152,7 @@
             <Provide-Capability>osgi.serviceloader;osgi.serviceloader="jakarta.el.ExpressionFactory";register:="org.apache.el.ExpressionFactoryImpl"</Provide-Capability>
             <Require-Capability>osgi.extender;filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
             <_nouses>true</_nouses>
-            <_contract></_contract>
+            <_contract />
           </instructions>
         </configuration>
       </plugin>
