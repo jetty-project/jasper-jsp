@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.mortbay.jasper</groupId>
     <artifactId>jasper-jsp</artifactId>
-    <version>10.0.27-SNAPSHOT</version>
+    <version>10.0.27</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -139,7 +139,7 @@
                 jakarta.servlet.jsp.tagext;version="3.0"
             </Import-Package>
             <_nouses>true</_nouses>
-            <_contract></_contract>
+            <_contract />
           </instructions>
         </configuration>
       </plugin>
