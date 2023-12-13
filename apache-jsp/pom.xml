@@ -185,7 +185,7 @@
             <Bundle-Version>
               ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
             </Bundle-Version>
-            <Specification-Version>3.1.0</Specification-Version>
+            <Specification-Version>3.1</Specification-Version>
             <Implementation-Version>${tomcat.version}</Implementation-Version>
             <Require-Capability>osgi.serviceloader;
               filter:="(osgi.serviceloader=org.apache.juli.logging.Log)";resolution:=optional;cardinality:=multiple,
@@ -236,7 +236,7 @@
                   org.apache.jasper.xmlparser;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
                 </Export-Package>
                 <Import-Package>!org.apache.tools.ant.*,
-                  jakarta.el;version="5.0",
+                  jakarta.el;version="${jakarta.el.api.version}",
                   javax.naming,
                   javax.net.ssl,
                   jakarta.servlet;version="6.0",
@@ -244,9 +244,9 @@
                   jakarta.servlet.descriptor;version="6.0",
                   jakarta.servlet.http;version="6.0",
                   jakarta.servlet.resources;version="6.0",
-                  jakarta.servlet.jsp;version="3.1",
-                  jakarta.servlet.jsp.el;version="3.1",
-                  jakarta.servlet.jsp.tagext;version="3.1",
+                  jakarta.servlet.jsp;version="${jakarta.servlet.jsp.api.version}",
+                  jakarta.servlet.jsp.el;version="${jakarta.servlet.jsp.api.version}",
+                  jakarta.servlet.jsp.tagext;version="${jakarta.servlet.jsp.api.version}",
                   javax.xml.parsers,
                   org.apache.el.util,
                   org.eclipse.jdt.core.compiler,

@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>apache-el</artifactId>
   <packaging>jar</packaging>
-  <name>MortBay :: Apache EL :: API and Implementation</name>
+  <name>MortBay :: Apache EL :: Implementation</name>
 
   <build>
     <sourceDirectory>${project.build.directory}/sources</sourceDirectory>
@@ -126,7 +126,7 @@
         <configuration>
           <instructions>
             <Automatic-Module-Name>org.mortbay.apache.el</Automatic-Module-Name>
-            <Bundle-Name>Mortbay Apache EL API and Implementation</Bundle-Name>
+            <Bundle-Name>Mortbay Apache EL Implementation</Bundle-Name>
             <Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
             <Bundle-Classpath>.</Bundle-Classpath>
             <Bundle-Version>
@@ -145,9 +145,9 @@
             </Export-Package>
             <Import-Package>
                 jakarta.el;version="${jakarta.el.api.version}",
-                jakarta.servlet.jsp;version="3.1.0",
-                jakarta.servlet.jsp.el;version="3.1.0",
-                jakarta.servlet.jsp.tagext;version="3.1.0"
+                jakarta.servlet.jsp;version="${jakarta.servlet.jsp.api.version}",
+                jakarta.servlet.jsp.el;version="${jakarta.servlet.jsp.api.version}",
+                jakarta.servlet.jsp.tagext;version="${jakarta.servlet.jsp.api.version}"
             </Import-Package>
             <Provide-Capability>osgi.serviceloader;osgi.serviceloader="jakarta.el.ExpressionFactory";register:="org.apache.el.ExpressionFactoryImpl"</Provide-Capability>
             <Require-Capability>osgi.extender;filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
@@ -177,7 +177,7 @@
               <archive>
                 <manifestEntries>
                   <Automatic-Module-Name>org.mortbay.apache.el.sources</Automatic-Module-Name>
-                  <Bundle-Name>Mortbay Apache EL API and Implementation Sources</Bundle-Name>
+                  <Bundle-Name>Mortbay Apache EL Implementation Sources</Bundle-Name>
                 </manifestEntries>
               </archive>
             </configuration>

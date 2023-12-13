@@ -12,6 +12,9 @@ the class to supply its own `ServletContainerInitializer` service to initialize 
 
 This project makes no change to the licensing or copyright applied to the apache project.
 
+Artifacts produced by the 10.1 builds and above do _not_ contain the EL and JSP apis, however
+lower versions do.
+
 
 Branches
 ============
