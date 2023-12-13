@@ -25,7 +25,7 @@
               <goal>unpack-dependencies</goal>
             </goals>
             <configuration>
-              <excludeArtifactIds>jakarta.servlet-api,ecj,ant,ant-launcher</excludeArtifactIds>
+              <excludeArtifactIds>jakarta.servlet-api,jakarta.el-api,ecj,ant,ant-launcher</excludeArtifactIds>
               <classifier>sources</classifier>
               <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
               <outputDirectory>${project.build.directory}/sources</outputDirectory>
@@ -57,6 +57,17 @@
               <goal>parse-version</goal>
             </goals>
           </execution>
+          <execution>
+            <id>set-tomcat-osgi-version</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>parse-version</goal>
+            </goals>
+            <configuration>
+              <versionString>${tomcat.version}</versionString>
+              <propertyPrefix>tomcat</propertyPrefix>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
 
@@ -77,11 +88,11 @@
                 <filter>
                   <artifact>*:*</artifact>
                   <excludes>
+                    <exclude>jakarta/el/**</exclude>
                     <exclude>META-INF/services/jakarta.servlet.ServletContainerInitializer</exclude>
                     <exclude>META-INF/services/javax.tools.JavaCompiler</exclude>
                   </excludes>
                   <includes>
-                    <include>jakarta/el/**</include>
                     <include>org/apache/el/**</include>
                     <include>META-INF/NOTICE</include>
                     <include>META-INF/LICENSE</include>
@@ -116,7 +127,7 @@
         <configuration>
           <instructions>
             <Automatic-Module-Name>org.mortbay.apache.el</Automatic-Module-Name>
-            <Bundle-Name>Mortbay Apache EL API and Implementation</Bundle-Name>
+            <Bundle-Name>Mortbay Apache EL Implementation</Bundle-Name>
             <Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
             <Bundle-Classpath>.</Bundle-Classpath>
             <Bundle-Version>
@@ -125,20 +136,23 @@
             <Specification-Version>3.0</Specification-Version>
             <Implementation-Version>${tomcat.version}</Implementation-Version>
             <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
-            <Export-Package>!jakarta.servlet.*,
-              jakarta.el;version="4.0.0.SNAPSHOT",
-              org.apache.el;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.lang;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.stream;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.parser;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.util;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"
+             <Export-Package>!jakarta.servlet.*,
+              !jakarta.el.*,
+              org.apache.el;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+              org.apache.el.lang;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+              org.apache.el.stream;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+              org.apache.el.parser;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+              org.apache.el.util;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}"
             </Export-Package>
             <Import-Package>
-                jakarta.servlet.jsp;version="3.0",
-                jakarta.servlet.jsp.el;version="3.0",
-                jakarta.servlet.jsp.tagext;version="3.0"
+                jakarta.servlet.jsp;version="${jakarta.servlet.jsp.api.version}",
+                jakarta.servlet.jsp.el;version="${jakarta.servlet.jsp.api.version}",
+                jakarta.servlet.jsp.tagext;version="${jakarta.servlet.jsp.api.version}"
             </Import-Package>
+            <Provide-Capability>osgi.serviceloader;osgi.serviceloader="jakarta.el.ExpressionFactory";register:="org.apache.el.ExpressionFactoryImpl"</Provide-Capability>
+            <Require-Capability>osgi.extender;filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
             <_nouses>true</_nouses>
+            <_contract>!JakartaJSP</_contract>
           </instructions>
         </configuration>
       </plugin>
@@ -163,7 +177,7 @@
               <archive>
                 <manifestEntries>
                   <Automatic-Module-Name>org.mortbay.apache.el.sources</Automatic-Module-Name>
-                  <Bundle-Name>Mortbay Apache EL API and Implementation Sources</Bundle-Name>
+                  <Bundle-Name>Mortbay Apache EL Implementation Sources</Bundle-Name>
                 </manifestEntries>
               </archive>
             </configuration>
@@ -192,14 +206,33 @@
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
-      <version>${servlet.api.version}</version>
+      <version>${jakarta.servlet.api.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-jasper</artifactId>
+      <artifactId>tomcat-jasper-el</artifactId>
       <version>${tomcat.version}</version>
       <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-servlet-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-jsp-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-el-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.el</groupId>
+      <artifactId>jakarta.el-api</artifactId>
+      <version>${jakarta.el.api.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>
