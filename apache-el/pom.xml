@@ -133,7 +133,7 @@
             <Bundle-Version>
               ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
             </Bundle-Version>
-            <Specification-Version>3.0</Specification-Version>
+            <Specification-Version>${jakarta.servlet.jsp.api.version}</Specification-Version>
             <Implementation-Version>${tomcat.version}</Implementation-Version>
             <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
              <Export-Package>!jakarta.servlet.*,
