@@ -57,7 +57,7 @@
 
   <properties>
     <jakarta.servlet.api.version>6.1.0-M2</jakarta.servlet.api.version>
-    <tomcat.version>11.0.0-M18</tomcat.version>
+    <tomcat.version>11.0.0-M19</tomcat.version>
     <ecj.version>3.37.0</ecj.version>
     <jakarta.servlet.jsp.api.version>4.0.0-M2</jakarta.servlet.jsp.api.version>
     <jakarta.el.api.version>6.0.0</jakarta.el.api.version>
