@@ -2,25 +2,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.eclipse.jetty</groupId>
+    <artifactId>jetty-parent</artifactId>
+    <version>26</version>
+  </parent>
   <groupId>org.mortbay.jasper</groupId>
   <artifactId>jasper-jsp</artifactId>
   <version>10.1.17-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Jetty :: Jasper :: Project</name>
 
-  <description>
-    A rebundling of Apache Tomcat Jasper to remove the tomcat server dependencies,
-    so that the JSP engine can be used by the Eclipse Jetty project.
-  </description>
+  <description>A rebundling of Apache Tomcat Jasper to remove the tomcat server dependencies,
+    so that the JSP engine can be used by the Eclipse Jetty project.</description>
 
   <url>https://github.com/jetty-project/jasper-jsp</url>
 
   <inceptionYear>2014</inceptionYear>
-
-  <issueManagement>
-    <system>github</system>
-    <url>https://github.com/jetty-project/jasper-jsp/issues</url>
-  </issueManagement>
 
   <licenses>
     <license>
@@ -29,15 +27,8 @@
     </license>
   </licenses>
 
-  <scm>
-    <connection>scm:git:git://github.com/jetty-project/jasper-jsp.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/jetty-project/jasper-jsp.git</developerConnection>
-    <url>https://github.com/jetty-project/jasper-jsp</url>
-    <tag>HEAD</tag>
-  </scm>
-
   <developers>
-      <developer>
+    <developer>
       <id>janb</id>
       <name>Jan Bartel</name>
       <email>janb@webtide.com</email>
@@ -55,74 +46,67 @@
     </developer>
   </developers>
 
+  <modules>
+    <module>apache-el</module>
+    <module>apache-jsp</module>
+  </modules>
+
+  <scm>
+    <connection>scm:git:git://github.com/jetty-project/jasper-jsp.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/jetty-project/jasper-jsp.git</developerConnection>
+    <url>https://github.com/jetty-project/jasper-jsp</url>
+  </scm>
+
+  <issueManagement>
+    <system>github</system>
+    <url>https://github.com/jetty-project/jasper-jsp/issues</url>
+  </issueManagement>
+
   <properties>
-    <jakarta.servlet.api.version>6.0.0</jakarta.servlet.api.version>
-    <tomcat.version>10.1.20</tomcat.version>
-    <jakarta.el.api.version>5.0.1</jakarta.el.api.version>
-    <jakarta.servlet.jsp.api.version>3.1.1</jakarta.servlet.jsp.api.version>
     <ecj.version>3.33.0</ecj.version>
+    <jakarta.el.api.version>5.0.1</jakarta.el.api.version>
+    <jakarta.servlet.api.version>6.0.0</jakarta.servlet.api.version>
+    <jakarta.servlet.jsp.api.version>3.1.1</jakarta.servlet.jsp.api.version>
+    <tomcat.version>10.1.20</tomcat.version>
   </properties>
 
   <repositories>
     <repository>
-      <id>sonatype-snapshots</id>
-      <name>Sonatype Jetty Snapshots</name>
-      <url>https://oss.sonatype.org/content/groups/jetty</url>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
+      <id>sonatype-snapshots</id>
+      <name>Sonatype Jetty Snapshots</name>
+      <url>https://oss.sonatype.org/content/groups/jetty</url>
     </repository>
     <repository>
-      <id>jetty-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/jetty-snapshots/</url>
       <releases>
         <enabled>false</enabled>
       </releases>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
+      <id>jetty-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/jetty-snapshots/</url>
     </repository>
   </repositories>
 
-  <modules>
-    <module>apache-el</module>
-    <module>apache-jsp</module>
-  </modules>
-
   <build>
     <defaultGoal>install</defaultGoal>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>require-jdk11</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <requireJavaVersion>
-                  <version>11</version>
-                </requireJavaVersion>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>5.1.9</version>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>3.3.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.13.0</version>
           <configuration>
             <source>11</source>
             <target>11</target>
@@ -132,48 +116,7 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.6.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>3.1.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-enforcer-plugin</artifactId>
-          <version>3.4.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-install-plugin</artifactId>
-          <version>3.1.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>3.3.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.2.5</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-gpg-plugin</artifactId>
-          <version>3.2.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>3.4.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.6.3</version>
           <configuration>
             <additionalDependencies>
               <additionalDependency>
@@ -244,7 +187,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
-          <version>3.0.1</version>
           <configuration>
             <autoVersionSubmodules>true</autoVersionSubmodules>
             <releaseProfiles>eclipse-release</releaseProfiles>
@@ -252,13 +194,7 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-shade-plugin</artifactId>
-          <version>3.5.2</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
-          <version>3.3.1</version>
           <executions>
             <execution>
               <id>attach-sources</id>
@@ -278,27 +214,30 @@
           <artifactId>build-helper-maven-plugin</artifactId>
           <version>3.5.0</version>
         </plugin>
-        <plugin>
-          <groupId>org.apache.felix</groupId>
-          <artifactId>maven-bundle-plugin</artifactId>
-          <version>5.1.9</version>
-        </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>require-jdk11</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>11</version>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
-
-  <distributionManagement>
-    <repository>
-      <id>oss.sonatype.org</id>
-      <name>Jetty Staging Repository</name>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-    <snapshotRepository>
-      <id>oss.sonatype.org</id>
-      <name>Jetty Snapshot Repository</name>
-      <url>https://oss.sonatype.org/content/repositories/jetty-snapshots/</url>
-    </snapshotRepository>
-  </distributionManagement>
 
   <profiles>
     <profile>
@@ -306,49 +245,12 @@
       <build>
         <plugins>
           <plugin>
-            <inherited>true</inherited>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-deploy-plugin</artifactId>
+            <inherited>true</inherited>
             <configuration>
               <updateReleaseInfo>true</updateReleaseInfo>
             </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
           </plugin>
         </plugins>
       </build>

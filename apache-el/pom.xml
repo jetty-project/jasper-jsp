@@ -1,137 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.mortbay.jasper</groupId>
     <artifactId>jasper-jsp</artifactId>
     <version>10.1.17-SNAPSHOT</version>
   </parent>
-
-  <modelVersion>4.0.0</modelVersion>
   <artifactId>apache-el</artifactId>
   <packaging>jar</packaging>
   <name>MortBay :: Apache EL :: Implementation</name>
 
-  <build>
-    <sourceDirectory>${project.build.directory}/sources</sourceDirectory>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack-source</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>unpack-dependencies</goal>
-            </goals>
-            <configuration>
-              <excludeArtifactIds>jakarta.servlet-api,jakarta.el-api,ecj,ant,ant-launcher</excludeArtifactIds>
-              <classifier>sources</classifier>
-              <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
-              <outputDirectory>${project.build.directory}/sources</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+  <dependencies>
+    <dependency>
+      <groupId>jakarta.el</groupId>
+      <artifactId>jakarta.el-api</artifactId>
+      <version>${jakarta.el.api.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-jasper-el</artifactId>
+      <version>${tomcat.version}</version>
+      <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-el-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-jsp-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>${jakarta.servlet.api.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>1.10.14</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
 
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>add-source</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${project.build.directory}/sources</source>
-              </sources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>set-osgi-version</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>parse-version</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>set-tomcat-osgi-version</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>parse-version</goal>
-            </goals>
-            <configuration>
-              <versionString>${tomcat.version}</versionString>
-              <propertyPrefix>tomcat</propertyPrefix>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <createSourcesJar>false</createSourcesJar>
-              <shadeSourcesContent>false</shadeSourcesContent>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
-              <filters>
-                <filter>
-                  <artifact>*:*</artifact>
-                  <excludes>
-                    <exclude>META-INF/services/jakarta.servlet.ServletContainerInitializer</exclude>
-                    <exclude>META-INF/services/javax.tools.JavaCompiler</exclude>
-                    <exclude>jakarta/el/**</exclude>
-                  </excludes>
-                  <includes>
-                    <include>org/apache/el/**</include>
-                    <include>META-INF/NOTICE</include>
-                    <include>META-INF/LICENSE</include>
-                    <include>META-INF/services/**</include>
-                  </includes>
-                </filter>
-              </filters>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
-                  <resource>META-INF/MANIFEST.MF</resource>
-                  <file>target/classes/META-INF/MANIFEST.MF</file>
-                </transformer>
-              </transformers>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+  <build>
+    <plugins>
 
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
-        <executions>
-          <execution>
-            <id>bundle-manifest</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>manifest</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
           <instructions>
             <Automatic-Module-Name>org.mortbay.apache.el</Automatic-Module-Name>
             <Bundle-Name>Mortbay Apache EL Implementation</Bundle-Name>
             <Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
             <Bundle-Classpath>.</Bundle-Classpath>
-            <Bundle-Version>
-              ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
-            </Bundle-Version>
+            <Bundle-Version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</Bundle-Version>
             <Specification-Version>5.0</Specification-Version>
             <Implementation-Version>${tomcat.version}</Implementation-Version>
             <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
@@ -141,20 +74,45 @@
               org.apache.el.lang;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
               org.apache.el.stream;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
               org.apache.el.parser;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
-              org.apache.el.util;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}"
-            </Export-Package>
-            <Import-Package>
-                jakarta.el;version="${jakarta.el.api.version}",
+              org.apache.el.util;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}"</Export-Package>
+            <Import-Package>jakarta.el;version="${jakarta.el.api.version}",
                 jakarta.servlet.jsp;version="${jakarta.servlet.jsp.api.version}",
                 jakarta.servlet.jsp.el;version="${jakarta.servlet.jsp.api.version}",
-                jakarta.servlet.jsp.tagext;version="${jakarta.servlet.jsp.api.version}"
-            </Import-Package>
+                jakarta.servlet.jsp.tagext;version="${jakarta.servlet.jsp.api.version}"</Import-Package>
             <Provide-Capability>osgi.serviceloader;osgi.serviceloader="jakarta.el.ExpressionFactory";register:="org.apache.el.ExpressionFactoryImpl"</Provide-Capability>
             <Require-Capability>osgi.extender;filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
             <_nouses>true</_nouses>
             <_contract />
           </instructions>
         </configuration>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+            <phase>process-classes</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-source</id>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <excludeArtifactIds>jakarta.servlet-api,jakarta.el-api,ecj,ant,ant-launcher</excludeArtifactIds>
+              <classifier>sources</classifier>
+              <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
+              <outputDirectory>${project.build.directory}/sources</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -162,10 +120,10 @@
         <executions>
           <execution>
             <id>sources-jar</id>
-            <phase>package</phase>
             <goals>
               <goal>jar</goal>
             </goals>
+            <phase>package</phase>
             <configuration>
               <classifier>sources</classifier>
               <classesDirectory>${project.build.directory}/sources</classesDirectory>
@@ -198,48 +156,85 @@
           </additionalDependencies>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <createSourcesJar>false</createSourcesJar>
+              <shadeSourcesContent>false</shadeSourcesContent>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/services/jakarta.servlet.ServletContainerInitializer</exclude>
+                    <exclude>META-INF/services/javax.tools.JavaCompiler</exclude>
+                    <exclude>jakarta/el/**</exclude>
+                  </excludes>
+                  <includes>
+                    <include>org/apache/el/**</include>
+                    <include>META-INF/NOTICE</include>
+                    <include>META-INF/LICENSE</include>
+                    <include>META-INF/services/**</include>
+                  </includes>
+                </filter>
+              </filters>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                  <resource>META-INF/MANIFEST.MF</resource>
+                  <file>target/classes/META-INF/MANIFEST.MF</file>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>set-osgi-version</id>
+            <goals>
+              <goal>parse-version</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+          <execution>
+            <id>set-tomcat-osgi-version</id>
+            <goals>
+              <goal>parse-version</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <versionString>${tomcat.version}</versionString>
+              <propertyPrefix>tomcat</propertyPrefix>
+            </configuration>
+          </execution>
+          <execution>
+            <id>add-source</id>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/sources</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
 
     </plugins>
+    <sourceDirectory>${project.build.directory}/sources</sourceDirectory>
   </build>
-
-  <dependencies>
-    <dependency>
-      <groupId>jakarta.servlet</groupId>
-      <artifactId>jakarta.servlet-api</artifactId>
-      <version>${jakarta.servlet.api.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-jasper-el</artifactId>
-      <version>${tomcat.version}</version>
-      <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.tomcat</groupId>
-          <artifactId>tomcat-servlet-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.tomcat</groupId>
-          <artifactId>tomcat-jsp-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.tomcat</groupId>
-          <artifactId>tomcat-el-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>jakarta.el</groupId>
-      <artifactId>jakarta.el-api</artifactId>
-      <version>${jakarta.el.api.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.ant</groupId>
-      <artifactId>ant</artifactId>
-      <version>1.10.14</version>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
 
 </project>
