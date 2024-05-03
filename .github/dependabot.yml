@@ -11,6 +11,8 @@ updates:
     milestone: 1
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "[apache-11.0.x] "
     ignore:
       # Do not upgrade major versions of dependencies
       - dependency-name: "*"
@@ -22,6 +24,8 @@ updates:
     milestone: 2
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "[apache-10.1.x] "
     ignore:
       # Do not upgrade major versions of dependencies
       - dependency-name: "*"
@@ -44,6 +48,8 @@ updates:
     milestone: 3
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "[apache-10.0.x] "
     ignore:
       # Do not upgrade major versions of dependencies
       - dependency-name: "*"
@@ -66,6 +72,8 @@ updates:
     milestone: 4
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "[apache-9] "
     ignore:
       # Do not upgrade major versions of dependencies
       - dependency-name: "*"
@@ -81,5 +89,3 @@ updates:
       # ECJ 3.34 bumps the minimum Java to JDK17 now
       - dependency-name: "org.eclipse.jdt:ecj"
         versions: [ ">= 3.34.0" ]
-
-
