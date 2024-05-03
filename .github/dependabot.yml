@@ -11,6 +11,10 @@ updates:
     milestone: 1
     schedule:
       interval: "weekly"
+    ignore:
+      # Do not upgrade major versions of dependencies
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-major" ]
   # EE10 - Tomcat 10.1 - Servlet 6.0
   - package-ecosystem: "maven"
     directory: "/"
@@ -19,6 +23,9 @@ updates:
     schedule:
       interval: "weekly"
     ignore:
+      # Do not upgrade major versions of dependencies
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-major" ]
       - dependency-name: "org.apache.tomcat:*"
         versions: [ ">= 11.0.0" ]
       - dependency-name: "jakarta.servlet:*"
@@ -38,6 +45,9 @@ updates:
     schedule:
       interval: "weekly"
     ignore:
+      # Do not upgrade major versions of dependencies
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-major" ]
       - dependency-name: "org.apache.tomcat:*"
         versions: [ ">= 10.1.0" ]
       - dependency-name: "jakarta.servlet:*"
@@ -57,6 +67,9 @@ updates:
     schedule:
       interval: "weekly"
     ignore:
+      # Do not upgrade major versions of dependencies
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-major" ]
       - dependency-name: "org.apache.tomcat:*"
         versions: [ ">= 10.0.0" ]
       - dependency-name: "jakarta.servlet:*"
