@@ -140,6 +140,89 @@
       </plugin>
 
       <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <!-- common part -->
+        <configuration>
+          <instructions>
+            <Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
+            <Bundle-Classpath>.</Bundle-Classpath>
+            <Bundle-Version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</Bundle-Version>
+            <Specification-Version>${jakarta.servlet.jsp.api.version}</Specification-Version>
+            <Implementation-Version>${tomcat.version}</Implementation-Version>
+            <Require-Capability>osgi.serviceloader;
+              filter:="(osgi.serviceloader=org.apache.juli.logging.Log)";resolution:=optional;cardinality:=multiple,
+              osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)"</Require-Capability>
+            <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
+            <_nouses>true</_nouses>
+            <_contract>!JakartaServerPages</_contract>
+          </instructions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+            <phase>process-classes</phase>
+            <configuration>
+              <instructions>
+                <Automatic-Module-Name>org.mortbay.apache.jasper</Automatic-Module-Name>
+                <Bundle-Name>Mortbay Jasper</Bundle-Name>
+                <Export-Package>jakarta.servlet.jsp.resources,
+                  org.apache.juli.logging;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.compat;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.scan;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.file;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.digester;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.descriptor.tagplugin;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.descriptor.tld;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.descriptor.web;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.buf;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.res;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.tomcat.util.security;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.compiler;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.compiler.tagplugin;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.el;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.resources;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.runtime;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.security;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.servlet;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.tagplugins.jstl;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.tagplugins.jstl.core;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.util;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
+                  org.apache.jasper.xmlparser;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",</Export-Package>
+                <Import-Package>!org.apache.tools.ant.*,
+                  jakarta.el;version="${jakarta.el.api.version}",
+                  jakarta.servlet.annotation;version="[$(version;==;${servletApi.osgiVersion}),$(version;+;${servletApi.osgiVersion}))",
+                  jakarta.servlet.descriptor;version="[$(version;==;${servletApi.osgiVersion}),$(version;+;${servletApi.osgiVersion}))",
+                  jakarta.servlet.resources;version="[$(version;==;${servletApi.osgiVersion}),$(version;+;${servletApi.osgiVersion}))",
+                  jakarta.servlet;version="[$(version;==;${servletApi.osgiVersion}),$(version;+;${servletApi.osgiVersion}))",
+                  jakarta.servlet.http;version="[$(version;==;${servletApi.osgiVersion}),$(version;+;${servletApi.osgiVersion}))",
+                  javax.naming,
+                  javax.net.ssl,
+                  javax.xml.parsers,
+                  org.apache.el.util,
+                  org.eclipse.jdt.core.compiler,
+                  org.eclipse.jdt.internal.compiler,
+                  org.eclipse.jdt.internal.compiler.classfmt,
+                  org.eclipse.jdt.internal.compiler.env,
+                  org.eclipse.jdt.internal.compiler.impl,
+                  org.eclipse.jdt.internal.compiler.problem,
+                  org.xml.sax,
+                  org.xml.sax.ext,
+                  org.xml.sax.helpers</Import-Package>
+              </instructions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
@@ -184,6 +267,16 @@
                 </manifestEntries>
               </archive>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>sources-jar</id>
+            <phase>package</phase>
           </execution>
         </executions>
       </plugin>
@@ -308,7 +401,6 @@
             <goals>
               <goal>shade</goal>
             </goals>
-            <phase>package</phase>
           </execution>
         </executions>
       </plugin>
@@ -349,7 +441,23 @@
           </execution>
         </executions>
       </plugin>
-
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>set-servlet-api-version</id>
+            <goals>
+              <goal>parse-version</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <versionString>${jakarta.servlet.api.version}</versionString>
+              <propertyPrefix>servletApi</propertyPrefix>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
     <sourceDirectory>${project.build.directory}/sources</sourceDirectory>
   </build>

@@ -75,9 +75,9 @@
               org.apache.el.stream;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
               org.apache.el.parser;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}",
               org.apache.el.util;version="${tomcat.majorVersion}.${tomcat.minorVersion}.${tomcat.incrementalVersion}"</Export-Package>
-            <Import-Package>jakarta.servlet.jsp;version="${jakarta.servlet.jsp.api.version}",
-                jakarta.servlet.jsp.el;version="${jakarta.servlet.jsp.api.version}",
-                jakarta.servlet.jsp.tagext;version="${jakarta.servlet.jsp.api.version}"</Import-Package>
+            <Import-Package>jakarta.servlet.jsp;version="${jspApi.majorVersion}.${jspApi.minorVersion}.${jspApi.incrementalVersion}",
+                jakarta.servlet.jsp.el;version="${jspApi.majorVersion}.${jspApi.minorVersion}.${jspApi.incrementalVersion}",
+                jakarta.servlet.jsp.tagext;version="${jspApi.majorVersion}.${jspApi.minorVersion}.${jspApi.incrementalVersion}"</Import-Package>
             <Provide-Capability>osgi.serviceloader;osgi.serviceloader="jakarta.el.ExpressionFactory";register:="org.apache.el.ExpressionFactoryImpl"</Provide-Capability>
             <Require-Capability>osgi.extender;filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
             <_nouses>true</_nouses>
@@ -155,7 +155,6 @@
           </additionalDependencies>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -201,6 +200,17 @@
         <artifactId>build-helper-maven-plugin</artifactId>
         <executions>
           <execution>
+            <id>set-api-version</id>
+            <goals>
+              <goal>parse-version</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <versionString>${jakarta.servlet.jsp.api.version}</versionString>
+              <propertyPrefix>jspApi</propertyPrefix>
+            </configuration>
+          </execution>
+          <execution>
             <id>set-osgi-version</id>
             <goals>
               <goal>parse-version</goal>
@@ -232,7 +242,6 @@
           </execution>
         </executions>
       </plugin>
-
     </plugins>
     <sourceDirectory>${project.build.directory}/sources</sourceDirectory>
   </build>
