@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.mortbay.jasper</groupId>
     <artifactId>jasper-jsp</artifactId>
-    <version>11.0.0-SNAPSHOT</version>
+    <version>11.0.0-M19</version>
   </parent>
   <artifactId>apache-el</artifactId>
   <packaging>jar</packaging>
