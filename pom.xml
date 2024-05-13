@@ -65,7 +65,7 @@
   <properties>
     <ecj.version>3.33.0</ecj.version>
     <jdk.version>11</jdk.version>
-    <tomcat.version>9.0.88</tomcat.version>
+    <tomcat.version>9.0.89</tomcat.version>
   </properties>
 
   <repositories>
