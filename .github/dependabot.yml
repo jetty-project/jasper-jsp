@@ -89,3 +89,19 @@ updates:
       # ECJ 3.34 bumps the minimum Java to JDK17 now
       - dependency-name: "org.eclipse.jdt:ecj"
         versions: [ ">= 3.34.0" ]
+  # EE7 - Tomcat 8.5 - Servlet 3.1
+  - package-ecosystem: "maven"
+    directory: "/"
+    target-branch: apache-8.5
+    milestone: 4
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "[apache-8.5] "
+    ignore:
+      # Do not upgrade major versions of dependencies
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-major" ]
+      # ECJ 3.34 bumps the minimum Java to JDK17 now
+      - dependency-name: "org.eclipse.jdt:ecj"
+        versions: [ ">= 3.34.0" ]
