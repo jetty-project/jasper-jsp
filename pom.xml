@@ -54,6 +54,7 @@
   <scm>
     <connection>scm:git:git://github.com/jetty-project/jasper-jsp.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/jetty-project/jasper-jsp.git</developerConnection>
+    <tag>apache-10.1.x</tag>
     <url>https://github.com/jetty-project/jasper-jsp</url>
   </scm>
 
