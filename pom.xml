@@ -58,7 +58,7 @@
 
   <properties>
     <!-- must update both versions together -->
-    <tomcat.version>8.5.70</tomcat.version>
+    <tomcat.version>8.5.100</tomcat.version>
     <ecj.version>3.19.0</ecj.version>
   </properties>
 
