@@ -30,14 +30,6 @@ updates:
       # Do not upgrade major versions of dependencies
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
-      - dependency-name: "org.apache.tomcat:*"
-        versions: [ ">= 11.0.0" ]
-      - dependency-name: "jakarta.servlet:*"
-        versions: [ ">=6.1.0" ]
-      - dependency-name: "jakarta.servlet.jsp:*"
-        versions: [ ">=4.0.0" ]
-      - dependency-name: "jakarta.servlet.jsp.jstl:*"
-        versions: [ ">=3.1.0" ]
       # ECJ 3.34 bumps the minimum Java to JDK17 now
       - dependency-name: "org.eclipse.jdt:ecj"
         versions: [ ">= 3.34.0" ]
@@ -54,14 +46,6 @@ updates:
       # Do not upgrade major versions of dependencies
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
-      - dependency-name: "org.apache.tomcat:*"
-        versions: [ ">= 10.1.0" ]
-      - dependency-name: "jakarta.servlet:*"
-        versions: [ ">=6.0.0" ]
-      - dependency-name: "jakarta.servlet.jsp:*"
-        versions: [ ">=4.0.0" ]
-      - dependency-name: "jakarta.servlet.jsp.jstl:*"
-        versions: [ ">=3.0.0" ]
       # ECJ 3.34 bumps the minimum Java to JDK17 now
       - dependency-name: "org.eclipse.jdt:ecj"
         versions: [ ">= 3.34.0" ]
