@@ -24,7 +24,10 @@ pipeline {
                    sourcePattern: '**/src/main/java'
             warnings consoleParsers: [[parserName: 'Maven'], [parserName: 'Java']]
             script {
-              if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'apache-9' || env.BRANCH_NAME == 'apache-8') {
+              if (env.BRANCH_NAME == 'apache-11.0.x' ||
+                  env.BRANCH_NAME == 'apache-10.0.x' ||
+                  env.BRANCH_NAME == 'apache-10.1.x' ||
+                  env.BRANCH_NAME == 'apache-9') {
                 mavenBuild( "jdk8", "deploy" )
               }
             }
@@ -53,7 +56,7 @@ pipeline {
  * @return the Jenkinsfile step representing a maven build
  */
 def mavenBuild(jdk, cmdline) {
-  def mvnName = 'maven3.5'
+  def mvnName = 'maven3'
   def localRepo = "${env.JENKINS_HOME}/${env.EXECUTOR_NUMBER}" // ".repository" //
   def settingsName = 'oss-settings.xml'
   def mavenOpts = '-Xms2g -Xmx2g -Djava.awt.headless=true'
@@ -67,7 +70,7 @@ def mavenBuild(jdk, cmdline) {
           mavenOpts: mavenOpts,
           mavenLocalRepo: localRepo) {
     // Some common Maven command line + provided command line
-    sh "mvn -V -B -DfailIfNoTests=false -Dmaven.test.failure.ignore=true -T3 -Djetty.testtracker.log=true -e $cmdline"
+    sh "mvn -V -B -DfailIfNoTests=false -Dmaven.test.failure.ignore=true -T2 -Djetty.testtracker.log=true -e $cmdline"
   }
 }
 
