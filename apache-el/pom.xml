@@ -1,29 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.mortbay.jasper</groupId>
     <artifactId>jasper-jsp</artifactId>
     <version>8.5.70-SNAPSHOT</version>
   </parent>
-
-  <modelVersion>4.0.0</modelVersion>
   <groupId>org.mortbay.jasper</groupId>
   <artifactId>apache-el</artifactId>
   <packaging>jar</packaging>
   <name>MortBay :: Apache EL :: API and Implementation</name>
 
+  <dependencies>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>3.1.0</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-jasper-el</artifactId>
+      <version>${tomcat.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+  </dependencies>
+
   <build>
     <plugins>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Automatic-Module-Name>org.mortbay.apache.el</Automatic-Module-Name>
+            <Bundle-Name>Mortbay Apache EL API and Implementation</Bundle-Name>
+            <Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
+            <Bundle-Classpath>.</Bundle-Classpath>
+            <Bundle-Version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</Bundle-Version>
+            <Specification-Version>3.0</Specification-Version>
+            <Implementation-Version>${tomcat.version}</Implementation-Version>
+            <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
+            <Export-Package>!javax.servlet.*,
+              javax.el;version="3.0",
+              org.apache.el;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+              org.apache.el.lang;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+              org.apache.el.stream;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+              org.apache.el.parser;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+              org.apache.el.util;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"</Export-Package>
+            <Import-Package>javax.el;version="3.0",
+              org.apache.el;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+              org.apache.el.lang;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+              org.apache.el.stream;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+              org.apache.el.parser;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
+              org.apache.el.util;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"</Import-Package>
+            <Require-Capability>osgi.serviceloader; filter:="(osgi.serviceloader=javax.el.ExpressionFactory)";resolution:=optional;cardinality:=multiple, osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)";resolution:=optional</Require-Capability>
+            <_nouses>true</_nouses>
+          </instructions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+            <phase>process-classes</phase>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
             <id>unpack-source</id>
-            <phase>generate-sources</phase>
             <goals>
               <goal>unpack-dependencies</goal>
             </goals>
+            <phase>generate-sources</phase>
             <configuration>
               <excludeArtifactIds>javax.servlet-api</excludeArtifactIds>
               <classifier>sources</classifier>
@@ -33,43 +91,44 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
-            <id>add-source</id>
-            <phase>generate-sources</phase>
+            <id>sources-jar</id>
             <goals>
-              <goal>add-source</goal>
+              <goal>jar</goal>
             </goals>
+            <phase>package</phase>
             <configuration>
-              <sources>
-                <source>${project.build.directory}/sources</source>
-              </sources>
+              <classifier>sources</classifier>
+              <classesDirectory>${project.build.directory}/sources</classesDirectory>
+              <forceCreation>true</forceCreation>
+              <useDefaultManifestFile>false</useDefaultManifestFile>
+              <excludes>
+                <exclude>*.java</exclude>
+              </excludes>
+              <archive>
+                <manifestEntries>
+                  <Automatic-Module-Name>org.mortbay.apache.el.sources</Automatic-Module-Name>
+                  <Bundle-Name>Mortbay Apache EL API and Implementation Sources</Bundle-Name>
+                </manifestEntries>
+              </archive>
             </configuration>
-          </execution>
-          <execution>
-            <id>set-osgi-version</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>parse-version</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>
-
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <executions>
           <execution>
-            <phase>package</phase>
             <goals>
               <goal>shade</goal>
             </goals>
+            <phase>package</phase>
             <configuration>
               <createSourcesJar>false</createSourcesJar>
               <shadeSourcesContent>false</shadeSourcesContent>
@@ -97,75 +156,26 @@
       </plugin>
 
       <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>bundle-manifest</id>
-            <phase>process-classes</phase>
+            <id>set-osgi-version</id>
             <goals>
-              <goal>manifest</goal>
+              <goal>parse-version</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
-        </executions>
-        <configuration>
-          <instructions>
-            <Automatic-Module-Name>org.mortbay.apache.el</Automatic-Module-Name>
-            <Bundle-Name>Mortbay Apache EL API and Implementation</Bundle-Name>
-            <Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
-            <Bundle-Classpath>.</Bundle-Classpath>
-            <Bundle-Version>
-              ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
-            </Bundle-Version>
-            <Specification-Version>3.0</Specification-Version>
-            <Implementation-Version>${tomcat.version}</Implementation-Version>
-            <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
-            <Export-Package>!javax.servlet.*,
-              javax.el;version="3.0",
-              org.apache.el;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.lang;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.stream;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.parser;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.util;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"
-            </Export-Package>
-            <Import-Package>
-              javax.el;version="3.0",
-              org.apache.el;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.lang;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.stream;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.parser;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}",
-              org.apache.el.util;version="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}"
-            </Import-Package>
-            <Require-Capability>osgi.serviceloader; filter:="(osgi.serviceloader=javax.el.ExpressionFactory)";resolution:=optional;cardinality:=multiple, osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)";resolution:=optional</Require-Capability>
-            <_nouses>true</_nouses>
-          </instructions>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
           <execution>
-            <id>sources-jar</id>
-            <phase>package</phase>
+            <id>add-source</id>
             <goals>
-              <goal>jar</goal>
+              <goal>add-source</goal>
             </goals>
+            <phase>generate-sources</phase>
             <configuration>
-              <classifier>sources</classifier>
-              <classesDirectory>${project.build.directory}/sources</classesDirectory>
-              <forceCreation>true</forceCreation>
-              <useDefaultManifestFile>false</useDefaultManifestFile>
-              <excludes>
-                <exclude>*.java</exclude>
-              </excludes>
-              <archive>
-                <manifestEntries>
-                  <Automatic-Module-Name>org.mortbay.apache.el.sources</Automatic-Module-Name>
-                  <Bundle-Name>Mortbay Apache EL API and Implementation Sources</Bundle-Name>
-                </manifestEntries>
-              </archive>
+              <sources>
+                <source>${project.build.directory}/sources</source>
+              </sources>
             </configuration>
           </execution>
         </executions>
@@ -173,21 +183,5 @@
 
     </plugins>
   </build>
-
-  <dependencies>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-jasper-el</artifactId>
-      <version>${tomcat.version}</version>
-      <optional>true</optional>
-    </dependency>
-
-  </dependencies>
 
 </project>
