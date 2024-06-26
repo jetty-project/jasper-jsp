@@ -65,11 +65,11 @@
   </issueManagement>
 
   <properties>
-    <ecj.version>3.37.0</ecj.version>
+    <ecj.version>3.38.0</ecj.version>
     <jakarta.el.api.version>6.0.0</jakarta.el.api.version>
-    <jakarta.servlet.api.version>6.1.0-M2</jakarta.servlet.api.version>
-    <jakarta.servlet.jsp.api.version>4.0.0-M2</jakarta.servlet.jsp.api.version>
-    <tomcat.version>11.0.0-M20</tomcat.version>
+    <jakarta.servlet.api.version>6.1.0</jakarta.servlet.api.version>
+    <jakarta.servlet.jsp.api.version>4.0.0</jakarta.servlet.jsp.api.version>
+    <tomcat.version>11.0.0-M21</tomcat.version>
   </properties>
 
   <repositories>
@@ -208,7 +208,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
-          <version>3.5.0</version>
+          <version>3.6.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
