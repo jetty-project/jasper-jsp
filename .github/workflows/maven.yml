@@ -1,0 +1,11 @@
+name: GitHub CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Verify
+    uses: jetty/.github/.github/workflows/maven-ci.yml@main
+    with:
+      jdk-matrix: '["8"]'
+      verify-goal: "install -Peclipse-release -Dgpg.skip"
