@@ -86,6 +86,6 @@ updates:
       # Do not upgrade major versions of dependencies
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
-      # ECJ 3.34 bumps the minimum Java to JDK17 now
+      # ECJ 3.27 bumps the minimum Java to JDK11 (stay on 3.26 for now)
       - dependency-name: "org.eclipse.jdt:ecj"
-        versions: [ ">= 3.34.0" ]
+        versions: [ ">= 3.27.0" ]
