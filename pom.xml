@@ -64,7 +64,7 @@
   </issueManagement>
 
   <properties>
-    <ecj.version>3.33.0</ecj.version>
+    <ecj.version>3.26.0</ecj.version>
     <jdk.version>8</jdk.version>
     <tomcat.version>8.5.100</tomcat.version>
   </properties>
