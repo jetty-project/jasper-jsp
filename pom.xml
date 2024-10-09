@@ -69,7 +69,7 @@
     <jakarta.el.api.version>6.0.1</jakarta.el.api.version>
     <jakarta.servlet.api.version>6.1.0</jakarta.servlet.api.version>
     <jakarta.servlet.jsp.api.version>4.0.0</jakarta.servlet.jsp.api.version>
-    <tomcat.version>11.0.0-M22</tomcat.version>
+    <tomcat.version>11.0.0</tomcat.version>
   </properties>
 
   <repositories>
