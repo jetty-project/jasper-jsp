@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.mortbay.jasper</groupId>
     <artifactId>jasper-jsp</artifactId>
-    <version>9.0.91-SNAPSHOT</version>
+    <version>9.0.96-SNAPSHOT</version>
   </parent>
   <artifactId>apache-jsp</artifactId>
   <packaging>jar</packaging>
@@ -114,6 +114,7 @@
                   javax.el;version="3.0",
                   javax.naming,
                   javax.net.ssl,
+                  javax.security.auth,
                   javax.servlet;version="4.0.0",
                   javax.servlet.annotation;version="4.0.0",
                   javax.servlet.descriptor;version="4.0.0",
