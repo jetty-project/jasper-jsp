@@ -12,7 +12,7 @@ pipeline {
         stage( "Parallel Stage" ) {
             parallel {
                 stage( "Build / Test - JDK17" ) {
-                    agent { node { label 'linux' } }
+                    agent { node { label 'linux-light' } }
                     options { timeout( time: 120, unit: 'MINUTES' ) }
                     steps {
                         mavenBuild( "jdk17", "clean install -Peclipse-release -Dgpg.skip" )
@@ -28,7 +28,7 @@ pipeline {
                     }
                 }
                 stage( "Build / Test - JDK21" ) {
-                    agent { node { label 'linux' } }
+                    agent { node { label 'linux-light' } }
                     options { timeout( time: 120, unit: 'MINUTES' ) }
                     steps {
                         mavenBuild( "jdk21", "clean install -Peclipse-release -Dgpg.skip" )
