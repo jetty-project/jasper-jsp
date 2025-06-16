@@ -81,7 +81,7 @@
     <jakarta.servlet.api.version>6.1.0</jakarta.servlet.api.version>
     <jakarta.servlet.jsp.api.version>4.0.0</jakarta.servlet.jsp.api.version>
     <njord.autoPublish>true</njord.autoPublish>
-    <tomcat.version>11.0.7</tomcat.version>
+    <tomcat.version>11.0.8</tomcat.version>
   </properties>
 
   <build>
