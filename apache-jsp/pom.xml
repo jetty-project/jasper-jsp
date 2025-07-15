@@ -189,22 +189,12 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>sources-jar</id>
-            <phase>package</phase>
-          </execution>
-        </executions>
-      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
-          <source>8</source>
+          <source>11</source>
           <additionalDependencies>
             <additionalDependency>
               <groupId>jakarta.servlet</groupId>
