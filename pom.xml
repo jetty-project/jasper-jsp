@@ -78,7 +78,7 @@
     <ecj.version>3.33.0</ecj.version>
     <jdk.version>11</jdk.version>
     <njord.autoPublish>true</njord.autoPublish>
-    <tomcat.version>9.0.105</tomcat.version>
+    <tomcat.version>9.0.107</tomcat.version>
   </properties>
 
   <build>
