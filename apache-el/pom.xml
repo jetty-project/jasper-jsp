@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.mortbay.jasper</groupId>
+    <artifactId>jasper-jsp</artifactId>
+    <version>9.0.108-SNAPSHOT</version>
+  </parent>
+  <artifactId>apache-el</artifactId>
+  <packaging>pom</packaging>
+  <name>Relocated MortBay :: Apache EL :: API and Implementation</name>
+
+  <distributionManagement>
+    <relocation>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>mortbay-apache-el</artifactId>
+      <version>${project.version}</version>
+      <message>This artifact has been relocated to org.mortbay.jasper:mortbay-apache-el
+        Please update your dependencies accordingly.</message>
+    </relocation>
+  </distributionManagement>
+
+</project>
