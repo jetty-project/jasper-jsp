@@ -7,7 +7,7 @@
     <artifactId>jasper-jsp</artifactId>
     <version>9.0.108-SNAPSHOT</version>
   </parent>
-  <artifactId>apache-jsp</artifactId>
+  <artifactId>mortbay-apache-jsp</artifactId>
   <packaging>jar</packaging>
   <name>MortBay :: Apache Jasper :: JSP Implementation</name>
 
