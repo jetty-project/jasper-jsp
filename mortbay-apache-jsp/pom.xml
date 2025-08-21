@@ -7,17 +7,17 @@
     <artifactId>jasper-jsp</artifactId>
     <version>10.0.27-SNAPSHOT</version>
   </parent>
-  <artifactId>apache-el</artifactId>
-  <packaging>pom</packaging>
-  <name>Relocated MortBay :: Apache EL :: API and Implementation</name>
+  <artifactId>mortbay-apache-jsp</artifactId>
+  <name>Relocated MortBay :: Apache Jasper :: JSP Implementation</name>
 
   <distributionManagement>
     <relocation>
       <groupId>org.mortbay.jasper</groupId>
-      <artifactId>mortbay-apache-el</artifactId>
+      <artifactId>mortbay-apache-jsp</artifactId>
       <version>${project.version}</version>
-      <message>This artifact has been relocated to org.mortbay.jasper:mortbay-apache-el
+      <message>This artifact has been relocated to org.mortbay.jasper:mortbay-apache-jsp
         Please update your dependencies accordingly.</message>
     </relocation>
   </distributionManagement>
+
 </project>
