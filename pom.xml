@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.eclipse.jetty</groupId>
     <artifactId>jetty-parent</artifactId>
-    <version>27</version>
+    <version>31</version>
   </parent>
   <groupId>org.mortbay.jasper</groupId>
   <artifactId>jasper-jsp</artifactId>
@@ -49,6 +49,8 @@
   <modules>
     <module>apache-el</module>
     <module>apache-jsp</module>
+    <module>mortbay-apache-el</module>
+    <module>mortbay-apache-jsp</module>
   </modules>
 
   <scm>
@@ -235,13 +237,6 @@
         </executions>
       </plugin>
     </plugins>
-    <extensions>
-      <extension>
-        <groupId>eu.maveniverse.maven.njord</groupId>
-        <artifactId>extension3</artifactId>
-        <version>0.8.3</version>
-      </extension>
-    </extensions>
   </build>
 
   <profiles>
