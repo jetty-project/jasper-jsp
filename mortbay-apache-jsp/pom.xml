@@ -177,7 +177,6 @@
               <classifier>sources</classifier>
               <classesDirectory>${project.build.directory}/sources</classesDirectory>
               <forceCreation>true</forceCreation>
-              <useDefaultManifestFile>false</useDefaultManifestFile>
               <excludes>
                 <exclude>*.java</exclude>
               </excludes>
@@ -196,7 +195,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
-          <source>8</source>
           <additionalDependencies>
             <additionalDependency>
               <groupId>jakarta.servlet</groupId>

@@ -49,6 +49,8 @@
   <modules>
     <module>apache-el</module>
     <module>apache-jsp</module>
+    <module>mortbay-apache-jsp</module>
+    <module>mortbay-apache-el</module>
   </modules>
 
   <scm>
@@ -75,10 +77,14 @@
   </distributionManagement>
 
   <properties>
+    <detectOfflineLinks>false</detectOfflineLinks>
     <ecj.version>3.33.0</ecj.version>
     <jakarta.el.api.version>5.0.1</jakarta.el.api.version>
     <jakarta.servlet.api.version>6.0.0</jakarta.servlet.api.version>
     <jakarta.servlet.jsp.api.version>3.1.1</jakarta.servlet.jsp.api.version>
+    <maven.compiler.release>11</maven.compiler.release>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
     <njord.autoPublish>true</njord.autoPublish>
     <tomcat.version>10.1.43</tomcat.version>
   </properties>
@@ -100,8 +106,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
-            <source>11</source>
-            <target>11</target>
             <skipMain>true</skipMain>
             <skip>true</skip>
           </configuration>
@@ -167,7 +171,7 @@
             <detectLinks>false</detectLinks>
             <detectJavaApiLink>false</detectJavaApiLink>
             <doclint>none</doclint>
-            <verbose>true</verbose>
+            <verbose>false</verbose>
             <links>
               <link>http://tomcat.apache.org/tomcat-10.1-doc/jspapi/</link>
               <link>http://tomcat.apache.org/tomcat-10.1-doc/elapi/</link>
