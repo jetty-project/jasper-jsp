@@ -104,7 +104,6 @@
               <classifier>sources</classifier>
               <classesDirectory>${project.build.directory}/sources</classesDirectory>
               <forceCreation>true</forceCreation>
-              <useDefaultManifestFile>false</useDefaultManifestFile>
               <excludes>
                 <exclude>*.java</exclude>
               </excludes>
