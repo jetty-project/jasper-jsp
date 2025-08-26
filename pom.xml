@@ -172,10 +172,11 @@
             </additionalDependencies>
             <excludePackageNames>org.apache.tomcat.*,org.apache.tomcat.util,org.apache.tools,org.apache.juli,org.apache.juli.logging</excludePackageNames>
             <docfilessubdirs>true</docfilessubdirs>
+            <detectOfflineLinks>false</detectOfflineLinks>
             <detectLinks>false</detectLinks>
             <detectJavaApiLink>false</detectJavaApiLink>
             <doclint>none</doclint>
-            <verbose>true</verbose>
+            <verbose>false</verbose>
             <links>
               <link>http://tomcat.apache.org/tomcat-10.0-doc/jspapi/</link>
               <link>http://tomcat.apache.org/tomcat-10.0-doc/elapi/</link>
