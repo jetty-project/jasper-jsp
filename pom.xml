@@ -48,8 +48,8 @@
   </developers>
 
   <modules>
-    <module>apache-el</module>
-    <module>apache-jsp</module>
+    <module>mortbay-apache-el</module>
+    <module>mortbay-apache-jsp</module>
   </modules>
 
   <scm>
