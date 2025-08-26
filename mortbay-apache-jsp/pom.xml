@@ -48,7 +48,7 @@
     </dependency>
     <dependency>
       <groupId>org.mortbay.jasper</groupId>
-      <artifactId>apache-el</artifactId>
+      <artifactId>mortbay-apache-el</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
@@ -194,7 +194,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
-          <source>11</source>
           <additionalDependencies>
             <additionalDependency>
               <groupId>jakarta.servlet</groupId>
