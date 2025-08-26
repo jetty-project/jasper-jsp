@@ -172,7 +172,6 @@
               <classifier>sources</classifier>
               <classesDirectory>${project.build.directory}/sources</classesDirectory>
               <forceCreation>true</forceCreation>
-              <useDefaultManifestFile>false</useDefaultManifestFile>
               <excludes>
                 <exclude>*.java</exclude>
               </excludes>
@@ -216,8 +215,9 @@
           <docfilessubdirs>true</docfilessubdirs>
           <detectLinks>false</detectLinks>
           <detectJavaApiLink>true</detectJavaApiLink>
+          <detectOfflineLinks>false</detectOfflineLinks>
           <doclint>none</doclint>
-          <verbose>true</verbose>
+          <verbose>false</verbose>
           <links>
             <link>http://docs.oracle.com/javase/8/docs/api/</link>
             <link>https://javaee.github.io/javaee-spec/javadocs/</link>

@@ -96,6 +96,7 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
+            <detectOfflineLinks>false</detectOfflineLinks>
             <legacyMode>true</legacyMode>
             <additionalDependencies>
               <additionalDependency>
