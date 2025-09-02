@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.mortbay.jasper</groupId>
     <artifactId>jasper-jsp</artifactId>
-    <version>9.0.109-SNAPSHOT</version>
+    <version>9.0.108.1-SNAPSHOT</version>
   </parent>
   <artifactId>mortbay-apache-jsp</artifactId>
   <packaging>jar</packaging>
@@ -239,7 +239,7 @@
             <excludes>
               <exclude>org.apache.tomcat:tomcat-el-api</exclude>
               <exclude>org.apache.tomcat:tomcat-jasper-el</exclude>
-              <exclude>org.mortbay.jasper:apache-el</exclude>
+              <exclude>org.mortbay.jasper:mortbay-apache-el</exclude>
               <exclude>org.eclipse.jdt:ecj</exclude>
             </excludes>
           </artifactSet>
