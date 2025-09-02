@@ -223,7 +223,7 @@
             <excludes>
               <exclude>org.apache.tomcat:tomcat-el-api</exclude>
               <exclude>org.apache.tomcat:tomcat-jasper-el</exclude>
-              <exclude>org.mortbay.jasper:apache-el</exclude>
+              <exclude>org.mortbay.jasper:mortbay-apache-el</exclude>
               <exclude>org.eclipse.jdt:ecj</exclude>
             </excludes>
           </artifactSet>
