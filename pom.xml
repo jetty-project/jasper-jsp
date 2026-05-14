@@ -228,13 +228,6 @@
         </executions>
       </plugin>
     </plugins>
-    <extensions>
-      <extension>
-        <groupId>eu.maveniverse.maven.njord</groupId>
-        <artifactId>extension3</artifactId>
-        <version>0.9.5</version>
-      </extension>
-    </extensions>
   </build>
 
   <profiles>
