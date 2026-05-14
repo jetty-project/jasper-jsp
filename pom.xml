@@ -5,11 +5,11 @@
   <parent>
     <groupId>org.eclipse.jetty</groupId>
     <artifactId>jetty-parent</artifactId>
-    <version>31</version>
+    <version>32</version>
   </parent>
   <groupId>org.mortbay.jasper</groupId>
   <artifactId>jasper-jsp</artifactId>
-  <version>9.0.112-SNAPSHOT</version>
+  <version>9.0.118-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Jetty :: Jasper :: Project</name>
 
@@ -160,13 +160,6 @@
         </executions>
       </plugin>
     </plugins>
-    <extensions>
-      <extension>
-        <groupId>eu.maveniverse.maven.njord</groupId>
-        <artifactId>extension3</artifactId>
-        <version>0.8.2</version>
-      </extension>
-    </extensions>
   </build>
 
 </project>
