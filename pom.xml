@@ -86,7 +86,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <njord.autoPublish>true</njord.autoPublish>
-    <tomcat.version>10.1.56</tomcat.version>
+    <tomcat.version>10.1.59</tomcat.version>
   </properties>
 
   <build>
