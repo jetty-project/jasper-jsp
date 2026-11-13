@@ -56,21 +56,17 @@ pipeline {
  * @return the Jenkinsfile step representing a maven build
  */
 def mavenBuild(jdk, cmdline) {
-  def mvnName = 'maven3'
-  def localRepo = "${env.JENKINS_HOME}/${env.EXECUTOR_NUMBER}" // ".repository" //
-  def settingsName = 'oss-deploy'
-  def mavenOpts = '-Xms2g -Xmx2g -Djava.awt.headless=true'
-
-  withMaven(
-          maven: mvnName,
-          jdk: "$jdk",
-          publisherStrategy: 'EXPLICIT',
-          globalMavenSettingsConfig: settingsName,
-          options: [junitPublisher(disabled: false)],
-          mavenOpts: mavenOpts,
-          mavenLocalRepo: localRepo) {
-    // Some common Maven command line + provided command line
-    sh "mvn -V -B -DfailIfNoTests=false -Dmaven.test.failure.ignore=true -T2 -Djetty.testtracker.log=true -e $cmdline"
+  def localRepo = "${env.JENKINS_HOME}/${env.EXECUTOR_NUMBER}"
+  withEnv(["JAVA_HOME=${ tool "$jdk" }",
+           "PATH+MAVEN=${ tool "$jdk" }/bin:${ tool 'maven3' }/bin",
+           "MAVEN_OPTS=-Xms2g -Xmx2g -Djava.awt.headless=true"]) {
+    configFileProvider([configFile(fileId: 'oss-deploy', variable: 'GLOBAL_MVN_SETTINGS')]) {
+      try {
+        sh "mvn -s $GLOBAL_MVN_SETTINGS -Dmaven.repo.local=$localRepo -V -B -DfailIfNoTests=false -Dmaven.test.failure.ignore=true -T2 -Djetty.testtracker.log=true -e $cmdline"
+      } finally {
+        junit testResults: '**/target/surefire-reports/TEST-*.xml', allowEmptyResults: true
+      }
+    }
   }
 }
 
