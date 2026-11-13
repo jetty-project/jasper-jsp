@@ -18,6 +18,7 @@ Branches
 
 | Branch                                                                            | Jakarta EE | Apache Jasper Version | Apache EL Version |
 |-----------------------------------------------------------------------------------|------------|-----------------------|-------------------|
+| [`apache-12.0.x`](https://github.com/jetty-project/jasper-jsp/tree/apache-12.0.x) | EE12       | 12.0.x                | 12.0.x            |
 | [`apache-11.0.x`](https://github.com/jetty-project/jasper-jsp/tree/apache-11.0.x) | EE11       | 11.0.x                | 11.0.x            |
 | [`apache-10.1.x`](https://github.com/jetty-project/jasper-jsp/tree/apache-10.1.x) | EE10       | 10.1.x                | 10.1.x            |
 | [`apache-10.0.x`](https://github.com/jetty-project/jasper-jsp/tree/apache-10.0.x) | EE9        | 10.0.x                | 10.0.x            |

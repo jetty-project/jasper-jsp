@@ -10,7 +10,7 @@
   </parent>
   <groupId>org.mortbay.jasper</groupId>
   <artifactId>jasper-jsp</artifactId>
-  <version>11.0.24-SNAPSHOT</version>
+  <version>12.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Jetty :: Jasper :: Project</name>
 
@@ -57,7 +57,7 @@
   <scm>
     <connection>scm:git:git://github.com/jetty-project/jasper-jsp.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/jetty-project/jasper-jsp.git</developerConnection>
-    <tag>apache-11.0.x</tag>
+    <tag>apache-12.0.x</tag>
     <url>https://github.com/jetty-project/jasper-jsp</url>
   </scm>
 
@@ -78,16 +78,44 @@
   </distributionManagement>
 
   <properties>
-    <ecj.version>3.46.0</ecj.version>
-    <jakarta.el.api.version>6.0.1</jakarta.el.api.version>
-    <jakarta.servlet.api.version>6.1.0</jakarta.servlet.api.version>
-    <jakarta.servlet.jsp.api.version>4.0.0</jakarta.servlet.jsp.api.version>
+    <ecj.version>3.46.100</ecj.version>
+    <jakarta.el.api.version>6.1.0-M2</jakarta.el.api.version>
+    <jakarta.servlet.api.version>6.2.0-M2</jakarta.servlet.api.version>
+    <jakarta.servlet.jsp.api.version>4.1.0-M2</jakarta.servlet.jsp.api.version>
     <maven.compiler.release>17</maven.compiler.release>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <njord.autoPublish>true</njord.autoPublish>
-    <tomcat.version>11.0.23</tomcat.version>
+    <tomcat.version>12.0.0-M1-SNAPSHOT</tomcat.version>
   </properties>
+
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>apache-snapshots</id>
+      <name>Apache Snapshots</name>
+      <url>https://repository.apache.org/content/groups/snapshots/</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>apache-snapshots</id>
+      <name>Apache Snapshots</name>
+      <url>https://repository.apache.org/content/groups/snapshots/</url>
+    </pluginRepository>
+  </pluginRepositories>
 
   <build>
     <defaultGoal>install</defaultGoal>
