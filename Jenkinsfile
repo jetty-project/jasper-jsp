@@ -11,27 +11,21 @@ pipeline {
     stages {
         stage( "Parallel Stage" ) {
             parallel {
-                stage( "Build / Test - JDK17" ) {
+                stage( "Build / Test - JDK25" ) {
                     agent { node { label 'linux-light' } }
                     options { timeout( time: 120, unit: 'MINUTES' ) }
                     steps {
-                        mavenBuild( "jdk17", "clean install -Peclipse-release -Dgpg.skip" )
+                        mavenBuild( "jdk25", "clean install -Peclipse-release -Dgpg.skip" )
                         warnings consoleParsers: [[parserName: 'Maven'], [parserName: 'Java']]
                         script {
-                            if (env.BRANCH_NAME == 'apache-11.0.x' ||
+                            if (env.BRANCH_NAME == 'apache-12.0.x' ||
+                                env.BRANCH_NAME == 'apache-11.0.x' ||
                                 env.BRANCH_NAME == 'apache-10.0.x' ||
                                 env.BRANCH_NAME == 'apache-10.1.x' ||
                                 env.BRANCH_NAME == 'apache-9') {
-                                mavenBuild( "jdk17", "deploy" )
+                                mavenBuild( "jdk25", "deploy" )
                             }
                         }
-                    }
-                }
-                stage( "Build / Test - JDK21" ) {
-                    agent { node { label 'linux-light' } }
-                    options { timeout( time: 120, unit: 'MINUTES' ) }
-                    steps {
-                        mavenBuild( "jdk21", "clean install -Peclipse-release -Dgpg.skip" )
                     }
                 }
             }
