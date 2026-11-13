@@ -16,7 +16,7 @@ pipeline {
                     options { timeout( time: 120, unit: 'MINUTES' ) }
                     steps {
                         mavenBuild( "jdk17", "clean install -Peclipse-release -Dgpg.skip" )
-                        warnings consoleParsers: [[parserName: 'Maven'], [parserName: 'Java']]
+                        recordIssues id: "jdk17", name: "Static Analysis jdk17", aggregatingResults: true, enabledForFailure: true, tools: [mavenConsole(), java()]
                         script {
                             if (env.BRANCH_NAME == 'apache-11.0.x' ||
                                 env.BRANCH_NAME == 'apache-10.0.x' ||
