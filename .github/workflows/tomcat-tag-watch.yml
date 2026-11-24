@@ -37,7 +37,7 @@ jobs:
           - { branch: apache-12.0.x, line: '12.0', allow_pre: 'true'  }
     steps:
       - name: Checkout ${{ matrix.branch }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ matrix.branch }}
           fetch-depth: 0
@@ -47,7 +47,7 @@ jobs:
           token: ${{ secrets.TOMCAT_BUMP_TOKEN || github.token }}
 
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
