@@ -9,7 +9,7 @@
   </parent>
   <groupId>org.mortbay.jasper</groupId>
   <artifactId>jasper-jsp</artifactId>
-  <version>9.0.120-SNAPSHOT</version>
+  <version>9.0.124-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Jetty :: Jasper :: Project</name>
 
@@ -69,7 +69,7 @@
     <ecj.version>3.33.0</ecj.version>
     <jdk.version>11</jdk.version>
     <njord.autoPublish>true</njord.autoPublish>
-    <tomcat.version>9.0.119</tomcat.version>
+    <tomcat.version>9.0.124</tomcat.version>
   </properties>
 
   <build>
