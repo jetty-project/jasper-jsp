@@ -1,0 +1,134 @@
+name: Tomcat tag watch
+
+# Watches apache/tomcat git tags and, when a line has a newer Tomcat release than
+# the branch currently pins, opens (or updates) a PR that bumps <tomcat.version>
+# and the project version to <tag>-SNAPSHOT across all modules.
+#
+# NOTE: schedule/workflow_dispatch only run from the repository default branch
+# (apache-11.0.x). This single workflow fans out to every line via the matrix
+# below by checking out each branch in its own job.
+
+on:
+  schedule:
+    - cron: '27 6 * * *'   # daily, 06:27 UTC
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Limit the run to a single branch (blank = all branches)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    name: ${{ matrix.branch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { branch: apache-9,      line: '9.0',  allow_pre: 'false' }
+          - { branch: apache-10.0.x, line: '10.0', allow_pre: 'false' }
+          - { branch: apache-10.1.x, line: '10.1', allow_pre: 'false' }
+          - { branch: apache-11.0.x, line: '11.0', allow_pre: 'false' }
+          - { branch: apache-12.0.x, line: '12.0', allow_pre: 'true'  }
+    steps:
+      - name: Checkout ${{ matrix.branch }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+          fetch-depth: 0
+          # A PAT (repo scope) lets the opened PR trigger the GitHub Actions CI
+          # (maven.yml). Falls back to GITHUB_TOKEN, in which case the real build
+          # is Jenkins (multibranch Jenkinsfile), which runs regardless.
+          token: ${{ secrets.TOMCAT_BUMP_TOKEN || github.token }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Detect newest Tomcat tag for ${{ matrix.line }}
+        id: detect
+        env:
+          LINE: ${{ matrix.line }}
+          ALLOW_PRE: ${{ matrix.allow_pre }}
+          ONLY_BRANCH: ${{ github.event.inputs.branch }}
+          THIS_BRANCH: ${{ matrix.branch }}
+        run: |
+          set -euo pipefail
+
+          if [ -n "${ONLY_BRANCH}" ] && [ "${ONLY_BRANCH}" != "${THIS_BRANCH}" ]; then
+            echo "Skipping ${THIS_BRANCH}: run limited to ${ONLY_BRANCH}."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Newest matching tag on apache/tomcat (no clone, no auth needed).
+          tags=$(git ls-remote --tags --refs https://github.com/apache/tomcat.git \
+                   "refs/tags/${LINE}.*" | sed 's#.*refs/tags/##')
+          if [ "${ALLOW_PRE}" != "true" ]; then
+            # Stable only: drop -M / -RC / alpha / beta suffixes.
+            tags=$(printf '%s\n' "$tags" | grep -E "^${LINE}\.[0-9]+$" || true)
+          fi
+          latest=$(printf '%s\n' "$tags" | grep -v '^$' | sort -V | tail -n1 || true)
+
+          if [ -z "${latest}" ]; then
+            echo "No matching Tomcat tag found for line ${LINE}; nothing to do."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          current=$(grep -oPm1 '(?<=<tomcat.version>)[^<]+' pom.xml | sed 's/-SNAPSHOT$//')
+          echo "current tomcat.version = ${current}"
+          echo "latest tomcat tag      = ${latest}"
+
+          # Act only if latest is strictly newer than current.
+          newest=$(printf '%s\n%s\n' "${current}" "${latest}" | sort -V | tail -n1)
+          if [ "${latest}" != "${current}" ] && [ "${newest}" = "${latest}" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "latest=${latest}" >> "$GITHUB_OUTPUT"
+            echo "A newer Tomcat release is available: ${current} -> ${latest}"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Already up to date (current ${current}, latest ${latest})."
+          fi
+
+      - name: Bump tomcat.version and project version
+        if: steps.detect.outputs.changed == 'true'
+        env:
+          LATEST: ${{ steps.detect.outputs.latest }}
+        run: |
+          set -euo pipefail
+          mvn -B -q -N versions:set-property \
+            -Dproperty=tomcat.version -DnewVersion="${LATEST}" -DgenerateBackupPoms=false
+          mvn -B -q versions:set \
+            -DnewVersion="${LATEST}-SNAPSHOT" -DprocessAllModules=true -DgenerateBackupPoms=false
+          echo "Changed files:"
+          git --no-pager diff --name-only
+
+      - name: Open / update pull request
+        if: steps.detect.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.TOMCAT_BUMP_TOKEN || github.token }}
+          base: ${{ matrix.branch }}
+          branch: tomcat-update/${{ matrix.branch }}/${{ steps.detect.outputs.latest }}
+          commit-message: Upgrade to ${{ steps.detect.outputs.latest }}
+          title: Upgrade to ${{ steps.detect.outputs.latest }}
+          labels: dependencies
+          assignees: joakime,olamy
+          delete-branch: true
+          body: |
+            Apache Tomcat [${{ steps.detect.outputs.latest }}](https://github.com/apache/tomcat/releases/tag/${{ steps.detect.outputs.latest }})
+            is available for the `${{ matrix.line }}.x` line.
+
+            This PR bumps `tomcat.version` to `${{ steps.detect.outputs.latest }}` and sets
+            the project version to `${{ steps.detect.outputs.latest }}-SNAPSHOT` across all
+            modules, targeting the `${{ matrix.branch }}` branch.
+
+            Opened automatically by the `Tomcat tag watch` workflow.
