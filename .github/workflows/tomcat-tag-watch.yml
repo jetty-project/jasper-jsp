@@ -37,7 +37,7 @@ jobs:
           - { branch: apache-12.0.x, line: '12.0', allow_pre: 'true'  }
     steps:
       - name: Checkout ${{ matrix.branch }}
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           ref: ${{ matrix.branch }}
           fetch-depth: 0
