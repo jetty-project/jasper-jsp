@@ -113,7 +113,7 @@ jobs:
 
       - name: Open / update pull request
         if: steps.detect.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.TOMCAT_BUMP_TOKEN || github.token }}
           base: ${{ matrix.branch }}
